@@ -1,0 +1,144 @@
+﻿<UserControl x:Class="Shuriken.Views.UIEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Shuriken.Views"
+             xmlns:controls="clr-namespace:Shuriken.Controls"
+             xmlns:models="clr-namespace:Shuriken.Models"
+             xmlns:animation="clr-namespace:Shuriken.Models.Animation"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:gl="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
+             xmlns:viewmodels="clr-namespace:Shuriken.ViewModels"
+             d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="1200">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+                <TreeView Name="ScenesTreeView" ItemsSource="{Binding Scenes, Mode=OneTime}"
+                          VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type models:UIScene}" ItemsSource="{Binding Groups}">
+                            <TextBlock Text="{Binding Name}"/>
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type models:UIGroup}" ItemsSource="{Binding Layers}">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type models:UILayer}">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="New Scene" HorizontalAlignment="Stretch" Margin="5" Style="{StaticResource ButtonPrimary}"/>
+                <Button Grid.Column="1" Content="Remove Scene" HorizontalAlignment="Stretch" Margin="0 5 5 5"/>
+            </Grid>
+        </Grid>
+
+        <GridSplitter Grid.Column="1" Width="5" ResizeBehavior="PreviousAndNext" Margin="2.5 0"/>
+        <GridSplitter Grid.Column="3" Width="5" ResizeBehavior="PreviousAndNext" Margin="2.5 0"/>
+
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <Border Width="1280" Height="720" RenderTransformOrigin="0.5, 0.5" BorderBrush="{StaticResource BorderBrush}" BorderThickness="2">
+                        <Border.LayoutTransform>
+                            <ScaleTransform ScaleX="{Binding SceneManager.Zoom}" ScaleY="{Binding SceneManager.Zoom}"/>
+                        </Border.LayoutTransform>
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="12" ShadowDepth="3" Direction="-45" Color="#333" Opacity="0.5"/>
+                        </Border.Effect>
+                        <gl:GLWpfControl Width="1280" Height="720" Name="glControl" Render="glControlRender" RenderTransformOrigin="0.5, 0.5">
+                        </gl:GLWpfControl>
+                    </Border>
+                </ScrollViewer>
+                <ToolBar Grid.Row="1" Padding="0 5 0 5">
+                    <StackPanel Orientation="Horizontal" Margin="5 0">
+                        <Button Command="{Binding SceneManager.ZoomOutCmd}">
+                            <Button.Content>
+                                <TextBlock Text="&#xf010;" FontFamily="{StaticResource FontAwesome}"/>
+                            </Button.Content>
+                        </Button>
+                        <Slider Value="{Binding SceneManager.Zoom, FallbackValue=1}" Minimum="{Binding SceneManager.MinZoom, FallbackValue=0.25}"
+                            Maximum="{Binding SceneManager.MaxZoom, FallbackValue=2.5}" Width="150" VerticalAlignment="Center"/>
+                        <Button Command="{Binding SceneManager.ZoomInCmd}">
+                            <Button.Content>
+                                <TextBlock Text="&#xf00e;" FontFamily="{StaticResource FontAwesome}"/>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+                    
+                    <TextBlock Text="{Binding SceneManager.Zoom, StringFormat={}{0:P2}, FallbackValue=100%}" VerticalAlignment="Center"/>
+                    <Separator Margin="5 0"/>
+                    <Button Command="{Binding SceneManager.TogglePlayingCmd}" Margin="0 0 3 0">
+                        <Button.Content>
+                            <TextBlock FontFamily="{StaticResource FontAwesome}">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Text" Value="&#xf04b;"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SceneManager.Playing}" Value="True">
+                                                <Setter Property="Text" Value="&#xf04c;"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Button.Content>
+                    </Button>
+                    <Button Command="{Binding SceneManager.StopPlayingCmd}" Margin="3 0">
+                        <Button.Content>
+                            <TextBlock Text="&#xf04d;" FontFamily="{StaticResource FontAwesome}"/>
+                        </Button.Content>
+                    </Button>
+                    <TextBlock Margin="5 0" VerticalAlignment="Center">
+                        <Run Text="Frame: "/>
+                        <Run Text="{Binding SceneManager.Time, StringFormat={}{0:0.}, FallbackValue=69}"/>
+                    </TextBlock>
+                </ToolBar>
+            </Grid>
+            <Grid Grid.Row="1">
+                <ListBox ItemsSource="{Binding ElementName=ScenesTreeView, Path=SelectedItem.Animations}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type animation:AnimationGroup}">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding Enabled}" Margin="0 0 5 0"/>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Grid>
+        <hc:PropertyGrid Grid.Column="4" SelectedObject="{Binding ElementName=ScenesTreeView, Path=SelectedItem}"/>
+    </Grid>
+</UserControl>

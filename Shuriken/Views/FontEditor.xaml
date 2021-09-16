@@ -1,0 +1,73 @@
+﻿<UserControl x:Class="Shuriken.Views.FontEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Shuriken.Views"
+             xmlns:models="clr-namespace:Shuriken.Models"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        <GroupBox Header="Fonts">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <ListBox Grid.Row="0" Grid.ColumnSpan="2" Name="FontsView" ItemsSource="{Binding UIFonts}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:UIFont}">
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button Content="Add Font" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" Style="{StaticResource ButtonPrimary}" Margin="5"/>
+                <Button Content="Remove Font" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Properties" Grid.Column="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0">
+                    <TextBlock HorizontalAlignment="Left" Margin="5">Name</TextBlock>
+                    <TextBox Text="{Binding ElementName=FontsView, Path=SelectedItem.Name}"/>
+                    <TextBlock Text="Character Definitions" Margin="5 20 5 5"/>
+                </StackPanel>
+                <ListBox Grid.Row="1" ItemsSource="{Binding ElementName=FontsView, Path=SelectedItem.Mappings}" HorizontalContentAlignment="Stretch">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:CharacterMapping}">
+                            <Grid HorizontalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Character" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Text="{Binding Character}" HorizontalAlignment="Stretch"/>
+                                <TextBlock Grid.Column="2" Text="Sprite Index" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="3" Text="{Binding SpriteIndex}" HorizontalAlignment="Stretch"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                    <Button Content="New Definition" Margin="5" Style="{StaticResource ButtonPrimary}"/>
+                    <Button Content="Remove Definition" Margin="5"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>
