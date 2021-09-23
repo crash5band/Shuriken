@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Shuriken.Views"
              xmlns:models="clr-namespace:Shuriken.Models"
-             mc:Ignorable="d" 
+             xmlns:vm="clr-namespace:Shuriken.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type={x:Type vm:MainViewModel}}"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -22,7 +24,7 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <ListBox Grid.Row="0" Grid.ColumnSpan="2" Name="FontsView" ItemsSource="{Binding UIFonts}">
+                <ListBox Grid.Row="0" Grid.ColumnSpan="2" Name="FontsView" ItemsSource="{Binding SelectedProject.Fonts}">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type models:UIFont}">
                             <TextBlock Text="{Binding Name}"/>
@@ -43,27 +45,38 @@
                 <StackPanel Grid.Row="0">
                     <TextBlock HorizontalAlignment="Left" Margin="5">Name</TextBlock>
                     <TextBox Text="{Binding ElementName=FontsView, Path=SelectedItem.Name}"/>
-                    <TextBlock Text="Character Definitions" Margin="5 20 5 5"/>
                 </StackPanel>
-                <ListBox Grid.Row="1" ItemsSource="{Binding ElementName=FontsView, Path=SelectedItem.Mappings}" HorizontalContentAlignment="Stretch">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type models:CharacterMapping}">
-                            <Grid HorizontalAlignment="Stretch">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Character" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1" Text="{Binding Character}" HorizontalAlignment="Stretch"/>
-                                <TextBlock Grid.Column="2" Text="Sprite Index" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="3" Text="{Binding SpriteIndex}" HorizontalAlignment="Stretch"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Character Definitions" Margin="5"/>
+                    <ListBox Grid.Row="2" ItemsSource="{Binding ElementName=FontsView, Path=SelectedItem.Mappings}" HorizontalContentAlignment="Stretch">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type models:CharacterMapping}">
+                                <StackPanel>
+                                    <Grid HorizontalAlignment="Stretch" Margin="1 2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Character}" VerticalAlignment="Center"/>
+                                        <Image Grid.Column="1" Source="{Binding Sprite.Image}" Width="30" Height="30"/>
+                                        <Button Grid.Column="2">
+                                            <Button.Content>
+                                                <TextBlock Text="&#xf044;" FontFamily="{StaticResource FontAwesome}"/>
+                                            </Button.Content>
+                                        </Button>
+                                    </Grid>
+                                    <Separator/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+                <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                     <Button Content="New Definition" Margin="5" Style="{StaticResource ButtonPrimary}"/>
                     <Button Content="Remove Definition" Margin="5"/>
                 </StackPanel>

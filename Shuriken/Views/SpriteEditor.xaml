@@ -19,42 +19,85 @@
         <GroupBox Header="Sprite Treeview">
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-                <TreeView Grid.Row="0" Name="ScenesTreeView" ItemsSource="{Binding Scenes}"
-                          VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
-                    <TreeView.Resources>
-                        <HierarchicalDataTemplate DataType="{x:Type models:UIScene}" ItemsSource="{Binding Sprites}">
-                            <TextBlock Text="{Binding Name}"/>
-                        </HierarchicalDataTemplate>
+                <StackPanel>
+                    <TextBlock Text="Texture List" Padding="5 0"/>
+                    <ComboBox Margin="0 5" Name="TextureListSelect" ItemsSource="{Binding SelectedProject.TextureLists}"
+                              SelectedItem="{Binding SelectedTexList}" DisplayMemberPath="Name"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1">
+                    <TextBlock Text="Texture" Padding="5 0"/>
+                    <ComboBox Margin="0 5" Name="TextureSelect" ItemsSource="{Binding SelectedTexList.Textures}"
+                              SelectedItem="{Binding SelectedTexture}" DisplayMemberPath="Name"/>
+                    <TextBlock Text="Sprites" Padding="5 0"/>
+                </StackPanel>
+                <ListBox Margin="0 5" Grid.Row="2" Name="ScenesTreeView" ItemsSource="{Binding SelectedTexture.Sprites}">
+                    <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type viewmodels:SpriteViewModel}">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="{Binding Image}" Width="32" Height="32" Margin="0 0 5 0" VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding Texture.Name}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </DataTemplate>
-                    </TreeView.Resources>
-                </TreeView>
-                <Grid Grid.Row="1">
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0" Content="New Sprite" HorizontalAlignment="Stretch" Margin="5" Style="{StaticResource ButtonPrimary}"
-                            Command="{Binding CreateSpriteCmd}"/>
+                            />
                     <Button Grid.Column="1" Content="Remove Sprite" HorizontalAlignment="Stretch" Margin="0 5 5 5"/>
                 </Grid>
             </Grid>
         </GroupBox>
         <GroupBox Header="Sprite Properties" Grid.Column="1">
-            <ContentControl Grid.Column="1" Content="{Binding ElementName=ScenesTreeView, Path=SelectedItem}">
+            <ContentControl Content="{Binding ElementName=ScenesTreeView, Path=SelectedItem}">
                 <ContentControl.Resources>
                     <DataTemplate DataType="{x:Type viewmodels:SpriteViewModel}">
-                        <controls:SpriteControl/>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*"/>
+                                <RowDefinition Height="1*"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0" BorderBrush="{StaticResource SecondaryBorderBrush}" BorderThickness="1" CornerRadius="2" Margin="5">
+                                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                                    <controls:TextureAtlasControl x:Name="TexView" Background="{StaticResource SecondaryRegionBrush}"/>
+                                </ScrollViewer>
+                            </Border>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <Slider Value="{Binding ElementName=TexView, Path=Zoom}" HorizontalAlignment="Stretch"/>
+                                    <Button Content="Change Texture" HorizontalAlignment="Stretch"/>
+                                    <TextBlock>
+                                        <Run Text="Name: "/>
+                                        <Run Text="{Binding Texture.Name, Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <TextBlock>
+                                        <Run Text="Width:"/>
+                                        <Run Text="{Binding Texture.Width, Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <TextBlock>
+                                        <Run Text="Height:"/>
+                                        <Run Text="{Binding Texture.Height, Mode=OneWay}"/>
+                                    </TextBlock>
+                                </StackPanel>
+                                <controls:SpriteControl Grid.Column="1" Margin="5"/>
+                            </Grid>
+                        </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type models:UIScene}">
-                        <TextBlock Text="Select a sprite from the tree view to view its properties" Margin="5"/>
+                        <TextBlock Text="Select a sprite from the tree view to view its properties"/>
                     </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>

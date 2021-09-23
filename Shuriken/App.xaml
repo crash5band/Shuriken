@@ -18,6 +18,13 @@
             <Style TargetType="{x:Type GridSplitter}">
                 <Setter Property="Background" Value="{StaticResource BorderBrush}"/>
             </Style>
+            <Style x:Key="TransparentButton" TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonBaseStyle}">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+            </Style>
+            <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource TabItemStyle}">
+                <Setter Property="Padding" Value="1 5"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

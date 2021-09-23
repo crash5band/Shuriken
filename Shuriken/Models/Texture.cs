@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using AmicitiaLibrary.Graphics.DDS;
 using Shuriken.Converters;
+using Shuriken.ViewModels;
 using OpenTK.Graphics.OpenGL;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -22,8 +24,10 @@ namespace Shuriken.Models
         public string Name { get; }
         public int Width { get; }
         public int Height { get; }
-        public BitmapSource ImageSource { get; set; }
+        public BitmapSource ImageSource { get; private set; }
         private System.Drawing.Bitmap bitmap;
+
+        public ObservableCollection<SpriteViewModel> Sprites { get; set; }
         
         private void CreateGLTexture()
         {
@@ -76,6 +80,7 @@ namespace Shuriken.Models
             ImageSource = BitmapConverter.Bitmap2BitmapImage(bitmap);
             Width = ImageSource.PixelWidth;
             Height = ImageSource.PixelHeight;
+            Sprites = new ObservableCollection<SpriteViewModel>();
 
             CreateGLTexture();
         }
@@ -86,6 +91,7 @@ namespace Shuriken.Models
             Width = 0;
             Height = 0;
             ImageSource = null;
+            Sprites = new ObservableCollection<SpriteViewModel>();
         }
     }
 }

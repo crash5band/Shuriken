@@ -24,7 +24,7 @@ namespace Shuriken.Models
         public uint Field00 { get; set; }
 
         [Category("Layer")]
-        public uint DrawType { get; set; }
+        public DrawType Type { get; set; }
 
         [Category("Layer")]
         public bool IsEnabled { get; set; }
@@ -76,7 +76,6 @@ namespace Shuriken.Models
             {
                 translation = value;
                 NotifyPropertyChanged();
-                NotifyPropertyChanged("Position");
             }
         }
 
@@ -108,7 +107,7 @@ namespace Shuriken.Models
         public uint InfoField38 { get; set; }
 
         [Category("Sprite")]
-        public int[] SubImageIndices { get; set; }
+        public SpriteViewModel[] Sprites { get; set; }
 
         [Browsable(false)]
         public bool Visible
@@ -121,50 +120,6 @@ namespace Shuriken.Models
             }
         }
 
-        [Browsable(false)]
-        public Vector2 OffsetPosition
-        {
-            get
-            {
-                Vector2 result = new Vector2();
-                UILayer current = this;
-                while (current.Parent != null)
-                {
-                    result += current.Parent.Offset;
-                    current = current.Parent;
-                }
-
-                return result;
-            }
-        }
-
-        [Browsable(false)]
-        public Vector2 Position
-        {
-            get
-            {
-                Vector2 result = Translation;
-                if (Parent != null)
-                {
-                    result += OffsetPosition;
-                }
-
-                return result;
-            }
-        }
-
-        [Browsable(false)]
-        public float WidthOffset
-        {
-            get => Width / 2;
-        }
-
-        [Browsable(false)]
-        public float HeightOffset
-        {
-            get => Height / 2;
-        }
-
         public UILayer Parent { get; set; }
 
         [Browsable(false)]
@@ -174,7 +129,7 @@ namespace Shuriken.Models
         {
             Name = name;
             Field00 = cast.Field00;
-            DrawType = cast.Field04;
+            Type = (DrawType)cast.Field04;
             IsEnabled = cast.IsEnabled != 0;
             Visible = true;
             Children = new ObservableCollection<UILayer>();
@@ -220,7 +175,7 @@ namespace Shuriken.Models
             InfoField34 = cast.CastInfoData.Field34;
             InfoField38 = cast.CastInfoData.Field38;
 
-            SubImageIndices = cast.CastMaterialData.SubImageIndices;
+            Sprites = new SpriteViewModel[32];
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

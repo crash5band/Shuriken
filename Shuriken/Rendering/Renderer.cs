@@ -75,7 +75,7 @@ namespace Shuriken.Rendering
 
         private void Init()
         {
-            const int stride = 4 * 10;
+            const int stride = 10 * sizeof(float);
 
             GL.GenVertexArrays(1, out vao);
             GL.BindVertexArray(vao);
@@ -91,15 +91,15 @@ namespace Shuriken.Rendering
 
             // position
             GL.EnableVertexAttribArray(0);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 10 * sizeof(float), 0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride, 0);
 
             // color
             GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 10 * sizeof(float), 4 * sizeof(float));
+            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, stride, 4 * sizeof(float));
 
             // uv
             GL.EnableVertexAttribArray(2);
-            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 10 * sizeof(float), 8 * sizeof(float));
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, stride, 8 * sizeof(float));
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindVertexArray(0);
@@ -169,8 +169,9 @@ namespace Shuriken.Rendering
             return uvCoords;
         }
 
-        public void DrawLayerSprite(UIScene scene, UILayer layer)
+        public void DrawLayerSprite(UIScene scene, UILayer layer, float time)
         {
+            /*
             if (layer.SubImageIndices[0] == -1 || layer.SubImageIndices[0] > scene.Sprites.Count)
                 return;
 
@@ -196,18 +197,20 @@ namespace Shuriken.Rendering
             UILayer current = layer;
             foreach (var anim in scene.Animations)
             {
-                float time = anim.Time;
-                if (anim.LayerHasAnimation(current, AnimationType.SubImage) && anim.Enabled)
+                foreach (var layerAnimList in anim.LayerAnimations)
                 {
-                    AnimationTrack a = anim.GetAnimation(current, AnimationType.SubImage);
-                    int value = (int)a.GetValue(time);
-                    if (value >= 0 && value < layer.SubImageIndices.Length)
+                    AnimationTrack a = layerAnimList.GetTrack(AnimationType.SubImage);
+                    if (a != null && anim.Enabled)
                     {
-                        int index = layer.SubImageIndices[value];
-                        if (index >= 0 && index < scene.Sprites.Count)
+                        int value = (int)a.GetValue(time);
+                        if (value >= 0 && value < layer.SubImageIndices.Length)
                         {
-                            spriteIndex = index;
-                            spr = scene.Sprites[spriteIndex].Sprite;
+                            int index = layer.SubImageIndices[value];
+                            if (index >= 0 && index < scene.Sprites.Count)
+                            {
+                                spriteIndex = index;
+                                spr = scene.Sprites[spriteIndex].Sprite;
+                            }
                         }
                     }
                 }
@@ -223,58 +226,75 @@ namespace Shuriken.Rendering
                 bool hasCol = false;
                 foreach (var anim in scene.Animations)
                 {
-                    float time = anim.Time;
-                    if (anim.LayerHasAnimation(current, AnimationType.XPosition) && anim.Enabled)
+                    AnimationTrack a = anim.GetTrack(current, AnimationType.XPosition);
+                    if (a != null)
                     {
-                        AnimationTrack a = anim.GetAnimation(current, AnimationType.XPosition);
-                        hasTx = true;
-                        resultTranslate.X += a.GetValue(time);
+                        if (anim.Enabled)
+                        {
+                            hasTx = true;
+                            resultTranslate.X += a.GetValue(time);
+                        }
                     }
 
-                    if (anim.LayerHasAnimation(current, AnimationType.YPosition) && anim.Enabled)
+                    a = anim.GetTrack(current, AnimationType.YPosition);
+                    if (a != null)
                     {
-                        AnimationTrack a = anim.GetAnimation(current, AnimationType.YPosition);
-                        hasTy = true;
-                        resultTranslate.Y += a.GetValue(time);
+                        if (anim.Enabled)
+                        {
+                            hasTy = true;
+                            resultTranslate.Y += a.GetValue(time);
+                        }
                     }
 
-                    if (anim.LayerHasAnimation(current, AnimationType.Rotation) && anim.Enabled)
+                    a = anim.GetTrack(current, AnimationType.Rotation);
+                    if (a != null)
                     {
-                        AnimationTrack a = anim.GetAnimation(current, AnimationType.Rotation);
-                        hasRot = true;
-                        resultRotation += a.GetValue(time);
+                        if (anim.Enabled)
+                        {
+                            hasRot = true;
+                            resultRotation += a.GetValue(time);
+                        }
                     }
 
-                    if (anim.LayerHasAnimation(current, AnimationType.XScale) && anim.Enabled)
+                    a = anim.GetTrack(current, AnimationType.XScale);
+                    if (a != null)
                     {
-                        AnimationTrack a = anim.GetAnimation(current, AnimationType.XScale);
-                        hasSx = true;
-                        resultScale.X *= a.GetValue(time);
+                        if (anim.Enabled)
+                        {
+                            hasSx = true;
+                            resultScale.X *= a.GetValue(time);
+                        }
                     }
 
-                    if (anim.LayerHasAnimation(current, AnimationType.YScale) && anim.Enabled)
+                    a = anim.GetTrack(current, AnimationType.YScale);
+                    if (a != null)
                     {
-                        AnimationTrack a = anim.GetAnimation(current, AnimationType.YScale);
-                        hasSy = true;
-                        resultScale.Y *= a.GetValue(time);
+                        if (anim.Enabled)
+                        {
+                            hasSy = true;
+                            resultScale.Y *= a.GetValue(time);
+                        }
                     }
 
-                    if (anim.LayerHasAnimation(current, AnimationType.Color) && anim.Enabled)
-                    {   
-                        AnimationTrack a = anim.GetAnimation(current, AnimationType.Color);
-                        hasCol = true;
-                        float val = a.GetValue(time);
+                    a = anim.GetTrack(current, AnimationType.Color);
+                    if (a != null)
+                    {
+                        if (anim.Enabled)
+                        {
+                            hasCol = true;
+                            float val = a.GetValue(time);
 
-                        Color c = new Color();
-                        byte[] bytes = BitConverter.GetBytes(val);
+                            Color c = new Color();
+                            byte[] bytes = BitConverter.GetBytes(val);
 
-                        c.R = bytes[3];
-                        c.G = bytes[2];
-                        c.B = bytes[1];
-                        c.A = bytes[0];
+                            c.R = bytes[3];
+                            c.G = bytes[2];
+                            c.B = bytes[1];
+                            c.A = bytes[0];
 
-                        Vector4 v = resultColor.ToFloats() * c.ToFloats();
-                        resultColor = new Color(v.X, v.Y, v.Z, v.W);
+                            Vector4 v = resultColor.ToFloats() * c.ToFloats();
+                            resultColor = new Color(v.X, v.Y, v.Z, v.W);
+                        }
                     }
                 }
 
@@ -313,6 +333,7 @@ namespace Shuriken.Rendering
             float up = diff * RenderHeight * resultScale.Y;
             pivot.Y -= up / 2.0f;
 
+            /*
             if (layer.Parent != null)
             {
                 bool hasSx = false;
@@ -321,17 +342,16 @@ namespace Shuriken.Rendering
 
                 foreach (var anim in scene.Animations)
                 {
-                    float time = anim.Time;
-                    if (anim.LayerHasAnimation(layer.Parent, AnimationType.XScale) && anim.Enabled)
+                    AnimationTrack a = anim.GetTrack(layer.Parent, AnimationType.XScale);
+                    if (a != null && anim.Enabled)
                     {
-                        AnimationTrack a = anim.GetAnimation(layer.Parent, AnimationType.XScale);
                         hasSx = true;
                         parentScale.X *= a.GetValue(time);
                     }
 
-                    if (anim.LayerHasAnimation(layer.Parent, AnimationType.YScale) && anim.Enabled)
+                    a = anim.GetTrack(layer.Parent, AnimationType.YScale);
+                    if (a != null && anim.Enabled)
                     {
-                        AnimationTrack a = anim.GetAnimation(layer.Parent, AnimationType.YScale);
                         hasSy = true;
                         parentScale.Y *= a.GetValue(time);
                     }
@@ -352,17 +372,19 @@ namespace Shuriken.Rendering
                 resultTranslate.X += adjust.X;
                 resultTranslate.Y += adjust.Y;
             }
+            
 
             // subtract half of the render dimensions to transform the point (0, 0) from the center to the top left corner
             float x = (resultTranslate.X * RenderWidth) - (RenderWidth / 2.0f);
             float y = (RenderHeight / 2.0f) - (resultTranslate.Y * RenderHeight);
 
             Matrix4 model = CreateModelMatrix(new Vector2(x, y), new Vector2(pivot.X, pivot.Y), resultRotation,
-                new Vector2(layer.Width * resultScale.X, layer.Height * resultScale.Y));
+                new Vector2(spr.Dimensions.X * resultScale.X, spr.Dimensions.Y * resultScale.Y));
 
             var uvCoords = GetUVCoords(spr, spr.Texture.Width, spr.Texture.Height, (layer.Field38 & 1024) != 0, (layer.Field38 & 2048) != 0);
             PushQuadBuffer(model, uvCoords, resultColor.ToFloats(), layer.GradientTopRight.ToFloats(), layer.GradientBottomRight.ToFloats(),
                 layer.GradientBottomLeft.ToFloats(), layer.GradientTopLeft.ToFloats());
+            */
         }
 
         public void PushQuadBuffer(Matrix4 model, Vector2[] uvCoords, Vector4 color, Vector4 colorTopRight, Vector4 colorBottomRight, Vector4 colorBottomLeft, Vector4 colorTopLeft)
@@ -392,8 +414,9 @@ namespace Shuriken.Rendering
             NumIndices += 6;
         }
 
-        public void DrawLayerFont(UIScene scene, IEnumerable<UIFont> fonts, UILayer layer)
+        public void DrawLayerFont(UIScene scene, IEnumerable<UIFont> fonts, UILayer layer, float time)
         {
+            /*
             if (string.IsNullOrEmpty(layer.FontName) || string.IsNullOrEmpty(layer.FontCharacters))
                 return;
 
@@ -444,16 +467,18 @@ namespace Shuriken.Rendering
                     {
                         if (anim.LayerHasAnimation(current, AnimationType.SubImage) && anim.Enabled)
                         {
-                            float time = anim.Time;
-                            AnimationTrack a = anim.GetAnimation(current, AnimationType.SubImage);
-                            int value = (int)a.GetValue(time);
-                            if (value >= 0 && value < layer.SubImageIndices.Length)
+                            AnimationTrack a = anim.GetTrack(current, AnimationType.SubImage);
+                            if (a != null)
                             {
-                                int index = layer.SubImageIndices[value];
-                                if (index >= 0 && index < scene.Sprites.Count)
+                                int value = (int)a.GetValue(time);
+                                if (value >= 0 && value < layer.SubImageIndices.Length)
                                 {
-                                    spriteIndex = index;
-                                    spr = scene.Sprites[spriteIndex].Sprite;
+                                    int index = layer.SubImageIndices[value];
+                                    if (index >= 0 && index < scene.Sprites.Count)
+                                    {
+                                        spriteIndex = index;
+                                        spr = scene.Sprites[spriteIndex].Sprite;
+                                    }
                                 }
                             }
                         }
@@ -466,42 +491,57 @@ namespace Shuriken.Rendering
                         bool hasRot = false;
                         bool hasSx = false;
                         bool hasSy = false;
+                        bool hasCol = false;
                         foreach (var anim in scene.Animations)
                         {
-                            float time = anim.Time;
-                            if (anim.LayerHasAnimation(current, AnimationType.XPosition) && anim.Enabled)
+                            AnimationTrack a = anim.GetTrack(current, AnimationType.XPosition);
+                            if (a != null)
                             {
-                                AnimationTrack a = anim.GetAnimation(current, AnimationType.XPosition);
-                                hasTx = true;
-                                resultTranslate.X += a.GetValue(time);
+                                if (anim.Enabled)
+                                {
+                                    hasTx = true;
+                                    resultTranslate.X += a.GetValue(time);
+                                }
                             }
 
-                            if (anim.LayerHasAnimation(current, AnimationType.YPosition) && anim.Enabled)
+                            a = anim.GetTrack(current, AnimationType.YPosition);
+                            if (a != null)
                             {
-                                AnimationTrack a = anim.GetAnimation(current, AnimationType.YPosition);
-                                hasTy = true;
-                                resultTranslate.Y += a.GetValue(time);
+                                if (anim.Enabled)
+                                {
+                                    hasTy = true;
+                                    resultTranslate.Y += a.GetValue(time);
+                                }
                             }
 
-                            if (anim.LayerHasAnimation(current, AnimationType.Rotation) && anim.Enabled)
+                            a = anim.GetTrack(current, AnimationType.Rotation);
+                            if (a != null)
                             {
-                                AnimationTrack a = anim.GetAnimation(current, AnimationType.Rotation);
-                                hasRot = true;
-                                resultRotation += a.GetValue(time);
+                                if (anim.Enabled)
+                                {
+                                    hasRot = true;
+                                    resultRotation += a.GetValue(time);
+                                }
                             }
 
-                            if (anim.LayerHasAnimation(current, AnimationType.XScale) && anim.Enabled)
+                            a = anim.GetTrack(current, AnimationType.XScale);
+                            if (a != null)
                             {
-                                AnimationTrack a = anim.GetAnimation(current, AnimationType.XScale);
-                                hasSx = true;
-                                resultScale.X *= a.GetValue(time);
+                                if (anim.Enabled)
+                                {
+                                    hasSx = true;
+                                    resultScale.X *= a.GetValue(time);
+                                }
                             }
 
-                            if (anim.LayerHasAnimation(current, AnimationType.YScale) && anim.Enabled)
+                            a = anim.GetTrack(current, AnimationType.YScale);
+                            if (a != null)
                             {
-                                AnimationTrack a = anim.GetAnimation(current, AnimationType.YScale);
-                                hasSy = true;
-                                resultScale.Y *= a.GetValue(time);
+                                if (anim.Enabled)
+                                {
+                                    hasSy = true;
+                                    resultScale.Y *= a.GetValue(time);
+                                }
                             }
                         }
 
@@ -540,7 +580,8 @@ namespace Shuriken.Rendering
 
                     xOffset += (spr.Dimensions.X / 2.0f * resultScale.X) - (Math.Abs(diffX) * spr.Dimensions.X / 2.0f * resultScale.X);
                 }
-            }  
+            }
+            */
         }
 
         public UIVector2 GetPivot(UILayer layer)
@@ -575,7 +616,7 @@ namespace Shuriken.Rendering
             return model;
         }
 
-        public void DrawScenes(IEnumerable<UIScene> scenes, IEnumerable<UIFont> fonts)
+        public void DrawScenes(IEnumerable<UIScene> scenes, IEnumerable<UIFont> fonts, float time)
         {
             var basicShader = shaderDictionary["basic"];
             ConfigureShader(basicShader);
@@ -595,17 +636,17 @@ namespace Shuriken.Rendering
                         if (!layer.Visible)
                             continue;
 
-                        if (layer.DrawType == 0)
+                        if (layer.Type == DrawType.None)
                             continue;
-                        else if (layer.DrawType == 1)
+                        else if (layer.Type == DrawType.Sprite)
                         {
                             // draw using sprites
-                            DrawLayerSprite(scene, layer);
+                            DrawLayerSprite(scene, layer, time);
                         }
-                        else if (layer.DrawType == 2)
+                        else if (layer.Type == DrawType.Font)
                         {
                             // draw using fonts
-                            DrawLayerFont(scene, fonts, layer);
+                            DrawLayerFont(scene, fonts, layer, time);
                         }
                     }
                 }

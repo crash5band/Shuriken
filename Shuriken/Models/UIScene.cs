@@ -8,6 +8,7 @@ using XNCPLib.XNCP;
 using System.ComponentModel;
 using Shuriken.ViewModels;
 using Shuriken.Models.Animation;
+using Shuriken.Misc;
 
 namespace Shuriken.Models
 {
@@ -41,13 +42,9 @@ namespace Shuriken.Models
         public ObservableCollection<UIGroup> Groups { get; set; }
 
         [Browsable(false)]
-        public ObservableCollection<SpriteViewModel> Sprites { get; set; }
-
-        [Browsable(false)]
         public ObservableCollection<AnimationGroup> Animations { get; set; }
 
-        public UIScene(Scene scene, string sceneName, List<CastDictionary> castDictionary, ObservableCollection<Texture> textures,
-            ObservableCollection<UIFont> fonts)
+        public UIScene(Scene scene, string sceneName, TextureList texList, IEnumerable<UIFont> fonts)
         {
             Name = sceneName;
             Field00 = scene.Field00;
@@ -57,14 +54,13 @@ namespace Shuriken.Models
             AspectRatio = scene.AspectRatio;
             AnimationFramerate = scene.AnimationFramerate;
             Data1 = new List<Vector2>();
-            Sprites = new ObservableCollection<SpriteViewModel>();
             Animations = new ObservableCollection<AnimationGroup>();
 
             Groups = new ObservableCollection<UIGroup>();
 
             CreateGroups(scene);
-            CreateSprites(scene, textures);
-            CreateLayers(scene, castDictionary);
+            //CreateSprites(scene);
+            CreateLayers(scene, scene.CastDictionaries, texList);
             CreateHierarchyTree(scene);
             CreateAnimations(scene);
         }
@@ -77,7 +73,6 @@ namespace Shuriken.Models
             AnimationFramerate = 60.0f;
             Groups = new ObservableCollection<UIGroup>();
             Data1 = new List<Vector2>();
-            Sprites = new ObservableCollection<SpriteViewModel>();
             Animations = new ObservableCollection<AnimationGroup>();
         }
 
@@ -92,6 +87,7 @@ namespace Shuriken.Models
             }
         }
 
+        /*
         private void CreateSprites(Scene scene, ObservableCollection<Texture> textures)
         {
             foreach (var sub in scene.SubImages)
@@ -102,14 +98,22 @@ namespace Shuriken.Models
                 }
             }
         }
+        */
 
-        private void CreateLayers(Scene scene, List<CastDictionary> castDictionary)
+        private void CreateLayers(Scene scene, List<CastDictionary> castDictionary, TextureList texList)
         {
             for (int g = 0; g < scene.GroupCount; ++g)
             {
                 for (int c = 0; c < scene.UICastGroups[g].CastCount; ++c)
                 {
+                    int[] castSprites = scene.UICastGroups[g].Casts[c].CastMaterialData.SubImageIndices;
                     UILayer layer = new UILayer(scene.UICastGroups[g].Casts[c], GetLayerName(g, c, castDictionary));
+
+                    for (int index = 0; index < layer.Sprites.Length; ++index)
+                    {
+                        layer.Sprites[index] = Utilities.FindSpriteFromNCPScene(castSprites[index], scene.SubImages, texList.Textures);
+                    }
+
                     Groups[g].Layers.Add(layer);
                 }
             }
@@ -155,7 +159,7 @@ namespace Shuriken.Models
                     for (int c = 0; c < keyframeData.GroupAnimationDataList[g].CastCount; ++c)
                     {
                         XNCPLib.XNCP.Animation.CastAnimationData castAnimData = keyframeData.GroupAnimationDataList[g].CastAnimationDataList[c];
-                        List<AnimationTrack> anims = new List<AnimationTrack>((int)XNCPLib.Utilities.Utilities.CountSetBits(castAnimData.Flags));
+                        List<AnimationTrack> tracks = new List<AnimationTrack>((int)XNCPLib.Utilities.Utilities.CountSetBits(castAnimData.Flags));
 
                         int castAnimDataIndex = 0;
                         for (int i = 0; i < 8; ++i)
@@ -169,19 +173,21 @@ namespace Shuriken.Models
                                     Field00 = castAnimData.SubDataList[castAnimDataIndex].Field00,
                                 };
 
-                                anim.Keyframes.Capacity = (int)castAnimData.SubDataList[castAnimDataIndex].KeyframeCount;
                                 foreach (var key in castAnimData.SubDataList[castAnimDataIndex].Keyframes)
                                 {
                                     anim.Keyframes.Add(new Keyframe(key));
                                 }
 
-                                anims.Add(anim);
+                                tracks.Add(anim);
                                 ++castAnimDataIndex;
                             }
                         }
 
-                        if (anims.Count > 0)
-                            group.LayerAnimations.Add(Groups[g].Layers[c], anims);
+                        if (tracks.Count > 0)
+                        {
+                            AnimationList layerAnimationList = new AnimationList(Groups[g].Layers[c], tracks);
+                            group.LayerAnimations.Add(layerAnimationList);
+                        }
                     }
                 }
 

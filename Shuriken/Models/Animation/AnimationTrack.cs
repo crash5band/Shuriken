@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -12,12 +13,13 @@ namespace Shuriken.Models.Animation
     {
         public uint Field00 { get; set; }
         public AnimationType Type { get; }
-        public List<Keyframe> Keyframes { get; set; }
+        public string TypeString => Type.ToString();
+        public ObservableCollection<Keyframe> Keyframes { get; set; }
 
         public AnimationTrack(AnimationType type)
         {
             Type = type;
-            Keyframes = new List<Keyframe>();
+            Keyframes = new ObservableCollection<Keyframe>();
         }
 
         public float GetValue(float frame)

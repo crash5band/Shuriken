@@ -5,43 +5,66 @@ using System.Text;
 using System.Threading.Tasks;
 using Shuriken.Models;
 using Shuriken.Commands;
+using Shuriken.Rendering;
 
 namespace Shuriken.ViewModels
 {
-    public class ScenesManagerViewModel : ViewModelBase
+    public class SceneViewer : ViewModelBase
     {
-        ScenesManager manager;
+        private Renderer renderer;
 
         public float MinZoom => 0.25f;
         public float MaxZoom => 2.50f;
-        private bool stopping;
 
+        private float time;
         public float Time
         {
-            get => manager.Time;
+            get => time;
             set
             {
-                manager.Time = value;
+                time = value;
                 NotifyPropertyChanged();
             }
         }
 
+        private bool playing;
         public bool Playing
         {
-            get => manager.Playing;
+            get => playing;
             set
             {
-                manager.Playing = value;
+                playing = value;
                 NotifyPropertyChanged();
             }
         }
 
+        private float playbackSpeed;
         public float PlaybackSpeed
         {
-            get => manager.Speed;
+            get => playbackSpeed;
             set
             {
-                manager.Speed = value;
+                playbackSpeed = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int RenderWidth
+        {
+            get => renderer.RenderWidth;
+            set
+            {
+                renderer.RenderWidth = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int RenderHeight
+        {
+            get => renderer.RenderHeight;
+            set
+            {
+                renderer.RenderHeight = value;
                 NotifyPropertyChanged();
             }
         }
@@ -60,7 +83,7 @@ namespace Shuriken.ViewModels
         private RelayCommand togglePlayingCmd;
         public RelayCommand TogglePlayingCmd
         {
-            get => togglePlayingCmd ?? new RelayCommand(TogglePlaying, null);
+            get => togglePlayingCmd ?? new RelayCommand(() => Playing ^= true, null);
             set
             {
                 togglePlayingCmd = value;
@@ -71,10 +94,32 @@ namespace Shuriken.ViewModels
         private RelayCommand stopPlayingCmd;
         public RelayCommand StopPlayingCmd
         {
-            get => stopPlayingCmd ?? new RelayCommand(StopPlaying, null);
+            get => stopPlayingCmd ?? new RelayCommand(Stop, null);
             set
             {
                 stopPlayingCmd = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private RelayCommand replayCmd;
+        public RelayCommand ReplayCmd
+        {
+            get => replayCmd ?? new RelayCommand(Replay, null);
+            set
+            {
+                replayCmd = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private RelayCommand<float> seekCmd;
+        public RelayCommand<float> SeekCmd
+        {
+            get => seekCmd ?? new RelayCommand<float>(Seek, () => !Playing);
+            set
+            {
+                seekCmd = value;
                 NotifyPropertyChanged();
             }
         }
@@ -106,37 +151,37 @@ namespace Shuriken.ViewModels
             Playing ^= true;
         }
 
-        public void StopPlaying()
+        public void Stop()
         {
             Playing = false;
             Time = 0.0f;
-            stopping = true;
+        }
+
+        public void Replay()
+        {
+            Stop();
+            TogglePlaying();
+        }
+
+        public void Seek(object frames)
+        {
+            float f = (float)frames;
+            if (Time + f >= 0.0f)
+                Time += f;
         }
 
         public void UpdateScenes(IEnumerable<UIScene> scenes, IEnumerable<UIFont> fonts, float deltaT)
         {
+            renderer.DrawScenes(scenes, fonts, Time);
             Time += deltaT * PlaybackSpeed * (Playing ? 1 : 0);
-            manager.UpdateScenes(scenes, fonts, deltaT);
-
-            if (stopping)
-            {
-                foreach (var scene in scenes)
-                {
-                    foreach (var animation in scene.Animations)
-                    {
-                        animation.Reset();
-                    }
-                }
-
-                stopping = false;
-            }
         }
 
-        public ScenesManagerViewModel()
+        public SceneViewer()
         {
-            manager = new ScenesManager();
+            renderer = new Renderer(1280, 720);
+
             zoom = 0.65f;
-            stopping = false;
+            playbackSpeed = 1.0f;
         }
     }
 }

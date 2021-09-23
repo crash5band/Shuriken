@@ -8,11 +8,12 @@
         xmlns:vm ="clr-namespace:Shuriken.ViewModels"
         xmlns:models ="clr-namespace:Shuriken.Models"
         xmlns:hc ="https://handyorg.github.io/handycontrol"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         mc:Ignorable="d"
-        d:DataContext="vm:MainViewModel"
-        Title="Shuriken" d:DesignWidth="800" d:DesignHeight="450">
-    <Grid>
+        Title="Shuriken" d:DesignWidth="960" d:DesignHeight="450">
+    <Grid Background="{StaticResource RegionBrush}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
@@ -32,11 +33,31 @@
                 <MenuItem Header="Send help" Click="HelpClick"/>
             </MenuItem>
         </Menu>
-        <TabControl TabStripPlacement="Left" Grid.Row="1" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Project" VerticalAlignment="Center" Margin="10 0" Style="{StaticResource TextBlockDefault}"/>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}" Margin="5" DisplayMemberPath="Name"/>
+            <Button Grid.Column="2" Style="{StaticResource TransparentButton}" ToolTip="New project">
+                <Button.Content>
+                    <TextBlock Text="&#xf65e;" FontFamily="{StaticResource FontAwesome}"/>
+                </Button.Content>
+            </Button>
+            <Button Grid.Column="3" Style="{StaticResource TransparentButton}" ToolTip="Delete project">
+                <Button.Content>
+                    <TextBlock Text="&#xf65d;" FontFamily="{StaticResource FontAwesome}"/>
+                </Button.Content>
+            </Button>
+        </Grid>
+        <TabControl TabStripPlacement="Left" Grid.Row="2">
             <TabItem>
                 <TabItem.Header>
                     <StackPanel>
-                        <TextBlock Text="&#xf5cb;" HorizontalAlignment="Center" FontFamily="{StaticResource FontAwesome}"/>
+                        <TextBlock Text="&#xf008;" HorizontalAlignment="Center" FontFamily="{StaticResource FontAwesome}"/>
                         <TextBlock Text="Scenes" HorizontalAlignment="Center" FontSize="10" Margin="0 5 0 0"/>
                     </StackPanel>
                 </TabItem.Header>

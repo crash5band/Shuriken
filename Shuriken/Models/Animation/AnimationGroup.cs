@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -35,43 +36,13 @@ namespace Shuriken.Models.Animation
         public string Name { get; set; }
         public uint Field00 { get; set; }
         public float Duration { get; set; }
-        public Dictionary<UILayer, List<AnimationTrack>> LayerAnimations { get; set; }
+        public ObservableCollection<AnimationList> LayerAnimations { get; set; }
 
         public AnimationGroup(string name)
         {
             Name = name;
             Enabled = true;
-            LayerAnimations = new Dictionary<UILayer, List<AnimationTrack>>();
-        }
-
-        public bool LayerHasAnimation(UILayer layer, AnimationType type)
-        {
-            if (!LayerAnimations.ContainsKey(layer))
-                return false;
-
-            List<AnimationTrack> animationList = LayerAnimations[layer];
-            foreach (var animation in animationList)
-            {
-                if (animation.Type == type)
-                    return true;
-            }
-
-            return false;
-        }
-
-        public AnimationTrack GetAnimation(UILayer layer, AnimationType type)
-        {
-            if (!LayerHasAnimation(layer, type))
-                return null;
-
-            List<AnimationTrack> animationList = LayerAnimations[layer];
-            foreach (var animation in animationList)
-            {
-                if (animation.Type == type)
-                    return animation;
-            }
-
-            return null;
+            LayerAnimations = new ObservableCollection<AnimationList>();
         }
 
         public void AddTime(float delta)
@@ -82,6 +53,36 @@ namespace Shuriken.Models.Animation
         public void Reset()
         {
             Time = 0.0f;
+        }
+
+        public bool LayerHasAnimation(UILayer layer, AnimationType type)
+        {
+            foreach (var animation in LayerAnimations)
+            {
+                if (animation.Layer == layer)
+                {
+                    foreach (var track in animation.Tracks)
+                    {
+                        if (track.Type == type)
+                            return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public AnimationTrack GetTrack(UILayer layer, AnimationType type)
+        {
+            foreach (var animation in LayerAnimations)
+            {
+                if (animation.Layer == layer)
+                {
+                    return animation.GetTrack(type);
+                }
+            }
+
+            return null;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

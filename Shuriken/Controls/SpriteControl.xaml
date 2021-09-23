@@ -8,70 +8,46 @@
              xmlns:viewmodels="clr-namespace:Shuriken.ViewModels"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=viewmodels:SpriteViewModel}"
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="{StaticResource RegionBrush}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="2*"/>
-        </Grid.ColumnDefinitions>
-        
-        <!--Texture control grid-->
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="3*"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="1*"/>
-            </Grid.RowDefinitions>
-            <Border BorderBrush="{StaticResource SecondaryBorderBrush}" BorderThickness="1" CornerRadius="2" Margin="5">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <local:TextureAtlasControl x:Name="TexView" Background="{StaticResource SecondaryRegionBrush}"/>
-                </ScrollViewer>
-            </Border>
-            <Grid Grid.Row="1" Margin="5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="5*"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Run Text="{Binding ElementName=TexView, Path=MousePos.X, StringFormat={}{0:0.}}"/>
-                    <Run Text=", "/>
-                    <Run Text="{Binding ElementName=TexView, Path=MousePos.Y, StringFormat={}{0:0.}}"/>
-                </TextBlock>
-                <StackPanel Grid.Column="1" Margin="5" Orientation="Horizontal">
-                    <Slider Grid.Column="0" Value="{Binding ElementName=TexView, Path=Zoom}" Maximum="5" Minimum="0.5"/>
-                </StackPanel>
-                <TextBlock Grid.Column="2" Text="{Binding ElementName=TexView, Path=Zoom, StringFormat={}{0:P2}, UpdateSourceTrigger=PropertyChanged}"
-                           VerticalAlignment="Center"/>
-            </Grid>
-            <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" Margin="5">
-                <StackPanel>
-                    <Button Grid.Column="1" Content="Change Texture" Style="{StaticResource ButtonPrimary}" HorizontalAlignment="Stretch"
-                            Command="{Binding ChangeTextureCmd}"/>
-                    <TextBlock Margin="5">
-                        <Run Text="Name: "/>
-                        <Run Text="{Binding Texture.Name, Mode=OneWay}"/>
-                    </TextBlock>
-                    <TextBlock Text="{Binding Texture.Width, StringFormat={}Width: {0}px}" Margin="5"/>
-                    <TextBlock Text="{Binding Texture.Height, StringFormat={}Height: {0}px}" Margin="5"/>
-                </StackPanel>
-            </ScrollViewer>
-        </Grid>
-        
-        <!--Sprite control grid-->
-        <ScrollViewer Grid.Column="1" Padding="5" HorizontalScrollBarVisibility="Auto">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="3*"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="2*"/>
-                </Grid.RowDefinitions>
-                <hc:PropertyGrid Grid.Row="0" SelectedObject="{Binding}" Margin="5"/>
-                <GridSplitter Grid.Row="1" ResizeBehavior="PreviousAndNext" Height="5" ResizeDirection="Rows" HorizontalAlignment="Stretch"/>
-                <Border Grid.Row="2" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="2" Margin="5" Background="{StaticResource RegionBrush}">
-                    <Image Grid.Row="2" Source="{Binding Image}" MaxWidth="{Binding Width}" MaxHeight="{Binding Height}" MinHeight="32"/>
-                </Border>
-            </Grid>
+             d:DesignHeight="200" d:DesignWidth="300"  BorderBrush="{StaticResource BorderBrush}" BorderThickness="2">
+    <Grid>
+        <ScrollViewer Margin="5">
+            <ScrollViewer.Resources>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Margin" Value="0 10 0 5"/>
+                    <Setter Property="Padding" Value="5 0"/>
+                </Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Setter Property="Margin" Value="0 2"/>
+                </Style>
+            </ScrollViewer.Resources>
+            <StackPanel>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="X" Grid.Column="0"/>
+                    <hc:NumericUpDown Value="{Binding X}" Grid.Column="1"/>
+                    <TextBlock Text="Y" Grid.Column="2"/>
+                    <hc:NumericUpDown Value="{Binding Y}" Grid.Column="3"/>
+                </Grid>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Width" Grid.Column="0"/>
+                    <hc:NumericUpDown Value="{Binding Width}" Grid.Column="1"/>
+                    <TextBlock Text="Height" Grid.Column="2"/>
+                    <hc:NumericUpDown Value="{Binding Height}" Grid.Column="3"/>
+                </Grid>
+            </StackPanel>
         </ScrollViewer>
     </Grid>
 </UserControl>

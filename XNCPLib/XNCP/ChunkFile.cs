@@ -32,7 +32,8 @@ namespace XNCPLib.XNCP
 
             reader.SeekBegin(reader.PeekBaseOffset() + Info.NextChunkOffset);
 
-            // check whether the next chunk is a NCPJChunk or XTextureListChunk
+            // check whether the next chunk is a NCPJChunk or XTextureListChunk.
+            // signature check is always little endian.
             bool bigEndian = reader.Endianness == Endianness.BigEndian;
             reader.Endianness = Endianness.LittleEndian;
             uint nextSignature = reader.ReadUInt32();

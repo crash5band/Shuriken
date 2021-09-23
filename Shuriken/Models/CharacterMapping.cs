@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Shuriken.ViewModels;
 
 namespace Shuriken.Models
 {
@@ -24,13 +25,13 @@ namespace Shuriken.Models
             }
         }
 
-        private int spriteIndex;
-        public int SpriteIndex
+        private SpriteViewModel sprite;
+        public SpriteViewModel Sprite
         {
-            get => spriteIndex;
+            get => sprite;
             set
             {
-                spriteIndex = value;
+                sprite = value;
                 NotifyPropertyChanged();
             }
         }
@@ -42,15 +43,15 @@ namespace Shuriken.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public CharacterMapping(char c, int s)
+        public CharacterMapping(char c, SpriteViewModel spr)
         {
-            Character = c;
-            SpriteIndex = s;
+            character = c;
+            sprite = spr;
         }
 
         public CharacterMapping()
         {
-
+            Sprite = new SpriteViewModel();
         }
     }
 }

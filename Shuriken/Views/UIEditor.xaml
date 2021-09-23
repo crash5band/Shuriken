@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:s="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Shuriken.Views"
              xmlns:controls="clr-namespace:Shuriken.Controls"
              xmlns:models="clr-namespace:Shuriken.Models"
@@ -23,11 +24,12 @@
         </Grid.ColumnDefinitions>
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-                <TreeView Name="ScenesTreeView" ItemsSource="{Binding Scenes, Mode=OneTime}"
-                          VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+            <TextBlock Text="Scenes" Margin="5"/>
+            <TreeView Grid.Row="1" Name="ScenesTreeView" ItemsSource="{Binding SelectedProject.Scenes}" TreeViewItem.Selected="ScenesTreeViewSelected">
                     <TreeView.Resources>
                         <HierarchicalDataTemplate DataType="{x:Type models:UIScene}" ItemsSource="{Binding Groups}">
                             <TextBlock Text="{Binding Name}"/>
@@ -46,7 +48,7 @@
                         </DataTemplate>
                     </TreeView.Resources>
                 </TreeView>
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
@@ -72,7 +74,7 @@
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <Border Width="1280" Height="720" RenderTransformOrigin="0.5, 0.5" BorderBrush="{StaticResource BorderBrush}" BorderThickness="2">
                         <Border.LayoutTransform>
-                            <ScaleTransform ScaleX="{Binding SceneManager.Zoom}" ScaleY="{Binding SceneManager.Zoom}"/>
+                            <ScaleTransform ScaleX="{Binding Viewer.Zoom}" ScaleY="{Binding Viewer.Zoom}"/>
                         </Border.LayoutTransform>
                         <Border.Effect>
                             <DropShadowEffect BlurRadius="12" ShadowDepth="3" Direction="-45" Color="#333" Opacity="0.5"/>
@@ -83,30 +85,52 @@
                 </ScrollViewer>
                 <ToolBar Grid.Row="1" Padding="0 5 0 5">
                     <StackPanel Orientation="Horizontal" Margin="5 0">
-                        <Button Command="{Binding SceneManager.ZoomOutCmd}">
+                        <Button Style="{StaticResource TransparentButton}" ToolTip="Fit to screen">
+                            <Button.Content>
+                                <TextBlock Text="&#xf065;" FontFamily="{StaticResource FontAwesome}"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Padding="5" Command="{Binding Viewer.ZoomOutCmd}" Style="{StaticResource TransparentButton}" ToolTip="Zoom out">
                             <Button.Content>
                                 <TextBlock Text="&#xf010;" FontFamily="{StaticResource FontAwesome}"/>
                             </Button.Content>
                         </Button>
-                        <Slider Value="{Binding SceneManager.Zoom, FallbackValue=1}" Minimum="{Binding SceneManager.MinZoom, FallbackValue=0.25}"
-                            Maximum="{Binding SceneManager.MaxZoom, FallbackValue=2.5}" Width="150" VerticalAlignment="Center"/>
-                        <Button Command="{Binding SceneManager.ZoomInCmd}">
+                        <Slider Value="{Binding Viewer.Zoom, FallbackValue=1}" Minimum="{Binding Viewer.MinZoom, FallbackValue=0.25}"
+                            Maximum="{Binding Viewer.MaxZoom, FallbackValue=2.5}" Width="150" VerticalAlignment="Center"/>
+                        <Button Padding="5" Command="{Binding Viewer.ZoomInCmd}" Style="{StaticResource TransparentButton}" ToolTip="Zoom in">
                             <Button.Content>
                                 <TextBlock Text="&#xf00e;" FontFamily="{StaticResource FontAwesome}"/>
                             </Button.Content>
                         </Button>
                     </StackPanel>
-                    
-                    <TextBlock Text="{Binding SceneManager.Zoom, StringFormat={}{0:P2}, FallbackValue=100%}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Viewer.Zoom, StringFormat={}{0:P2}, FallbackValue=100%}" VerticalAlignment="Center"/>
                     <Separator Margin="5 0"/>
-                    <Button Command="{Binding SceneManager.TogglePlayingCmd}" Margin="0 0 3 0">
+                    <Button Style="{StaticResource TransparentButton}" ToolTip="Screenshot">
+                        <Button.Content>
+                            <TextBlock Text="&#xf030;" FontFamily="{StaticResource FontAwesome}"/>
+                        </Button.Content>
+                    </Button>
+                    <Button Command="{Binding Viewer.StopPlayingCmd}" Style="{StaticResource TransparentButton}" ToolTip="Stop">
+                        <Button.Content>
+                            <TextBlock Text="&#xf04d;" FontFamily="{StaticResource FontAwesome}"/>
+                        </Button.Content>
+                    </Button>
+                    <Button Command="{Binding Viewer.SeekCmd}" Style="{StaticResource TransparentButton}" ToolTip="Step back">
+                        <Button.Content>
+                            <TextBlock Text="&#xf04a;" FontFamily="{StaticResource FontAwesome}"/>
+                        </Button.Content>
+                        <Button.CommandParameter>
+                            <s:Single>-1.0</s:Single>
+                        </Button.CommandParameter>
+                    </Button>
+                    <Button Command="{Binding Viewer.TogglePlayingCmd}" Style="{StaticResource TransparentButton}">
                         <Button.Content>
                             <TextBlock FontFamily="{StaticResource FontAwesome}">
                                 <TextBlock.Style>
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Setter Property="Text" Value="&#xf04b;"/>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SceneManager.Playing}" Value="True">
+                                            <DataTrigger Binding="{Binding Viewer.Playing}" Value="True">
                                                 <Setter Property="Text" Value="&#xf04c;"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -114,25 +138,73 @@
                                 </TextBlock.Style>
                             </TextBlock>
                         </Button.Content>
+                        <Button.ToolTip>
+                            <TextBlock>
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Text" Value="Play"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Viewer.Playing}" Value="True">
+                                                <Setter Property="Text" Value="Pause"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Button.ToolTip>
                     </Button>
-                    <Button Command="{Binding SceneManager.StopPlayingCmd}" Margin="3 0">
+                    <Button Command="{Binding Viewer.SeekCmd}" Style="{StaticResource TransparentButton}" ToolTip="Step forward">
                         <Button.Content>
-                            <TextBlock Text="&#xf04d;" FontFamily="{StaticResource FontAwesome}"/>
+                            <TextBlock Text="&#xf04e;" FontFamily="{StaticResource FontAwesome}"/>
+                        </Button.Content>
+                        <Button.CommandParameter>
+                            <s:Single>1.0</s:Single>
+                        </Button.CommandParameter>
+                    </Button>
+                    <Button Command="{Binding Viewer.ReplayCmd}" Style="{StaticResource TransparentButton}" ToolTip="Replay">
+                        <Button.Content>
+                            <TextBlock Text="&#xf2f9;" FontFamily="{StaticResource FontAwesome}"/>
                         </Button.Content>
                     </Button>
-                    <TextBlock Margin="5 0" VerticalAlignment="Center">
+                    <TextBlock Margin="5 0" VerticalAlignment="Center" HorizontalAlignment="Right">
                         <Run Text="Frame: "/>
-                        <Run Text="{Binding SceneManager.Time, StringFormat={}{0:0.}, FallbackValue=69}"/>
+                        <Run Text="{Binding Viewer.Time, StringFormat={}{0:0.}, FallbackValue=69}"/>
                     </TextBlock>
                 </ToolBar>
             </Grid>
             <Grid Grid.Row="1">
-                <ListBox ItemsSource="{Binding ElementName=ScenesTreeView, Path=SelectedItem.Animations}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type animation:AnimationGroup}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TreeView Grid.Column="0" Name="AnimationTreeView" ItemsSource="{Binding SelectedScene.Animations}">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type animation:AnimationGroup}" ItemsSource="{Binding LayerAnimations}">
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox IsChecked="{Binding Enabled}" Margin="0 0 5 0"/>
                                 <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type animation:AnimationList}" ItemsSource="{Binding Tracks}">
+                            <TextBlock Text="{Binding Layer.Name}"/>
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type animation:AnimationTrack}">
+                            <TextBlock Text="{Binding TypeString}"/>
+                        </HierarchicalDataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+                <ListBox Grid.Column="1" ItemsSource="{Binding ElementName=AnimationTreeView, Path=SelectedItem.Keyframes}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type animation:Keyframe}">
+                            <StackPanel Margin="5">
+                                <TextBlock>
+                                    <Run Text="Frame: "/>
+                                    <Run Text="{Binding Frame}"/>
+                                </TextBlock>
+                                <TextBlock>
+                                    <Run Text="Value: "/>
+                                    <Run Text="{Binding Value}"/>
+                                </TextBlock>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

@@ -6,16 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Collections.ObjectModel;
 using Shuriken.Models;
 using Shuriken.Rendering;
 using Shuriken.ViewModels;
+using Shuriken.Misc;
 using OpenTK;
 using OpenTK.Core;
 using OpenTK.Windowing.Common;
@@ -49,6 +43,7 @@ namespace Shuriken.Views
             GL.Enable(EnableCap.Blend);
             GL.BlendEquation(BlendEquationMode.FuncAdd);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            GL.Enable(EnableCap.FramebufferSrgb);
         }
 
         private void glControlRender(TimeSpan obj)
@@ -61,8 +56,23 @@ namespace Shuriken.Views
 
             if (vm != null)
             {
-                if (vm.Scenes != null)
-                    vm.SceneManager.UpdateScenes(vm.Scenes, vm.UIFonts, delta);
+                UIProject project = vm.SelectedProject;
+                if (project != null)
+                    vm.Viewer.UpdateScenes(project.Scenes, project.Fonts, delta);
+            }
+        }
+
+        private void ScenesTreeViewSelected(object sender, RoutedEventArgs e)
+        {
+            // Move up the tree view until we reach the TreeViewItem holding the UIScene
+            TreeViewItem item = e.OriginalSource as TreeViewItem;
+            while (item.DataContext is not UIScene && item != null)
+                item = Utilities.GetParentTreeViewItem(item);
+
+            var vm = DataContext as MainViewModel;
+            if (vm != null && item != null)
+            {
+                vm.SelectedScene = item.DataContext as UIScene;
             }
         }
     }
