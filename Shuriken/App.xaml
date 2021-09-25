@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Shuriken"
              xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:models="clr-namespace:Shuriken.Models"
              xmlns:viewmodels="clr-namespace:Shuriken.ViewModels"
+             xmlns:controls="clr-namespace:Shuriken.Controls"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
@@ -11,20 +13,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/SkinDark.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml"/>
+                <ResourceDictionary Source="Styles.xaml"/>
+                <ResourceDictionary Source="DataTemplates.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <FontFamily x:Key="FontAwesome">/Fonts/fa-solid-900.ttf#Font Awesome 5 Free Solid</FontFamily>
-            
-            <!--Handy Controls does not style grid splitter for some reason...-->
-            <Style TargetType="{x:Type GridSplitter}">
-                <Setter Property="Background" Value="{StaticResource BorderBrush}"/>
-            </Style>
-            <Style x:Key="TransparentButton" TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonBaseStyle}">
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="BorderBrush" Value="Transparent"/>
-            </Style>
-            <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource TabItemStyle}">
-                <Setter Property="Padding" Value="1 5"/>
-            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
