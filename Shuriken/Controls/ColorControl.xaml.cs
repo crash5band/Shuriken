@@ -22,110 +22,25 @@ namespace Shuriken.Controls
     /// <summary>
     /// Interaction logic for ColorControl.xaml
     /// </summary>
-    public partial class ColorControl : UserControl, INotifyPropertyChanged
+    public partial class ColorControl : UserControl
     {
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(
-            "Value", typeof(Color), typeof(ColorControl), new PropertyMetadata(new Color(), new PropertyChangedCallback(OnValueChanged)));
-
-        public event PropertyChangedEventHandler PropertyChanged;
+            "Value", typeof(Color), typeof(ColorControl), new PropertyMetadata(new Color()));
 
         public Color Value
         {
-            get
-            {
-                return (Color)GetValue(ValueProperty);
-            }
-            set
-            {
-                SetValue(ValueProperty, value);
-                NotifyPropertyChanged("R");
-                NotifyPropertyChanged("G");
-                NotifyPropertyChanged("B");
-                NotifyPropertyChanged("A");
-            }
-        }
-
-        public byte R
-        {
-            get
-            {
-                return Value.R;
-            }
-            set
-            {
-                Value = new Color(value, Value.G, Value.B, Value.A);
-                NotifyPropertyChanged();
-            }
-        }
-
-        public byte G
-        {
-            get
-            {
-                return Value.G;
-            }
-            set
-            {
-                Value = new Color(Value.R, value, Value.B, Value.A);
-                NotifyPropertyChanged();
-            }
-        }
-
-        public byte B
-        {
-            get
-            {
-                return Value.B;
-            }
-            set
-            {
-                Value = new Color(Value.R, Value.G, value, Value.A);
-                NotifyPropertyChanged();
-            }
-        }
-
-        public byte A
-        {
-            get
-            {
-                return Value.A;
-            }
-            set
-            {
-                Value = new Color(Value.R, Value.G, Value.B, value);
-                NotifyPropertyChanged();
-            }
-        }
-
-        private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ColorControl ctrl = d as ColorControl;
-            ctrl.ChangeValue(e);
-        }
-
-        private void ChangeValue(DependencyPropertyChangedEventArgs e)
-        {
-            Value = (Color)e.NewValue;
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public ColorControl()
-        {
-            InitializeComponent();
+            get => (Color)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
         }
 
         private void ColorBtnClick(object sender, RoutedEventArgs e)
         {
             ColorPickerWindow window = new ColorPickerWindow();
             System.Windows.Media.Color c = new System.Windows.Media.Color();
-            c.R = R;
-            c.G = G;
-            c.B = B;
-            c.A = A;
+            c.R = Value.R;
+            c.G = Value.G;
+            c.B = Value.B;
+            c.A = Value.A;
             window.ColorPicker.SelectedBrush = new System.Windows.Media.SolidColorBrush(c);
 
             window.ShowDialog();
@@ -133,6 +48,12 @@ namespace Shuriken.Controls
             {
                 Value = window.SelectedColor;
             }
+        }
+
+        public ColorControl()
+        {
+            InitializeComponent();
+            LayoutRoot.DataContext = this;
         }
     }
 }
