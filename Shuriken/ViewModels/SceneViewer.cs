@@ -11,8 +11,6 @@ namespace Shuriken.ViewModels
 {
     public class SceneViewer : ViewModelBase
     {
-        private Renderer renderer;
-
         public float MinZoom => 0.25f;
         public float MaxZoom => 2.50f;
 
@@ -45,26 +43,6 @@ namespace Shuriken.ViewModels
             set
             {
                 playbackSpeed = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public int RenderWidth
-        {
-            get => renderer.RenderWidth;
-            set
-            {
-                renderer.RenderWidth = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public int RenderHeight
-        {
-            get => renderer.RenderHeight;
-            set
-            {
-                renderer.RenderHeight = value;
                 NotifyPropertyChanged();
             }
         }
@@ -172,14 +150,27 @@ namespace Shuriken.ViewModels
 
         public void UpdateScenes(IEnumerable<UIScene> scenes, IEnumerable<UIFont> fonts, float deltaT)
         {
-            renderer.DrawScenes(scenes, fonts, Time);
             Time += deltaT * PlaybackSpeed * (Playing ? 1 : 0);
+            foreach (UIScene scene in scenes)
+            {
+                if (!scene.Visible)
+                    continue;
+
+                foreach (LayerGroup group in scene.Groups)
+                {
+                    if (!group.Visible)
+                        continue;
+
+                    foreach (UILayer layer in group.Layers)
+                    {
+                        
+                    }
+                }
+            }
         }
 
         public SceneViewer()
         {
-            renderer = new Renderer(1280, 720);
-
             zoom = 0.65f;
             playbackSpeed = 1.0f;
         }

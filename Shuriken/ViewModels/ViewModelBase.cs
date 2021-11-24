@@ -8,8 +8,15 @@ using System.Runtime.CompilerServices;
 
 namespace Shuriken.ViewModels
 {
-    public class ViewModelBase : INotifyPropertyChanged
+    public abstract class ViewModelBase : INotifyPropertyChanged
     {
+        public string DisplayName { get; set; }
+
+        /// <summary>
+        /// FontAwesome icon codes
+        /// </summary>
+        public string IconCode { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

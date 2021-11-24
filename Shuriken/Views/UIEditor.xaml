@@ -11,7 +11,7 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:gl="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
              xmlns:viewmodels="clr-namespace:Shuriken.ViewModels"
-             d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
+             d:DataContext="{d:DesignInstance Type=viewmodels:ScenesViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="1200">
     <Grid>
@@ -29,25 +29,28 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="Scenes" Margin="5"/>
-            <TreeView Grid.Row="1" Name="ScenesTreeView" ItemsSource="{Binding SelectedProject.Scenes}" TreeViewItem.Selected="ScenesTreeViewSelected">
-                    <TreeView.Resources>
-                        <HierarchicalDataTemplate DataType="{x:Type models:UIScene}" ItemsSource="{Binding Groups}">
+            <TreeView Grid.Row="1" Name="ScenesTreeView" ItemsSource="{Binding Scenes}" TreeViewItem.Selected="ScenesTreeViewSelected">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type models:UIScene}" ItemsSource="{Binding Groups}">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
                             <TextBlock Text="{Binding Name}"/>
-                        </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type models:UIGroup}" ItemsSource="{Binding Layers}">
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
-                                <TextBlock Text="{Binding Name}"/>
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-                        <DataTemplate DataType="{x:Type models:UILayer}">
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
-                                <TextBlock Text="{Binding Name}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </TreeView.Resources>
-                </TreeView>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type models:LayerGroup}" ItemsSource="{Binding Layers}">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
+                            <TextBlock Text="{Binding Name}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type models:UILayer}">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
+                            <TextBlock Text="{Binding Name}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -79,11 +82,11 @@
                         <Border.Effect>
                             <DropShadowEffect BlurRadius="12" ShadowDepth="3" Direction="-45" Color="#333" Opacity="0.5"/>
                         </Border.Effect>
-                        <gl:GLWpfControl Width="1280" Height="720" Name="glControl" Render="glControlRender" RenderTransformOrigin="0.5, 0.5">
+                        <gl:GLWpfControl Width="1280" Height="720" Name="glControl" Render="glControlRender"  RenderTransformOrigin="0.5, 0.5">
                         </gl:GLWpfControl>
                     </Border>
                 </ScrollViewer>
-                <ToolBar Grid.Row="1" Padding="0 5 0 5">
+                <ToolBar Grid.Row="1" Padding="0 5 0 5" Margin="0">
                     <StackPanel Orientation="Horizontal" Margin="5 0">
                         <Button Style="{StaticResource TransparentButton}" ToolTip="Fit to screen">
                             <Button.Content>
@@ -211,6 +214,16 @@
                 </ListBox>
             </Grid>
         </Grid>
-        <hc:PropertyGrid Grid.Column="4" SelectedObject="{Binding ElementName=ScenesTreeView, Path=SelectedItem}"/>
+        <Grid Grid.Column="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Padding="10 5">
+                <Run Text="&#xf05a;" FontFamily="{StaticResource FontAwesome}"/>
+                <Run Text="Properties"/>
+            </TextBlock>
+            <ContentControl Grid.Row="1" Content="{Binding ElementName=ScenesTreeView, Path=SelectedItem}"/>
+        </Grid>
     </Grid>
 </UserControl>

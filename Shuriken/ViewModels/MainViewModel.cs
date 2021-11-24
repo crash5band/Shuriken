@@ -18,59 +18,18 @@ namespace Shuriken.ViewModels
     {
         public static string AppVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-        private UIProject selectedProject;
-        public UIProject SelectedProject
-        {
-            get => selectedProject;
-            set
-            {
-                selectedProject = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private UIScene selectedScene;
-        public UIScene SelectedScene
-        {
-            get => selectedScene;
-            set
-            {
-                selectedScene = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private TextureList selectedTexList;
-        public TextureList SelectedTexList
-        {
-            get => selectedTexList;
-            set
-            {
-                selectedTexList = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private Texture selectedTexture;
-        public Texture SelectedTexture
-        {
-            get => selectedTexture;
-            set
-            {
-                selectedTexture = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public SceneViewer Viewer { get; set; }
-        public ObservableCollection<UIProject> Projects { get; set; }
         public ObservableCollection<string> MissingTextures { get; set; }
+        public ObservableCollection<ViewModelBase> Editors { get; set; }
 
         public MainViewModel()
         {
-            Viewer = new SceneViewer();
-            Projects = new ObservableCollection<UIProject>();
             MissingTextures = new ObservableCollection<string>();
+            Editors = new ObservableCollection<ViewModelBase>
+            {
+                new ScenesViewModel(),
+                new SpritesViewModel(),
+                new FontsViewModel()
+            };
 #if DEBUG
             //LoadTestXNCP();
 #endif
@@ -92,9 +51,6 @@ namespace Shuriken.ViewModels
 
             string root = Path.GetDirectoryName(Path.GetFullPath(filename));
 
-            // TODO: load all project nodes
-            UIProject project = new UIProject(file.Resources[0].Content.CsdmProject.ProjectName.Value);
-
             List<Scene> xScenes = file.Resources[0].Content.CsdmProject.Root.Scenes;
             List<SceneID> xIDs = file.Resources[0].Content.CsdmProject.Root.SceneIDTable;
             List<XTexture> xTextures = file.Resources[1].Content.TextureList.Textures;
@@ -112,6 +68,9 @@ namespace Shuriken.ViewModels
                     MissingTextures.Add(texture.Name.Value);
             }
 
+            if (MissingTextures.Count > 0)
+                WarnMissingTextures();
+
             if (xScenes.Count > 0)
             {
                 // Hack: we load sprites from the first scene only since whatever tool sonic team uses
@@ -125,13 +84,13 @@ namespace Shuriken.ViewModels
                         Sprite spr = new Sprite(texList.Textures[textureIndex], subimage.TopLeft.Y, subimage.TopLeft.X,
                             subimage.BottomRight.Y, subimage.BottomRight.X);
 
-                        texList.Textures[textureIndex].Sprites.Add(new SpriteViewModel(spr));
+                        texList.Textures[textureIndex].Sprites.Add(spr);
                     }
                 }
             }
 
             foreach (SceneID sceneID in xIDs)
-                project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name.Value, texList, project.Fonts));
+                Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name.Value, texList, Project.Fonts));
 
             foreach (var entry in xFontList.FontIDTable)
             {
@@ -142,24 +101,15 @@ namespace Shuriken.ViewModels
                     font.Mappings.Add(new Models.CharacterMapping(mapping.SourceCharacter, sprite));
                 }
 
-                project.Fonts.Add(font);
+                Project.Fonts.Add(font);
             }
 
-            project.TextureLists.Add(texList);
-            Projects.Add(project);
-
-            if (MissingTextures.Count > 0)
-                WarnMissingTextures();
-
-            if (Projects.Count > 0)
-            {
-                SelectedProject = Projects[0];
-            }
+            Project.TextureLists.Add(texList);
         }
 
         public void Clear()
         {
-            Projects.Clear();
+            Project.Clear();
             MissingTextures.Clear();
         }
 

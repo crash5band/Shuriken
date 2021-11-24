@@ -30,6 +30,8 @@ namespace Shuriken
 
             vm = new MainViewModel();
             DataContext = vm;
+
+            editorSelect.SelectedIndex = 0;
         }
 
         private void OpenMenu_Click(object sender, RoutedEventArgs e)
