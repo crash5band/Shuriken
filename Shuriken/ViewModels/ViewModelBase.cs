@@ -13,7 +13,7 @@ namespace Shuriken.ViewModels
         public string DisplayName { get; set; }
 
         /// <summary>
-        /// FontAwesome icon codes
+        /// FontAwesome icon code
         /// </summary>
         public string IconCode { get; set; }
 

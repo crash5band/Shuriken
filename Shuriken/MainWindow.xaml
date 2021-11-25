@@ -31,55 +31,6 @@
                 <MenuItem Header="Send help" Click="HelpClick"/>
             </MenuItem>
         </Menu>
-        <!--
-        <TabControl TabStripPlacement="Left" Grid.Row="2">
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel>
-                        <TextBlock Text="&#xf008;" HorizontalAlignment="Center" FontFamily="{StaticResource FontAwesome}"/>
-                        <TextBlock Text="Scenes" HorizontalAlignment="Center" FontSize="10" Margin="0 5 0 0"/>
-                    </StackPanel>
-                </TabItem.Header>
-                <views:UIEditor Padding="5 0"/>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel>
-                        <TextBlock Text="&#xf031;" HorizontalAlignment="Center" FontFamily="{StaticResource FontAwesome}"/>
-                        <TextBlock Text="Fonts" HorizontalAlignment="Center" FontSize="10" Margin="0 5 0 0"/>
-                    </StackPanel>
-                </TabItem.Header>
-                <views:FontEditor Padding="5 0"/>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel>
-                        <TextBlock Text="&#xf302;" HorizontalAlignment="Center" FontFamily="{StaticResource FontAwesome}"/>
-                        <TextBlock Text="Sprites" HorizontalAlignment="Center" FontSize="10" Margin="0 5 0 0"/>
-                    </StackPanel>
-                </TabItem.Header>
-                <views:SpriteEditor Padding="5 0"/>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="&#xf013;" HorizontalAlignment="Center" FontFamily="{StaticResource FontAwesome}"/>
-                        <TextBlock Text="Settings" HorizontalAlignment="Center" FontSize="10" Margin="0 5 0 0"/>
-                    </StackPanel>
-                </TabItem.Header>
-                <views:SettingsView Padding="5 0"/>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="&#xf05a;" HorizontalAlignment="Center" FontFamily="{StaticResource FontAwesome}"/>
-                        <TextBlock Text="About" HorizontalAlignment="Center" FontSize="10" Margin="0 5 0 0"/>
-                    </StackPanel>
-                </TabItem.Header>
-                <views:AboutView Padding="5 0"/>
-            </TabItem>
-        </TabControl>
-        -->
         <TabControl TabStripPlacement="Left" ItemsSource="{Binding Editors}" Grid.Row="2" Name="editorSelect">
             <TabControl.ItemTemplate>
                 <DataTemplate>
