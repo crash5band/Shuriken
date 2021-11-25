@@ -15,6 +15,26 @@ namespace Shuriken.Models
         public Vector2 Dimensions { get; set; }
         public Texture Texture { get; set; }
 
+        public int X
+        {
+            get { return (int)Start.X; }
+        }
+
+        public int Y
+        {
+            get { return (int)Start.Y; }
+        }
+
+        public int Width
+        {
+            get { return (int)Dimensions.X; }
+        }
+
+        public int Height
+        {
+            get { return (int)Dimensions.Y; }
+        }
+
         public Sprite(Texture tex, float top = 0.0f, float left = 0.0f, float bottom = 1.0f, float right = 1.0f)
         {
             Texture = tex;

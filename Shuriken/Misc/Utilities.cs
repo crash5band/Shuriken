@@ -51,25 +51,28 @@ namespace Shuriken.Misc
             return (int)(v * factor);
         }
 
-        public static SpriteViewModel FindSpriteFromNCPScene(int spriteIndex, List<SubImage> spriteList, ObservableCollection<Texture> textures)
+        public static Sprite FindSpriteFromNCPScene(int spriteIndex, List<SubImage> spriteList, ObservableCollection<Texture> textures)
         {
             if (spriteIndex >= 0 && spriteIndex < spriteList.Count)
             {
                 int textureIndex = (int)spriteList[spriteIndex].TextureIndex;
-                var sprites = textures[textureIndex].Sprites;
-                var target = spriteList[spriteIndex];
-                for (int s = 0; s < sprites.Count; ++s)
+                if (textureIndex >= 0 && textureIndex < textures.Count)
                 {
-                    int x = ToPixels(target.TopLeft.X, textures[textureIndex].Width);
-                    int y = ToPixels(target.TopLeft.Y, textures[textureIndex].Height);
-                    int w = ToPixels(target.BottomRight.X - target.TopLeft.X, textures[textureIndex].Width);
-                    int h = ToPixels(target.BottomRight.Y - target.TopLeft.Y, textures[textureIndex].Height);
-
-                    if (sprites[s].X == x && sprites[s].Y == y
-                        && sprites[s].Width == w
-                        && sprites[s].Height == h)
+                    var sprites = textures[textureIndex].Sprites;
+                    var target = spriteList[spriteIndex];
+                    for (int s = 0; s < sprites.Count; ++s)
                     {
-                        return textures[textureIndex].Sprites[s];
+                        int x = ToPixels(target.TopLeft.X, textures[textureIndex].Width);
+                        int y = ToPixels(target.TopLeft.Y, textures[textureIndex].Height);
+                        int w = ToPixels(target.BottomRight.X - target.TopLeft.X, textures[textureIndex].Width);
+                        int h = ToPixels(target.BottomRight.Y - target.TopLeft.Y, textures[textureIndex].Height);
+
+                        if (sprites[s].X == x && sprites[s].Y == y
+                            && sprites[s].Width == w
+                            && sprites[s].Height == h)
+                        {
+                            return textures[textureIndex].Sprites[s];
+                        }
                     }
                 }
             }

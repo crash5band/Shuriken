@@ -77,7 +77,7 @@
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <Border Width="1280" Height="720" RenderTransformOrigin="0.5, 0.5" BorderBrush="{StaticResource BorderBrush}" BorderThickness="2">
                         <Border.LayoutTransform>
-                            <ScaleTransform ScaleX="{Binding Viewer.Zoom}" ScaleY="{Binding Viewer.Zoom}"/>
+                            <ScaleTransform ScaleX="{Binding Zoom}" ScaleY="{Binding Zoom}"/>
                         </Border.LayoutTransform>
                         <Border.Effect>
                             <DropShadowEffect BlurRadius="12" ShadowDepth="3" Direction="-45" Color="#333" Opacity="0.5"/>
@@ -93,32 +93,32 @@
                                 <TextBlock Text="&#xf065;" FontFamily="{StaticResource FontAwesome}"/>
                             </Button.Content>
                         </Button>
-                        <Button Padding="5" Command="{Binding Viewer.ZoomOutCmd}" Style="{StaticResource TransparentButton}" ToolTip="Zoom out">
+                        <Button Padding="5" Command="{Binding ZoomOutCmd}" Style="{StaticResource TransparentButton}" ToolTip="Zoom out">
                             <Button.Content>
                                 <TextBlock Text="&#xf010;" FontFamily="{StaticResource FontAwesome}"/>
                             </Button.Content>
                         </Button>
-                        <Slider Value="{Binding Viewer.Zoom, FallbackValue=1}" Minimum="{Binding Viewer.MinZoom, FallbackValue=0.25}"
-                            Maximum="{Binding Viewer.MaxZoom, FallbackValue=2.5}" Width="150" VerticalAlignment="Center"/>
-                        <Button Padding="5" Command="{Binding Viewer.ZoomInCmd}" Style="{StaticResource TransparentButton}" ToolTip="Zoom in">
+                        <Slider Value="{Binding Zoom, FallbackValue=1}" Minimum="{Binding MinZoom, FallbackValue=0.25}"
+                            Maximum="{Binding MaxZoom, FallbackValue=2.5}" Width="150" VerticalAlignment="Center"/>
+                        <Button Padding="5" Command="{Binding ZoomInCmd}" Style="{StaticResource TransparentButton}" ToolTip="Zoom in">
                             <Button.Content>
                                 <TextBlock Text="&#xf00e;" FontFamily="{StaticResource FontAwesome}"/>
                             </Button.Content>
                         </Button>
                     </StackPanel>
-                    <TextBlock Text="{Binding Viewer.Zoom, StringFormat={}{0:P2}, FallbackValue=100%}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Zoom, StringFormat={}{0:P2}, FallbackValue=100%}" VerticalAlignment="Center"/>
                     <Separator Margin="5 0"/>
                     <Button Style="{StaticResource TransparentButton}" ToolTip="Screenshot">
                         <Button.Content>
                             <TextBlock Text="&#xf030;" FontFamily="{StaticResource FontAwesome}"/>
                         </Button.Content>
                     </Button>
-                    <Button Command="{Binding Viewer.StopPlayingCmd}" Style="{StaticResource TransparentButton}" ToolTip="Stop">
+                    <Button Command="{Binding StopPlayingCmd}" Style="{StaticResource TransparentButton}" ToolTip="Stop">
                         <Button.Content>
                             <TextBlock Text="&#xf04d;" FontFamily="{StaticResource FontAwesome}"/>
                         </Button.Content>
                     </Button>
-                    <Button Command="{Binding Viewer.SeekCmd}" Style="{StaticResource TransparentButton}" ToolTip="Step back">
+                    <Button Command="{Binding SeekCmd}" Style="{StaticResource TransparentButton}" ToolTip="Step back">
                         <Button.Content>
                             <TextBlock Text="&#xf04a;" FontFamily="{StaticResource FontAwesome}"/>
                         </Button.Content>
@@ -126,14 +126,14 @@
                             <s:Single>-1.0</s:Single>
                         </Button.CommandParameter>
                     </Button>
-                    <Button Command="{Binding Viewer.TogglePlayingCmd}" Style="{StaticResource TransparentButton}">
+                    <Button Command="{Binding TogglePlayingCmd}" Style="{StaticResource TransparentButton}">
                         <Button.Content>
                             <TextBlock FontFamily="{StaticResource FontAwesome}">
                                 <TextBlock.Style>
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Setter Property="Text" Value="&#xf04b;"/>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Viewer.Playing}" Value="True">
+                                            <DataTrigger Binding="{Binding Playing}" Value="True">
                                                 <Setter Property="Text" Value="&#xf04c;"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -147,7 +147,7 @@
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Setter Property="Text" Value="Play"/>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Viewer.Playing}" Value="True">
+                                            <DataTrigger Binding="{Binding Playing}" Value="True">
                                                 <Setter Property="Text" Value="Pause"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -156,7 +156,7 @@
                             </TextBlock>
                         </Button.ToolTip>
                     </Button>
-                    <Button Command="{Binding Viewer.SeekCmd}" Style="{StaticResource TransparentButton}" ToolTip="Step forward">
+                    <Button Command="{Binding SeekCmd}" Style="{StaticResource TransparentButton}" ToolTip="Step forward">
                         <Button.Content>
                             <TextBlock Text="&#xf04e;" FontFamily="{StaticResource FontAwesome}"/>
                         </Button.Content>
@@ -164,14 +164,14 @@
                             <s:Single>1.0</s:Single>
                         </Button.CommandParameter>
                     </Button>
-                    <Button Command="{Binding Viewer.ReplayCmd}" Style="{StaticResource TransparentButton}" ToolTip="Replay">
+                    <Button Command="{Binding ReplayCmd}" Style="{StaticResource TransparentButton}" ToolTip="Replay">
                         <Button.Content>
                             <TextBlock Text="&#xf2f9;" FontFamily="{StaticResource FontAwesome}"/>
                         </Button.Content>
                     </Button>
                     <TextBlock Margin="5 0" VerticalAlignment="Center" HorizontalAlignment="Right">
                         <Run Text="Frame: "/>
-                        <Run Text="{Binding Viewer.Time, StringFormat={}{0:0.}, FallbackValue=69}"/>
+                        <Run Text="{Binding Time, StringFormat={}{0:0.}, FallbackValue=69}"/>
                     </TextBlock>
                 </ToolBar>
             </Grid>

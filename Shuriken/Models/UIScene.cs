@@ -9,37 +9,80 @@ using System.ComponentModel;
 using Shuriken.ViewModels;
 using Shuriken.Models.Animation;
 using Shuriken.Misc;
+using System.Runtime.CompilerServices;
 
 namespace Shuriken.Models
 {
-    public class UIScene
+    public class UIScene : INotifyPropertyChanged
     {
-        [Category("Scene")]
-        public string Name { get; set; }
+        private string name;
+        public string Name
+        {
+            get => name;
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    name = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
-        [Category("Scene")]
-        public uint Field00 { get; set; }
+        private uint field00;
+        public uint Field00
+        {
+            get => field00;
+            set { field00 = value; NotifyPropertyChanged(); }
+        }
 
-        [Category("Scene")]
-        public float ZIndex { get; set; }
+        private float zIndex;
+        public float ZIndex
+        {
+            get => zIndex;
+            set { zIndex = value; NotifyPropertyChanged(); }
+        }
 
-        [Category("Scene")]
-        public uint Field0C { get; set; }
+        private uint field0C;
+        public uint Field0C
+        {
+            get => field0C;
+            set { field0C = value; NotifyPropertyChanged(); }
+        }
 
-        [Category("Scene")]
-        public float Field10 { get; set; }
+        private float field10;
+        public float Field10
+        {
+            get => field10;
+            set { field10 = value; NotifyPropertyChanged(); }
+        }
 
-        [Category("Scene")]
-        public float AspectRatio { get; set; }
+        private float aspectRatio;
+        public float AspectRatio
+        {
+            get => aspectRatio;
+            set { aspectRatio = value; NotifyPropertyChanged(); }
+        }
 
-        [Category("Animation")]
-        public float AnimationFramerate { get; set; }
+        private float animationFramerate;
+        public float AnimationFramerate
+        {
+            get => animationFramerate;
+            set { animationFramerate = value; NotifyPropertyChanged(); }
+        }
+
+        private bool visible;
+        public bool Visible
+        {
+            get => visible;
+            set { visible = value; NotifyPropertyChanged(); }
+        }
 
         [Category("Data1")]
-        public List<Vector2> Data1 { get; set; }
+        public ObservableCollection<Vector2> TextureSizes { get; set; }
 
         [Browsable(false)]
-        public ObservableCollection<UIGroup> Groups { get; set; }
+        public ObservableCollection<LayerGroup> Groups { get; set; }
 
         [Browsable(false)]
         public ObservableCollection<AnimationGroup> Animations { get; set; }
@@ -53,16 +96,22 @@ namespace Shuriken.Models
             Field10 = scene.Field10;
             AspectRatio = scene.AspectRatio;
             AnimationFramerate = scene.AnimationFramerate;
-            Data1 = new List<Vector2>();
+            TextureSizes = new ObservableCollection<Vector2>();
             Animations = new ObservableCollection<AnimationGroup>();
+            Groups = new ObservableCollection<LayerGroup>();
 
-            Groups = new ObservableCollection<UIGroup>();
+            foreach (var texSize in scene.Data1)
+            {
+                TextureSizes.Add(new Vector2(texSize.X, texSize.Y));
+            }
 
             CreateGroups(scene);
             //CreateSprites(scene);
             CreateLayers(scene, scene.CastDictionaries, texList);
-            CreateHierarchyTree(scene);
             CreateAnimations(scene);
+            CreateHierarchyTree(scene);
+
+            Visible = false;
         }
 
         public UIScene(string sceneName)
@@ -71,19 +120,22 @@ namespace Shuriken.Models
             ZIndex = 0;
             AspectRatio = 16.0f / 9.0f;
             AnimationFramerate = 60.0f;
-            Groups = new ObservableCollection<UIGroup>();
-            Data1 = new List<Vector2>();
+            Groups = new ObservableCollection<LayerGroup>();
+            TextureSizes = new ObservableCollection<Vector2>();
             Animations = new ObservableCollection<AnimationGroup>();
+
+            Visible = false;
         }
 
         private void CreateGroups(Scene scene)
         {
             for (int i = 0; i < scene.GroupCount; ++i)
             {
-                UIGroup group = new UIGroup("UIGroup_" + i);
-                group.Field08 = scene.UICastGroups[i].Field08;
-
-                Groups.Add(group);
+                Groups.Add(new LayerGroup
+                {
+                    Name = "Group_" + i,
+                    Field08 = scene.UICastGroups[i].Field08
+                });
             }
         }
 
@@ -204,6 +256,13 @@ namespace Shuriken.Models
             }
 
             return "";
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

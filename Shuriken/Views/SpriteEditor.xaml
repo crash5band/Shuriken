@@ -8,7 +8,7 @@
              xmlns:viewmodels="clr-namespace:Shuriken.ViewModels"
              xmlns:controls="clr-namespace:Shuriken.Controls"
              xmlns:hc="https://handyorg.github.io/handycontrol"
-             d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
+             d:DataContext="{d:DesignInstance Type=viewmodels:SpritesViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -16,91 +16,114 @@
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="5*"/>
         </Grid.ColumnDefinitions>
-        <GroupBox Header="Sprite Treeview">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <StackPanel>
-                    <TextBlock Text="Texture List" Padding="5 0"/>
-                    <ComboBox Margin="0 5" Name="TextureListSelect" ItemsSource="{Binding SelectedProject.TextureLists}"
-                              SelectedItem="{Binding SelectedTexList}" DisplayMemberPath="Name"/>
-                </StackPanel>
-                <StackPanel Grid.Row="1">
-                    <TextBlock Text="Texture" Padding="5 0"/>
-                    <ComboBox Margin="0 5" Name="TextureSelect" ItemsSource="{Binding SelectedTexList.Textures}"
-                              SelectedItem="{Binding SelectedTexture}" DisplayMemberPath="Name"/>
-                    <TextBlock Text="Sprites" Padding="5 0"/>
-                </StackPanel>
-                <ListBox Margin="0 5" Grid.Row="2" Name="ScenesTreeView" ItemsSource="{Binding SelectedTexture.Sprites}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type viewmodels:SpriteViewModel}">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="{Binding Image}" Width="32" Height="32" Margin="0 0 5 0" VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding Texture.Name}" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                <Grid Grid.Row="3">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <StackPanel>
+                <TextBlock Text="Texture List" Padding="5 0"/>
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
-                        <ColumnDefinition/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Content="New Sprite" HorizontalAlignment="Stretch" Margin="5" Style="{StaticResource ButtonPrimary}"
+                    <ComboBox Grid.Column="0" Margin="0 5" Name="TextureListSelect" ItemsSource="{Binding TextureLists}"
+                              SelectedItem="{Binding SelectedTexList}" DisplayMemberPath="Name"/>
+                    <Button Grid.Column="1" Style="{StaticResource TransparentButton}" ToolTip="New texture list">
+                        <Button.Content>
+                            <TextBlock Text="&#xf65e;" FontFamily="{StaticResource FontAwesome}"/>
+                        </Button.Content>
+                    </Button>
+                    <Button Grid.Column="2" Style="{StaticResource TransparentButton}" ToolTip="Remove texture list">
+                        <Button.Content>
+                            <TextBlock Text="&#xf65d;" FontFamily="{StaticResource FontAwesome}"/>
+                        </Button.Content>
+                    </Button>
+                </Grid>
+            </StackPanel>
+            <StackPanel Grid.Row="1">
+                <TextBlock Text="Texture" Padding="5 0"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0" Margin="0 5" Name="TextureSelect" ItemsSource="{Binding SelectedTexList.Textures}"
+                              SelectedItem="{Binding SelectedTexture}" DisplayMemberPath="Name"/>
+                    <Button Grid.Column="1" Style="{StaticResource TransparentButton}" ToolTip="Open texture">
+                        <Button.Content>
+                            <TextBlock Text="&#xf07c;" FontFamily="{StaticResource FontAwesome}"/>
+                        </Button.Content>
+                    </Button>
+                    <Button Grid.Column="2" Style="{StaticResource TransparentButton}" ToolTip="Remove texture">
+                        <Button.Content>
+                            <TextBlock Text="&#xf2ed;" FontFamily="{StaticResource FontAwesome}"/>
+                        </Button.Content>
+                    </Button>
+                </Grid>
+                <TextBlock Text="Sprites" Padding="5 0"/>
+            </StackPanel>
+            <ListBox Margin="0 5" Grid.Row="2" Name="ScenesTreeView" ItemsSource="{Binding SelectedTexture.Sprites}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models:Sprite}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Image}" Width="32" Height="32" Margin="0 0 5 0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Texture.Name}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="New Sprite" HorizontalAlignment="Stretch" Margin="5" Style="{StaticResource ButtonPrimary}"
                             />
-                    <Button Grid.Column="1" Content="Remove Sprite" HorizontalAlignment="Stretch" Margin="0 5 5 5"/>
+                <Button Grid.Column="1" Content="Remove Sprite" HorizontalAlignment="Stretch" Margin="0 5 5 5"/>
+            </Grid>
+        </Grid>
+        <GroupBox Header="Sprite Properties" Grid.Column="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Margin="5" Grid.Column="0" Source="{Binding SelectedTexture.ImageSource}" Width="auto" Height="auto"
+                           MaxWidth="{Binding SelectedTexture.Width}" MaxHeight="{Binding SelectedTexture.Height}"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Stretch" Background="{StaticResource RegionBrush}">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockBaseStyle}">
+                                <Setter Property="Margin" Value="5"/>
+                                <Setter Property="HorizontalAlignment" Value="Left"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                            </Style>
+                        </StackPanel.Resources>
+                        <TextBlock>
+                            <Run Text="Name: "/>
+                            <Run Text="{Binding SelectedTexture.Name, Mode=OneWay}"/>
+                        </TextBlock>
+                        <TextBlock>
+                            <Run Text="Width: "/>
+                            <Run Text="{Binding SelectedTexture.Width, Mode=OneWay}"/>
+                        </TextBlock>
+                        <TextBlock>
+                            <Run Text="Height: "/>
+                            <Run Text="{Binding SelectedTexture.Height, Mode=OneWay}"/>
+                        </TextBlock>
+                    </StackPanel>
                 </Grid>
             </Grid>
-        </GroupBox>
-        <GroupBox Header="Sprite Properties" Grid.Column="1">
-            <ContentControl Content="{Binding ElementName=ScenesTreeView, Path=SelectedItem}">
-                <ContentControl.Resources>
-                    <DataTemplate DataType="{x:Type viewmodels:SpriteViewModel}">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="3*"/>
-                                <RowDefinition Height="1*"/>
-                            </Grid.RowDefinitions>
-                            <Border Grid.Row="0" BorderBrush="{StaticResource SecondaryBorderBrush}" BorderThickness="1" CornerRadius="2" Margin="5">
-                                <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                                    <controls:TextureAtlasControl x:Name="TexView" Background="{StaticResource SecondaryRegionBrush}"/>
-                                </ScrollViewer>
-                            </Border>
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0">
-                                    <Slider Value="{Binding ElementName=TexView, Path=Zoom}" HorizontalAlignment="Stretch"/>
-                                    <Button Content="Change Texture" HorizontalAlignment="Stretch"/>
-                                    <TextBlock>
-                                        <Run Text="Name: "/>
-                                        <Run Text="{Binding Texture.Name, Mode=OneWay}"/>
-                                    </TextBlock>
-                                    <TextBlock>
-                                        <Run Text="Width:"/>
-                                        <Run Text="{Binding Texture.Width, Mode=OneWay}"/>
-                                    </TextBlock>
-                                    <TextBlock>
-                                        <Run Text="Height:"/>
-                                        <Run Text="{Binding Texture.Height, Mode=OneWay}"/>
-                                    </TextBlock>
-                                </StackPanel>
-                                <controls:SpriteControl Grid.Column="1" Margin="5"/>
-                            </Grid>
-                        </Grid>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type models:UIScene}">
-                        <TextBlock Text="Select a sprite from the tree view to view its properties"/>
-                    </DataTemplate>
-                </ContentControl.Resources>
-            </ContentControl>
         </GroupBox>
     </Grid>
 </UserControl>

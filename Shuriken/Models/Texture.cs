@@ -27,7 +27,7 @@ namespace Shuriken.Models
         public BitmapSource ImageSource { get; private set; }
         private System.Drawing.Bitmap bitmap;
 
-        public ObservableCollection<SpriteViewModel> Sprites { get; set; }
+        public ObservableCollection<Sprite> Sprites { get; set; }
         
         private void CreateGLTexture()
         {
@@ -80,7 +80,7 @@ namespace Shuriken.Models
             ImageSource = BitmapConverter.Bitmap2BitmapImage(bitmap);
             Width = ImageSource.PixelWidth;
             Height = ImageSource.PixelHeight;
-            Sprites = new ObservableCollection<SpriteViewModel>();
+            Sprites = new ObservableCollection<Sprite>();
 
             CreateGLTexture();
         }
@@ -91,7 +91,7 @@ namespace Shuriken.Models
             Width = 0;
             Height = 0;
             ImageSource = null;
-            Sprites = new ObservableCollection<SpriteViewModel>();
+            Sprites = new ObservableCollection<Sprite>();
         }
     }
 }

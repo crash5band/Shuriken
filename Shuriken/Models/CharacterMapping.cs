@@ -25,8 +25,8 @@ namespace Shuriken.Models
             }
         }
 
-        private SpriteViewModel sprite;
-        public SpriteViewModel Sprite
+        private Sprite sprite;
+        public Sprite Sprite
         {
             get => sprite;
             set
@@ -43,7 +43,7 @@ namespace Shuriken.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public CharacterMapping(char c, SpriteViewModel spr)
+        public CharacterMapping(char c, Sprite spr)
         {
             character = c;
             sprite = spr;
@@ -51,7 +51,7 @@ namespace Shuriken.Models
 
         public CharacterMapping()
         {
-            Sprite = new SpriteViewModel();
+            Sprite = new Sprite();
         }
     }
 }

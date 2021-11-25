@@ -68,7 +68,7 @@ namespace Shuriken.Views
             var vm = DataContext as ScenesViewModel;
             if (vm != null)
             {
-                vm.Viewer.UpdateScenes(Project.Scenes, Project.Fonts, delta);
+                vm.UpdateScenes(Project.Scenes, Project.Fonts, delta);
                 //renderer.DrawScenes(Project.Scenes, Project.Fonts, delta);
             }
         }
