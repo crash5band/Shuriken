@@ -34,21 +34,30 @@
                     <HierarchicalDataTemplate DataType="{x:Type models:UIScene}" ItemsSource="{Binding Groups}">
                         <StackPanel Orientation="Horizontal">
                             <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
-                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock>
+                                <Run Text="&#xf61f; " FontFamily="{StaticResource FontAwesome}"/>
+                                <Run Text="{Binding Name}"/>
+                            </TextBlock>
                         </StackPanel>
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type models:LayerGroup}" ItemsSource="{Binding Layers}">
                         <StackPanel Orientation="Horizontal">
                             <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
-                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock>
+                                <Run Text="&#xf5fd; " FontFamily="{StaticResource FontAwesome}"/>
+                                <Run Text="{Binding Name}"/>
+                            </TextBlock>
                         </StackPanel>
                     </HierarchicalDataTemplate>
-                    <DataTemplate DataType="{x:Type models:UILayer}">
+                    <HierarchicalDataTemplate DataType="{x:Type models:UILayer}" ItemsSource="{Binding Children}">
                         <StackPanel Orientation="Horizontal">
                             <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
-                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock>
+                                <Run Text="&#xf0c8; " FontFamily="{StaticResource FontAwesome}"/>
+                                <Run Text="{Binding Name}"/>
+                            </TextBlock>
                         </StackPanel>
-                    </DataTemplate>
+                    </HierarchicalDataTemplate>
                 </TreeView.Resources>
             </TreeView>
             <Grid Grid.Row="2">

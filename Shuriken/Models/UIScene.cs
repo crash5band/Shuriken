@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using XNCPLib.XNCP;
 using System.ComponentModel;
-using Shuriken.ViewModels;
 using Shuriken.Models.Animation;
 using Shuriken.Misc;
 using System.Runtime.CompilerServices;
@@ -105,11 +104,12 @@ namespace Shuriken.Models
                 TextureSizes.Add(new Vector2(texSize.X, texSize.Y));
             }
 
-            CreateGroups(scene);
+            ProcessCasts(scene, texList);
+            //CreateGroups(scene);
             //CreateSprites(scene);
-            CreateLayers(scene, scene.CastDictionaries, texList);
-            CreateAnimations(scene);
-            CreateHierarchyTree(scene);
+            //CreateLayers(scene, scene.CastDictionaries, texList);
+            //CreateAnimations(scene);
+            //CreateHierarchyTree(scene);
 
             Visible = false;
         }
@@ -152,46 +152,67 @@ namespace Shuriken.Models
         }
         */
 
-        private void CreateLayers(Scene scene, List<CastDictionary> castDictionary, TextureList texList)
+        private void ProcessCasts(Scene scene, TextureList texList)
         {
+            // Create groups
             for (int g = 0; g < scene.GroupCount; ++g)
+            {
+                Groups.Add(new LayerGroup
+                {
+                    Name = "Group_" + g,
+                    Field08 = scene.UICastGroups[g].Field08
+                });
+            }
+
+            // process group layers
+            List<UILayer> tempLyrs = new List<UILayer>();
+            for (int g = 0; g < Groups.Count; ++g)
             {
                 for (int c = 0; c < scene.UICastGroups[g].CastCount; ++c)
                 {
                     int[] castSprites = scene.UICastGroups[g].Casts[c].CastMaterialData.SubImageIndices;
-                    UILayer layer = new UILayer(scene.UICastGroups[g].Casts[c], GetLayerName(g, c, castDictionary));
+                    UILayer layer = new UILayer(scene.UICastGroups[g].Casts[c], GetLayerName(g, c, scene.CastDictionaries));
 
                     for (int index = 0; index < layer.Sprites.Length; ++index)
                     {
                         layer.Sprites[index] = Utilities.FindSpriteFromNCPScene(castSprites[index], scene.SubImages, texList.Textures);
                     }
 
-                    Groups[g].Layers.Add(layer);
+                    tempLyrs.Add(layer);
                 }
+
+                // build hierarchy tree
+                CreateHierarchyTree(g, scene.UICastGroups[g].CastHierarchyTree, tempLyrs);
+
+                tempLyrs.Clear();
             }
         }
 
-        private void CreateHierarchyTree(Scene scene)
+        private void CreateHierarchyTree(int group, List<CastHierarchyTreeNode> tree, List<UILayer> tempLyrs)
         {
-            for (int g = 0; g < scene.GroupCount; ++g)
-            {
-                List<CastHierarchyTreeNode> tree = scene.UICastGroups[g].CastHierarchyTree;
-                BuildTree(g, 0, tree);
-            }
+            Groups[group].Layers.Add(tempLyrs[0]);
+            BuildTree(0, tree, tempLyrs, null);
         }
 
-        private void BuildTree(int g, int c, List<CastHierarchyTreeNode> tree)
+        private void BuildTree(int c, List<CastHierarchyTreeNode> tree, List<UILayer> lyrs, UILayer parent)
         {
-            if (tree[c].ChildIndex != -1)
+            int childIndex = tree[c].ChildIndex;
+            if (childIndex != -1)
             {
-                Groups[g].Layers[tree[c].ChildIndex].Parent = Groups[g].Layers[c];
-                BuildTree(g, tree[c].ChildIndex, tree);
+                UILayer child = lyrs[childIndex];
+                lyrs[c].Children.Add(child);
+
+                BuildTree(childIndex, tree, lyrs, lyrs[c]);
             }
 
-            if (tree[c].NextIndex != -1)
+            int siblingIndex = tree[c].NextIndex;
+            if (siblingIndex != -1)
             {
-                Groups[g].Layers[tree[c].NextIndex].Parent = Groups[g].Layers[c].Parent;
-                BuildTree(g, tree[c].NextIndex, tree);
+                UILayer sibling = lyrs[siblingIndex];
+                if (parent != null)
+                    parent.Children.Add(sibling);
+
+                BuildTree(siblingIndex, tree, lyrs, parent);
             }
         }
 

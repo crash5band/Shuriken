@@ -14,11 +14,13 @@ namespace Shuriken.Models
 {
     public class UILayer : INotifyPropertyChanged
     {
-        private bool visible;
-        private Vector2 translation;
-
         [Category("Layer")]
-        public string Name { get; set; }
+        private string name { get; set; }
+        public string Name
+        { 
+            get { return name; }
+            set { name = value; NotifyPropertyChanged(); }
+        }
 
         [Category("Layer")]
         public uint Field00 { get; set; }
@@ -45,7 +47,7 @@ namespace Shuriken.Models
         public ushort Field2E { get; set; }
         public ushort Field34 { get; set; }
         public ushort Field36 { get; set; }
-        public uint Field38 { get; set; }
+        public uint Flags { get; set; }
         public uint Field3C { get; set; }
 
         [Category("Font")]
@@ -68,27 +70,35 @@ namespace Shuriken.Models
         public uint Field70 { get; set; }
         public int InfoField00 { get; set; }
 
-        [Category("Transform")]
+        private Vector2 translation;
         public Vector2 Translation
         {
-            get => translation;
-            set
-            {
-                translation = value;
-                NotifyPropertyChanged();
-            }
+            get { return translation; }
+            set { translation = value; NotifyPropertyChanged(); }
         }
 
-        [Category("Transform")]
-        public float Rotation { get; set; }
+        private float rotation;
+        public float Rotation
+        {
+            get { return rotation; }
+            set { rotation = value; NotifyPropertyChanged(); }
+        }
 
-        [Category("Transform")]
-        public Vector2 Scale { get; set; }
+        private Vector2 scale;
+        public Vector2 Scale
+        {
+            get { return scale; }
+            set { scale = value; NotifyPropertyChanged(); }
+        }
 
         public float InfoField18 { get; set; }
 
-        [Category("Color")]
-        public Color Color { get; set; }
+        private Color color;
+        public Color Color
+        {
+            get { return color; }
+            set { color = value; NotifyPropertyChanged(); }
+        }
 
         [Category("Color")]
         public Color GradientTopLeft { get; set; }
@@ -107,17 +117,14 @@ namespace Shuriken.Models
         public uint InfoField38 { get; set; }
 
         [Category("Sprite")]
-        public SpriteViewModel[] Sprites { get; set; }
+        public Sprite[] Sprites { get; set; }
 
         [Browsable(false)]
+        private bool visible;
         public bool Visible
         {
             get => visible;
-            set
-            {
-                visible = value;
-                NotifyPropertyChanged();
-            }
+            set { visible = value; NotifyPropertyChanged(); }
         }
 
         public UILayer Parent { get; set; }
@@ -143,7 +150,7 @@ namespace Shuriken.Models
             Field2E = cast.Field2E;
             Field34 = cast.Field34;
             Field36 = cast.Field36;
-            Field38 = cast.Field38;
+            Flags = cast.Field38;
             Field3C = cast.Field3C;
 
             FontName = cast.FontNameOffset.Offset != 0 ? cast.FontNameOffset.Value : "";
@@ -175,7 +182,7 @@ namespace Shuriken.Models
             InfoField34 = cast.CastInfoData.Field34;
             InfoField38 = cast.CastInfoData.Field38;
 
-            Sprites = new SpriteViewModel[32];
+            Sprites = new Sprite[32];
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
