@@ -7,45 +7,40 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:viewmodels="clr-namespace:Shuriken.ViewModels"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance Type=viewmodels:SpriteViewModel}"
-             d:DesignHeight="200" d:DesignWidth="300"  BorderBrush="{StaticResource BorderBrush}" BorderThickness="2">
+             d:DataContext="{d:DesignInstance Type=viewmodels:SpritesViewModel}"
+             d:DesignHeight="200" d:DesignWidth="400"  BorderBrush="{StaticResource BorderBrush}" BorderThickness="2">
     <Grid>
         <ScrollViewer Margin="5">
             <ScrollViewer.Resources>
                 <Style TargetType="{x:Type TextBlock}">
-                    <Setter Property="Margin" Value="0 10 0 5"/>
-                    <Setter Property="Padding" Value="5 0"/>
-                </Style>
-                <Style TargetType="{x:Type Grid}">
-                    <Setter Property="Margin" Value="0 2"/>
+                    <Setter Property="Margin" Value="5 0"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="HorizontalAlignment" Value="Left"/>
                 </Style>
             </ScrollViewer.Resources>
             <StackPanel>
-
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="3*"/>
                         <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="X" Grid.Column="0"/>
-                    <hc:NumericUpDown Value="{Binding X}" Grid.Column="1"/>
-                    <TextBlock Text="Y" Grid.Column="2"/>
-                    <hc:NumericUpDown Value="{Binding Y}" Grid.Column="3"/>
-                </Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Text="X" Grid.Row="0" Grid.Column="0"/>
+                    <TextBlock Text="Y" Grid.Row="0" Grid.Column="2"/>
+                    <TextBlock Text="Width" Grid.Row="2" Grid.Column="0"/>
+                    <TextBlock Text="Height" Grid.Row="2" Grid.Column="2"/>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="2*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Width" Grid.Column="0"/>
-                    <hc:NumericUpDown Value="{Binding Width}" Grid.Column="1"/>
-                    <TextBlock Text="Height" Grid.Column="2"/>
-                    <hc:NumericUpDown Value="{Binding Height}" Grid.Column="3"/>
+                    <hc:NumericUpDown Value="{Binding X}" Grid.Row="0" Grid.Column="1"/>
+                    <hc:NumericUpDown Value="{Binding Y}" Grid.Row="0" Grid.Column="3"/>
+                    <hc:NumericUpDown Value="{Binding Width}" Grid.Row="2" Grid.Column="1"/>
+                    <hc:NumericUpDown Value="{Binding Height}" Grid.Row="2" Grid.Column="3"/>
                 </Grid>
             </StackPanel>
         </ScrollViewer>

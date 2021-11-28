@@ -1,11 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
-using Shuriken.Editors;
 using Shuriken.Converters;
 
 namespace Shuriken.Models
 {
-    [Editor(typeof(Vector2Editor), typeof(Vector2Editor))]
     public class Vector2
     {
         public float X { get; set; }

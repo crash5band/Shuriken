@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace Shuriken.Models
 {
@@ -34,6 +35,8 @@ namespace Shuriken.Models
         {
             get { return (int)Dimensions.Y; }
         }
+
+        public CroppedBitmap Crop => new CroppedBitmap(Texture.ImageSource, new Int32Rect(X, Y, Width, Height));
 
         public Sprite(Texture tex, float top = 0.0f, float left = 0.0f, float bottom = 1.0f, float right = 1.0f)
         {

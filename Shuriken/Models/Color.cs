@@ -4,14 +4,11 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Shuriken.Editors;
 using Shuriken.Converters;
 using System.Runtime.CompilerServices;
 
 namespace Shuriken.Models
 {
-    [Editor(typeof(ColorEditor), typeof(ColorEditor))]
-    [TypeConverter(typeof(ColorToBrushConverter))]
     public class Color : INotifyPropertyChanged
     {
         private byte r, g, b, a;
