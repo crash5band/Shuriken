@@ -1,0 +1,138 @@
+﻿<UserControl x:Class="Shuriken.Controls.LayerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Shuriken.Controls"
+             xmlns:models="clr-namespace:Shuriken.Models"
+             xmlns:viewmodels="clr-namespace:Shuriken.ViewModels"
+             xmlns:converters="clr-namespace:Shuriken.Converters"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             Name="LayerControlPanel"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=models:UILayer}"
+             d:DesignHeight="1500" d:DesignWidth="300">
+    <UserControl.Resources>
+        <Style TargetType="Label" BasedOn="{StaticResource BaseStyle}">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+            <Setter Property="Padding" Value="5 2.5"/>
+            <Setter Property="Margin" Value="0 5 0 0"/>
+        </Style>
+        <Style TargetType="Expander" BasedOn="{StaticResource ExpanderBaseStyle}">
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+        <Style TargetType="Border">
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Background" Value="{StaticResource RegionBrush}"/>
+            <Setter Property="CornerRadius" Value="1"/>
+        </Style>
+        <converters:EnumToCollectionConverter x:Key="EnumConverter"/>
+    </UserControl.Resources>
+    <ScrollViewer>
+        <StackPanel>
+            <Expander Header="Layer" IsExpanded="True">
+                <Border>
+                    <StackPanel>
+                        <Label>Name</Label>
+                        <TextBox Text="{Binding Name}"/>
+
+                        <Label>Field00</Label>
+                        <TextBox Text="{Binding Field00}"/>
+
+                        <Label>Type</Label>
+                        <ComboBox ItemsSource="{Binding Type, Converter={StaticResource EnumConverter}}"
+                              SelectedValue="{Binding Type}" SelectedValuePath="Value" DisplayMemberPath="Description"/>
+
+                        <CheckBox Content="Enabled" IsChecked="{Binding IsEnabled}" HorizontalAlignment="Left" Margin="5 10"/>
+                    </StackPanel>
+                </Border>
+            </Expander>
+            <Expander Header="Dimensions" IsExpanded="True">
+                <Border>
+                    <StackPanel>
+                        <Label>Width</Label>
+                        <hc:NumericUpDown Value="{Binding Width}"/>
+
+                        <Label>Height</Label>
+                        <hc:NumericUpDown Value="{Binding Height}"/>
+                    </StackPanel>
+                </Border>
+            </Expander>
+            <Expander Header="Transform" IsExpanded="True">
+                <Border>
+                    <StackPanel>
+                        <Label>Translation</Label>
+                        <local:Vector2Control Value="{Binding Translation}"/>
+
+                        <Label>Offset</Label>
+                        <local:Vector2Control Value="{Binding Offset}"/>
+
+                        <Label>Rotation</Label>
+                        <hc:NumericUpDown Value="{Binding Rotation}"/>
+
+                        <Label>Scale</Label>
+                        <local:Vector2Control Value="{Binding Scale}"/>
+                    </StackPanel>
+                </Border>
+            </Expander>
+            <Expander Header="Color" IsExpanded="True">
+                <Border>
+                    <StackPanel>
+                        <Label>Color</Label>
+                        <local:ColorControl Value="{Binding Color}"/>
+
+                        <Label>Top-Left Gradient</Label>
+                        <local:ColorControl Value="{Binding GradientTopLeft}"/>
+
+                        <Label>Top-Right Gradient</Label>
+                        <local:ColorControl Value="{Binding GradientTopRight}"/>
+
+                        <Label>Bottom-Left Gradient</Label>
+                        <local:ColorControl Value="{Binding GradientBottomLeft}"/>
+
+                        <Label>Bottom-Right Gradient</Label>
+                        <local:ColorControl Value="{Binding GradientBottomRight}"/>
+                    </StackPanel>
+                </Border>
+            </Expander>
+            <Expander Header="Unknown" IsExpanded="True">
+                <Border>
+                    <StackPanel>
+                        <Label>Field3C</Label>
+                        <TextBox Text="{Binding Field3C}"/>
+
+                        <Label>Field4C</Label>
+                        <TextBox Text="{Binding Field4C}"/>
+                        
+                        <Label>Field58</Label>
+                        <TextBox Text="{Binding Field58}"/>
+
+                        <Label>Field5C</Label>
+                        <TextBox Text="{Binding Field5C}"/>
+
+                        <Label>Field68</Label>
+                        <TextBox Text="{Binding Field68}"/>
+
+                        <Label>Field6C</Label>
+                        <TextBox Text="{Binding Field6C}"/>
+
+                        <Label>Flags</Label>
+                        <TextBox Text="{Binding Flags}"/>
+                    </StackPanel>
+                </Border>
+            </Expander>
+            <Expander Header="Sprites" IsExpanded="True">
+                <Border>
+                    <ListBox ItemsSource="{Binding Sprites}" Height="100">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type models:Sprite}">
+                                <Image Source="{Binding Image}" Width="auto" Height="30"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+            </Expander>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

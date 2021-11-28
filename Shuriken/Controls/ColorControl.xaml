@@ -10,40 +10,59 @@
              d:DataContext="{d:DesignInstance Type=local:ColorControl}"
              d:DesignHeight="35" d:DesignWidth="800">
     <UserControl.Resources>
-        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockBaseStyle}">
-            <Setter Property="Padding" Value="5 0"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-        <Style TargetType="{x:Type hc:NumericUpDown}" BasedOn="{StaticResource NumericUpDownBaseStyle}">
-            <Setter Property="Minimum" Value="0"/>
-            <Setter Property="Maximum" Value="255"/>
-        </Style>
         <converters:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+        <converters:RGBAToHexConverter x:Key="RgbaToHexConverter"/>
     </UserControl.Resources>
     
     <Grid Name="LayoutRoot">
+        <Grid.Resources>
+            <DataTemplate x:Key="RGBATemplate">
+                <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockBaseStyle}">
+                            <Setter Property="Padding" Value="5 0"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="R"/>
+                    <TextBox Grid.Column="1" Text="{Binding Value.R}"/>
+                    <TextBlock Grid.Column="2" Text="G"/>
+                    <TextBox Grid.Column="3" Text="{Binding Value.G}"/>
+                    <TextBlock Grid.Column="4" Text="B"/>
+                    <TextBox Grid.Column="5" Text="{Binding Value.B}"/>
+                    <TextBlock Grid.Column="6" Text="A"/>
+                    <TextBox Grid.Column="7" Text="{Binding Value.A}"/>
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate x:Key="HexTemplate">
+                <TextBox Grid.Column="0" Text="{Binding Value, Converter={StaticResource RgbaToHexConverter}}"/>
+            </DataTemplate>
+
+            <Style x:Key="ViewStyle" TargetType="ContentPresenter">
+                <Setter Property="ContentTemplate" Value="{StaticResource RGBATemplate}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding View}" Value="List">
+                        <Setter Property="ContentTemplate" Value="{StaticResource HexTemplate}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="35"/>
         </Grid.ColumnDefinitions>
-
-        <TextBlock Grid.Column="0" Text="R"/>
-        <TextBlock Grid.Column="2" Text="G"/>
-        <TextBlock Grid.Column="4" Text="B"/>
-        <TextBlock Grid.Column="6" Text="A"/>
-        
-        <hc:NumericUpDown Grid.Column="1" Value="{Binding Value.R, UpdateSourceTrigger=PropertyChanged}"/>
-        <hc:NumericUpDown Grid.Column="3" Value="{Binding Value.G, UpdateSourceTrigger=PropertyChanged}"/>
-        <hc:NumericUpDown Grid.Column="5" Value="{Binding Value.B, UpdateSourceTrigger=PropertyChanged}"/>
-        <hc:NumericUpDown Grid.Column="7" Value="{Binding Value.A, UpdateSourceTrigger=PropertyChanged}"/>
-        
+        <ContentPresenter Style="{StaticResource ViewStyle}" Content="{Binding }"/>
         <Button Name="ColorBtn" Grid.Column="8" Width="30" Height="30" Background="{Binding Value, Converter={StaticResource ColorToBrushConverter}}" Click="ColorBtnClick"/>
     </Grid>
 </UserControl>
