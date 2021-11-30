@@ -77,13 +77,10 @@ namespace Shuriken.Models
             set { visible = value; NotifyPropertyChanged(); }
         }
 
-        [Category("Data1")]
         public ObservableCollection<Vector2> TextureSizes { get; set; }
 
-        [Browsable(false)]
         public ObservableCollection<LayerGroup> Groups { get; set; }
 
-        [Browsable(false)]
         public ObservableCollection<AnimationGroup> Animations { get; set; }
 
         public UIScene(Scene scene, string sceneName, TextureList texList, IEnumerable<UIFont> fonts)
@@ -105,12 +102,6 @@ namespace Shuriken.Models
             }
 
             ProcessCasts(scene, texList);
-            //CreateGroups(scene);
-            //CreateSprites(scene);
-            //CreateLayers(scene, scene.CastDictionaries, texList);
-            //CreateAnimations(scene);
-            //CreateHierarchyTree(scene);
-
             Visible = false;
         }
 
@@ -127,31 +118,6 @@ namespace Shuriken.Models
             Visible = false;
         }
 
-        private void CreateGroups(Scene scene)
-        {
-            for (int i = 0; i < scene.GroupCount; ++i)
-            {
-                Groups.Add(new LayerGroup
-                {
-                    Name = "Group_" + i,
-                    Field08 = scene.UICastGroups[i].Field08
-                });
-            }
-        }
-
-        /*
-        private void CreateSprites(Scene scene, ObservableCollection<Texture> textures)
-        {
-            foreach (var sub in scene.SubImages)
-            {
-                if ((int)sub.TextureIndex > -1 && (int)sub.TextureIndex < textures.Count)
-                {
-                    Sprites.Add(new SpriteViewModel(new Sprite(textures[(int)sub.TextureIndex], sub.TopLeft.Y, sub.TopLeft.X, sub.BottomRight.Y, sub.BottomRight.X)));
-                }
-            }
-        }
-        */
-
         private void ProcessCasts(Scene scene, TextureList texList)
         {
             // Create groups
@@ -164,6 +130,16 @@ namespace Shuriken.Models
                 });
             }
 
+            // Pre-process animations
+            foreach (var entry in scene.AnimationDictionaries)
+            {
+                Animations.Add(new AnimationGroup(entry.Name.Value)
+                {
+                    Field00 = scene.AnimationFrameDataList[(int)entry.Index].Field00,
+                    Duration = scene.AnimationFrameDataList[(int)entry.Index].FrameCount
+                });
+            }
+
             // process group layers
             List<UILayer> tempLyrs = new List<UILayer>();
             for (int g = 0; g < Groups.Count; ++g)
@@ -171,7 +147,7 @@ namespace Shuriken.Models
                 for (int c = 0; c < scene.UICastGroups[g].CastCount; ++c)
                 {
                     int[] castSprites = scene.UICastGroups[g].Casts[c].CastMaterialData.SubImageIndices;
-                    UILayer layer = new UILayer(scene.UICastGroups[g].Casts[c], GetLayerName(g, c, scene.CastDictionaries));
+                    UILayer layer = new UILayer(scene.UICastGroups[g].Casts[c], GetCastName(g, c, scene.CastDictionaries));
 
                     for (int index = 0; index < layer.Sprites.Length; ++index)
                     {
@@ -181,54 +157,9 @@ namespace Shuriken.Models
                     tempLyrs.Add(layer);
                 }
 
-                // build hierarchy tree
-                CreateHierarchyTree(g, scene.UICastGroups[g].CastHierarchyTree, tempLyrs);
-
-                tempLyrs.Clear();
-            }
-        }
-
-        private void CreateHierarchyTree(int group, List<CastHierarchyTreeNode> tree, List<UILayer> tempLyrs)
-        {
-            Groups[group].Layers.Add(tempLyrs[0]);
-            BuildTree(0, tree, tempLyrs, null);
-        }
-
-        private void BuildTree(int c, List<CastHierarchyTreeNode> tree, List<UILayer> lyrs, UILayer parent)
-        {
-            int childIndex = tree[c].ChildIndex;
-            if (childIndex != -1)
-            {
-                UILayer child = lyrs[childIndex];
-                lyrs[c].Children.Add(child);
-
-                BuildTree(childIndex, tree, lyrs, lyrs[c]);
-            }
-
-            int siblingIndex = tree[c].NextIndex;
-            if (siblingIndex != -1)
-            {
-                UILayer sibling = lyrs[siblingIndex];
-                if (parent != null)
-                    parent.Children.Add(sibling);
-
-                BuildTree(siblingIndex, tree, lyrs, parent);
-            }
-        }
-
-        private void CreateAnimations(Scene scene)
-        {
-            foreach (var entry in scene.AnimationDictionaries)
-            {
-                AnimationGroup group = new AnimationGroup(entry.Name.Value)
+                for (int a = 0; a < Animations.Count; ++a)
                 {
-                    Field00 = scene.AnimationFrameDataList[(int)entry.Index].Field00,
-                    Duration = scene.AnimationFrameDataList[(int)entry.Index].FrameCount
-                };
-
-                for (int g = 0; g < scene.GroupCount; ++g)
-                {
-                    XNCPLib.XNCP.Animation.AnimationKeyframeData keyframeData = scene.AnimationKeyframeDataList[(int)entry.Index];
+                    XNCPLib.XNCP.Animation.AnimationKeyframeData keyframeData = scene.AnimationKeyframeDataList[a];
                     for (int c = 0; c < keyframeData.GroupAnimationDataList[g].CastCount; ++c)
                     {
                         XNCPLib.XNCP.Animation.CastAnimationData castAnimData = keyframeData.GroupAnimationDataList[g].CastAnimationDataList[c];
@@ -258,17 +189,56 @@ namespace Shuriken.Models
 
                         if (tracks.Count > 0)
                         {
-                            AnimationList layerAnimationList = new AnimationList(Groups[g].Layers[c], tracks);
-                            group.LayerAnimations.Add(layerAnimationList);
+                            AnimationList layerAnimationList = new AnimationList(tempLyrs[c], tracks);
+                            Animations[a].LayerAnimations.Add(layerAnimationList);
                         }
                     }
                 }
 
-                Animations.Add(group);
+                // build hierarchy tree
+                CreateHierarchyTree(g, scene.UICastGroups[g].CastHierarchyTree, tempLyrs);
+
+                tempLyrs.Clear();
             }
         }
 
-        public string GetLayerName(int groupIndex, int castIndex, List<CastDictionary> castDictionary)
+        private void CreateHierarchyTree(int group, List<CastHierarchyTreeNode> tree, List<UILayer> lyrs)
+        {
+            Groups[group].Layers.Add(lyrs[0]);
+            BuildTree(0, tree, lyrs, null);
+        }
+
+        private void BuildTree(int c, List<CastHierarchyTreeNode> tree, List<UILayer> lyrs, UILayer parent)
+        {
+            int childIndex = tree[c].ChildIndex;
+            if (childIndex != -1)
+            {
+                UILayer child = lyrs[childIndex];
+                lyrs[c].Children.Add(child);
+
+                BuildTree(childIndex, tree, lyrs, lyrs[c]);
+            }
+
+            int siblingIndex = tree[c].NextIndex;
+            if (siblingIndex != -1)
+            {
+                UILayer sibling = lyrs[siblingIndex];
+                if (parent != null)
+                    parent.Children.Add(sibling);
+
+                BuildTree(siblingIndex, tree, lyrs, parent);
+            }
+        }
+
+        /// <summary>
+        /// Gets the cast name from a cast dictionary provided its index and group index.
+        /// If the cast is not found, an empty string is returned.
+        /// </summary>
+        /// <param name="groupIndex">The index of the group in which the cast belongs</param>
+        /// <param name="castIndex">The index of the cast</param>
+        /// <param name="castDictionary">A dictionary containing cast names, group indices and cast indices.</param>
+        /// <returns></returns>
+        public string GetCastName(int groupIndex, int castIndex, List<CastDictionary> castDictionary)
         {
             foreach (var entry in castDictionary)
             {
@@ -276,7 +246,7 @@ namespace Shuriken.Models
                     return entry.Name.Value;
             }
 
-            return "";
+            return String.Empty;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
