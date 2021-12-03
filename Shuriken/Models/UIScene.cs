@@ -101,7 +101,7 @@ namespace Shuriken.Models
                 TextureSizes.Add(new Vector2(texSize.X, texSize.Y));
             }
 
-            ProcessCasts(scene, texList);
+            ProcessCasts(scene, texList, fonts);
             Visible = false;
         }
 
@@ -118,7 +118,7 @@ namespace Shuriken.Models
             Visible = false;
         }
 
-        private void ProcessCasts(Scene scene, TextureList texList)
+        private void ProcessCasts(Scene scene, TextureList texList, IEnumerable<UIFont> fonts)
         {
             // Create groups
             for (int g = 0; g < scene.GroupCount; ++g)
@@ -131,6 +131,8 @@ namespace Shuriken.Models
             }
 
             // Pre-process animations
+            Dictionary<int, int> entryIndexMap = new Dictionary<int, int>();
+            int animIndex = 0;
             foreach (var entry in scene.AnimationDictionaries)
             {
                 Animations.Add(new AnimationGroup(entry.Name.Value)
@@ -138,6 +140,8 @@ namespace Shuriken.Models
                     Field00 = scene.AnimationFrameDataList[(int)entry.Index].Field00,
                     Duration = scene.AnimationFrameDataList[(int)entry.Index].FrameCount
                 });
+
+                entryIndexMap.Add(animIndex++, (int)entry.Index);
             }
 
             // process group layers
@@ -146,20 +150,32 @@ namespace Shuriken.Models
             {
                 for (int c = 0; c < scene.UICastGroups[g].CastCount; ++c)
                 {
-                    int[] castSprites = scene.UICastGroups[g].Casts[c].CastMaterialData.SubImageIndices;
                     UILayer layer = new UILayer(scene.UICastGroups[g].Casts[c], GetCastName(g, c, scene.CastDictionaries));
 
-                    for (int index = 0; index < layer.Sprites.Length; ++index)
+                    // sprite
+                    if (layer.Type == DrawType.Sprite)
                     {
-                        layer.Sprites[index] = Utilities.FindSpriteFromNCPScene(castSprites[index], scene.SubImages, texList.Textures);
+                        int[] castSprites = scene.UICastGroups[g].Casts[c].CastMaterialData.SubImageIndices;
+                        for (int index = 0; index < layer.Sprites.Length; ++index)
+                        {
+                            layer.Sprites[index] = Utilities.FindSpriteFromNCPScene(castSprites[index], scene.SubImages, texList.Textures);
+                        }
+                    }
+                    else if (layer.Type == DrawType.Font)
+                    {
+                        foreach (var font in fonts)
+                        {
+                            if (font.Name == scene.UICastGroups[g].Casts[c].FontNameOffset.Value)
+                                layer.Font = font;
+                        }
                     }
 
                     tempLyrs.Add(layer);
                 }
 
-                for (int a = 0; a < Animations.Count; ++a)
+                foreach (var entry in entryIndexMap)
                 {
-                    XNCPLib.XNCP.Animation.AnimationKeyframeData keyframeData = scene.AnimationKeyframeDataList[a];
+                    XNCPLib.XNCP.Animation.AnimationKeyframeData keyframeData = scene.AnimationKeyframeDataList[entry.Value];
                     for (int c = 0; c < keyframeData.GroupAnimationDataList[g].CastCount; ++c)
                     {
                         XNCPLib.XNCP.Animation.CastAnimationData castAnimData = keyframeData.GroupAnimationDataList[g].CastAnimationDataList[c];
@@ -190,7 +206,7 @@ namespace Shuriken.Models
                         if (tracks.Count > 0)
                         {
                             AnimationList layerAnimationList = new AnimationList(tempLyrs[c], tracks);
-                            Animations[a].LayerAnimations.Add(layerAnimationList);
+                            Animations[entry.Key].LayerAnimations.Add(layerAnimationList);
                         }
                     }
                 }
