@@ -53,7 +53,7 @@
                         <StackPanel Orientation="Horizontal">
                             <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
                             <TextBlock>
-                                <Run Text="&#xf0c8; " FontFamily="{StaticResource FontAwesome}"/>
+                                <Run Text="&#xf111; " FontFamily="{StaticResource FontAwesome}"/>
                                 <Run Text="{Binding Name}"/>
                             </TextBlock>
                         </StackPanel>

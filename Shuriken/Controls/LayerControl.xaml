@@ -56,6 +56,18 @@
 
                         <Label>Height</Label>
                         <hc:NumericUpDown Value="{Binding Height}"/>
+
+                        <Label>Top Left</Label>
+                        <local:Vector2Control Value="{Binding TopLeft}"/>
+
+                        <Label>Top Right</Label>
+                        <local:Vector2Control Value="{Binding TopRight}"/>
+
+                        <Label>Bottom Right</Label>
+                        <local:Vector2Control Value="{Binding BottomRight}"/>
+
+                        <Label>Bottom Left</Label>
+                        <local:Vector2Control Value="{Binding BottomLeft}"/>
                     </StackPanel>
                 </Border>
             </Expander>
@@ -96,9 +108,23 @@
                     </StackPanel>
                 </Border>
             </Expander>
+            <Expander Header="Font" IsExpanded="True">
+                <Border>
+                    <StackPanel>
+                        <Label>Font</Label>
+                        <TextBox Text="{Binding Font.Name}"/>
+
+                        <Label>Font Characters</Label>
+                        <TextBox Text="{Binding FontCharacters}"/>
+                    </StackPanel>
+                </Border>
+            </Expander>
             <Expander Header="Unknown" IsExpanded="True">
                 <Border>
                     <StackPanel>
+                        <Label>Field34</Label>
+                        <TextBox Text="{Binding Field34}"/>
+
                         <Label>Field3C</Label>
                         <TextBox Text="{Binding Field3C}"/>
 

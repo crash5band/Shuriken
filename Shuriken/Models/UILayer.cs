@@ -31,27 +31,23 @@ namespace Shuriken.Models
         [Category("Layer")]
         public bool IsEnabled { get; set; }
 
-        [Category("Pivot")]
         public Vector2 TopLeft { get; set; }
 
-        [Category("Pivot")]
         public Vector2 BottomLeft { get; set; }
 
-        [Category("Pivot")]
         public Vector2 TopRight { get; set; }
 
-        [Category("Pivot")]
         public Vector2 BottomRight { get; set; }
 
         public ushort Field2C { get; set; }
         public ushort Field2E { get; set; }
-        public ushort Field34 { get; set; }
+        public uint Field34 { get; set; }
         public ushort Field36 { get; set; }
         public uint Flags { get; set; }
         public uint Field3C { get; set; }
 
         [Category("Font")]
-        public string FontName { get; set; }
+        public UIFont Font { get; set; }
 
         [Category("Font")]
         public string FontCharacters { get; set; }
@@ -149,11 +145,10 @@ namespace Shuriken.Models
             Field2C = cast.Field2C;
             Field2E = cast.Field2E;
             Field34 = cast.Field34;
-            Field36 = cast.Field36;
             Flags = cast.Field38;
             Field3C = cast.Field3C;
 
-            FontName = cast.FontNameOffset.Offset != 0 ? cast.FontNameOffset.Value : "";
+            Font = null;
             FontCharacters = cast.FontCharactersOffset.Offset != 0 ? cast.FontCharactersOffset.Value : "";
 
             Field4C = cast.Field4C;

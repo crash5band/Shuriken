@@ -4,11 +4,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Numerics;
 using Shuriken.Models;
 using Shuriken.Commands;
+using Shuriken.Rendering;
 
 namespace Shuriken.ViewModels
 {
+    using Vec2 = Shuriken.Models.Vector2;
     public class ScenesViewModel : ViewModelBase
     {
         public float MinZoom => 0.25f;
@@ -148,25 +151,9 @@ namespace Shuriken.ViewModels
                 Time += f;
         }
 
-        public void UpdateScenes(IEnumerable<UIScene> scenes, IEnumerable<UIFont> fonts, float deltaT)
+        public void Tick(float d)
         {
-            Time += deltaT * PlaybackSpeed * (Playing ? 1 : 0);
-            foreach (UIScene scene in scenes)
-            {
-                if (!scene.Visible)
-                    continue;
-
-                foreach (LayerGroup group in scene.Groups)
-                {
-                    if (!group.Visible)
-                        continue;
-
-                    foreach (UILayer layer in group.Layers)
-                    {
-
-                    }
-                }
-            }
+            Time += d * playbackSpeed * (playing ? 1 : 0);
         }
 
         public ObservableCollection<UIScene> Scenes => Project.Scenes;

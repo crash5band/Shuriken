@@ -20,8 +20,7 @@ namespace XNCPLib.XNCP
         public ushort Field2C { get; set; }
         public ushort Field2E { get; set; }
         public uint CastInfoOffset { get; set; }
-        public ushort Field34 { get; set; }
-        public ushort Field36 { get; set; }
+        public uint Field34 { get; set; }
         public uint Field38 { get; set; }
         public uint Field3C { get; set; }
         public uint CastMaterialInfoOffset { get; set; }
@@ -64,8 +63,7 @@ namespace XNCPLib.XNCP
             Field2C = reader.ReadUInt16();
             Field2E = reader.ReadUInt16();
             CastInfoOffset = reader.ReadUInt32();
-            Field34 = reader.ReadUInt16();
-            Field36 = reader.ReadUInt16();
+            Field34 = reader.ReadUInt32();
             Field38 = reader.ReadUInt32();
             Field3C = reader.ReadUInt32();
             CastMaterialInfoOffset = reader.ReadUInt32();

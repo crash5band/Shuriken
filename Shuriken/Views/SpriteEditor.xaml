@@ -72,8 +72,8 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:Sprite}">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding Image}" Width="32" Height="32" Margin="0 0 5 0" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding Texture.Name}" VerticalAlignment="Center"/>
+                            <Image Source="{Binding Crop}" Width="30" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Texture.Name}" VerticalAlignment="Center" Margin="5 0 0 0"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

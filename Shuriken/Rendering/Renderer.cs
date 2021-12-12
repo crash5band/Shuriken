@@ -3,18 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Numerics;
 using System.IO;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Mathematics;
-using Shuriken.Models;
-using Shuriken.Models.Animation;
 using Shuriken.Misc;
 
 namespace Shuriken.Rendering
 {
-    using UIVector2 = Shuriken.Models.Vector2;
-    using Vector2 = OpenTK.Mathematics.Vector2;
-
     class Renderer
     {
         public readonly string shadersDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Shaders");
@@ -23,7 +18,7 @@ namespace Shuriken.Rendering
         uint vbo;
         uint ebo;
         uint[] indices;
-        Dictionary<string, ShaderProgram> shaderDictionary;
+        public Dictionary<string, ShaderProgram> shaderDictionary;
 
         Vertex[] buffer;
         Vector2[] uvCoords;
@@ -39,7 +34,7 @@ namespace Shuriken.Rendering
         public int NumQuads { get; private set; }
         public int NumIndices { get; private set; }
         public int BufferPos { get; private set; }
-        public uint TexID { get; private set; }
+        public uint TexID { get; set; }
         public bool BatchStarted { get; private set; }
         public int RenderWidth { get; set; }
         public int RenderHeight { get; set; }
@@ -72,7 +67,6 @@ namespace Shuriken.Rendering
             RenderWidth = width;
             RenderHeight = height;
         }
-
         private void Init()
         {
             const int stride = 10 * sizeof(float);
@@ -116,6 +110,8 @@ namespace Shuriken.Rendering
             vPos[1] = new Vector4(0.5f, -0.5f, 0.0f, 1.0f);
             vPos[2] = new Vector4(-0.5f, -0.5f, 0.0f, 1.0f);
             vPos[3] = new Vector4(-0.5f, 0.5f, 0.0f, 1.0f);
+
+
         }
 
         private void ResetRenderStats()
@@ -149,12 +145,12 @@ namespace Shuriken.Rendering
             GL.DrawElements(PrimitiveType.Triangles, NumIndices, DrawElementsType.UnsignedInt, 0);
         }
 
-        public Vector2[] GetUVCoords(Sprite spr, float texWidth, float texHeight, bool mirrorX, bool mirrorY)
+        public Vector2[] GetUVCoords(Vector2 sprStart, Vector2 sprSize, float texWidth, float texHeight, bool mirrorX, bool mirrorY)
         {
             // Order: top-right, bottom-right, bottom-left, top-left
             Vector2[] uvCoords = new Vector2[4];
-            Vector2 start = new Vector2(spr.Start.X, spr.Start.Y);
-            Vector2 end = start + new Vector2(spr.Dimensions.X, spr.Dimensions.Y);
+            Vector2 start = new Vector2(sprStart.X, sprStart.Y);
+            Vector2 end = start + new Vector2(sprSize.X, sprSize.Y);
 
             float right = end.X / texWidth;
             float left = start.X / texWidth;
@@ -169,9 +165,10 @@ namespace Shuriken.Rendering
             return uvCoords;
         }
 
+        /*
         public void DrawLayerSprite(UIScene scene, UILayer layer, float time)
         {
-            /*
+            
             if (layer.SubImageIndices[0] == -1 || layer.SubImageIndices[0] > scene.Sprites.Count)
                 return;
 
@@ -384,28 +381,29 @@ namespace Shuriken.Rendering
             var uvCoords = GetUVCoords(spr, spr.Texture.Width, spr.Texture.Height, (layer.Field38 & 1024) != 0, (layer.Field38 & 2048) != 0);
             PushQuadBuffer(model, uvCoords, resultColor.ToFloats(), layer.GradientTopRight.ToFloats(), layer.GradientBottomRight.ToFloats(),
                 layer.GradientBottomLeft.ToFloats(), layer.GradientTopLeft.ToFloats());
-            */
+            
         }
+        */
 
-        public void PushQuadBuffer(Matrix4 model, Vector2[] uvCoords, Vector4 color, Vector4 colorTopRight, Vector4 colorBottomRight, Vector4 colorBottomLeft, Vector4 colorTopLeft)
+        public void PushQuadBuffer(Matrix4x4 model, Vector2[] uvCoords, Vector4 color, Vector4 colorTopRight, Vector4 colorBottomRight, Vector4 colorBottomLeft, Vector4 colorTopLeft)
         {
             int offset = 0;
-            buffer[BufferPos + offset].Position = Vector4.TransformRow(vPos[offset], model);
+            buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], model);
             buffer[BufferPos + offset].Color = color * colorTopRight;
             buffer[BufferPos + offset].UV = uvCoords[offset];
             ++offset;
 
-            buffer[BufferPos + offset].Position = Vector4.TransformRow(vPos[offset], model);
+            buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], model);
             buffer[BufferPos + offset].Color = color * colorBottomRight;
             buffer[BufferPos + offset].UV = uvCoords[offset];
             ++offset;
 
-            buffer[BufferPos + offset].Position = Vector4.TransformRow(vPos[offset], model);
+            buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], model);
             buffer[BufferPos + offset].Color = color * colorBottomLeft;
             buffer[BufferPos + offset].UV = uvCoords[offset];
             ++offset;
 
-            buffer[BufferPos + offset].Position = Vector4.TransformRow(vPos[offset], model);
+            buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], model);
             buffer[BufferPos + offset].Color = color * colorTopLeft;
             buffer[BufferPos + offset].UV = uvCoords[offset];
 
@@ -414,9 +412,10 @@ namespace Shuriken.Rendering
             NumIndices += 6;
         }
 
+        /*
         public void DrawLayerFont(UIScene scene, IEnumerable<UIFont> fonts, UILayer layer, float time)
         {
-            /*
+            
             if (string.IsNullOrEmpty(layer.FontName) || string.IsNullOrEmpty(layer.FontCharacters))
                 return;
 
@@ -581,79 +580,30 @@ namespace Shuriken.Rendering
                     xOffset += (spr.Dimensions.X / 2.0f * resultScale.X) - (Math.Abs(diffX) * spr.Dimensions.X / 2.0f * resultScale.X);
                 }
             }
-            */
+            
         }
-
-        public UIVector2 GetPivot(UILayer layer)
-        {
-            UIVector2 pivot = new UIVector2();
-
-            float diff = Math.Abs(layer.TopRight.X) - Math.Abs(layer.TopLeft.X);
-            float right = diff * RenderWidth * layer.Scale.X;
-            pivot.X += right / 2.0f;
-
-            diff = Math.Abs(layer.BottomRight.Y) - Math.Abs(layer.TopRight.Y);
-            float up = diff * RenderHeight * layer.Scale.Y;
-            pivot.Y -= up / 2.0f;
-
-            return pivot;
-        }
+        */
 
         public void ConfigureShader(ShaderProgram shader)
         {
             shader.Use();
-            shader.SetMatrix4("projection", Matrix4.CreateOrthographic(RenderWidth, RenderHeight, -1.0f, 1.0f));
+            shader.SetMatrix4("projection", OpenTK.Mathematics.Matrix4.CreateOrthographicOffCenter(0.0f, RenderWidth, -RenderHeight, 0.0f, -1.0f, 2.0f));
         }
 
-        public Matrix4 CreateModelMatrix(Vector2 position, Vector2 pivot, float rotation, Vector2 size)
+        public Matrix4x4 CreateModelMatrix(Vector2 position, Vector2 pivot, float rotation, Vector2 size)
         {
-            Matrix4 model = Matrix4.Identity;
-            model = Matrix4.Mult(model, Matrix4.CreateScale(size.X, size.Y, 1.0f));
-            model = Matrix4.Mult(model, Matrix4.CreateRotationZ(Utilities.ToRadians(rotation)));
-            model = Matrix4.Mult(model, Matrix4.CreateTranslation(pivot.X, pivot.Y, 0.0f));
-            model = Matrix4.Mult(model, Matrix4.CreateTranslation(position.X, position.Y, 0.0f));
+            Matrix4x4 model = Matrix4x4.Identity;
+            model = Matrix4x4.Multiply(model, Matrix4x4.CreateScale(size.X, size.Y, 1.0f));
+            model = Matrix4x4.Multiply(model, Matrix4x4.CreateTranslation(pivot.X, pivot.Y, 0.0f));
+            model = Matrix4x4.Multiply(model, Matrix4x4.CreateRotationZ(Utilities.ToRadians(rotation)));
+            model = Matrix4x4.Multiply(model, Matrix4x4.CreateTranslation(position.X, position.Y, 0.0f));
 
             return model;
         }
 
-        public void DrawScenes(IEnumerable<UIScene> scenes, IEnumerable<UIFont> fonts, float time)
+        public void DrawBoundingBox(BoundingBox box)
         {
-            var basicShader = shaderDictionary["basic"];
-            ConfigureShader(basicShader);
 
-            if (!BatchStarted)
-                BeginBatch();
-
-            foreach(var scene in scenes)
-            {
-                foreach (var group in scene.Groups)
-                {
-                    if (!group.Visible)
-                        continue;
-
-                    foreach(var layer in group.Layers)
-                    {
-                        if (!layer.Visible)
-                            continue;
-
-                        if (layer.Type == DrawType.None)
-                            continue;
-                        else if (layer.Type == DrawType.Sprite)
-                        {
-                            // draw using sprites
-                            DrawLayerSprite(scene, layer, time);
-                        }
-                        else if (layer.Type == DrawType.Font)
-                        {
-                            // draw using fonts
-                            DrawLayerFont(scene, fonts, layer, time);
-                        }
-                    }
-                }
-            }
-
-            if (BatchStarted)
-                EndBatch();
         }
     }
 }

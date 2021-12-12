@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Shuriken.Converters;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Shuriken.Models
@@ -117,9 +117,18 @@ namespace Shuriken.Models
             A = (byte)(a * 255);
         }
 
-        public OpenTK.Mathematics.Vector4 ToFloats()
+        public Color(float col)
         {
-            return new OpenTK.Mathematics.Vector4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+            byte[] bytes = BitConverter.GetBytes(col);
+            R = bytes[3];
+            G = bytes[2];
+            B = bytes[1];
+            A = bytes[0];
+        }
+
+        public Vector4 ToFloats()
+        {
+            return new Vector4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

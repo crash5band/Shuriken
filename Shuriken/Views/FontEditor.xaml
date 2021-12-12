@@ -63,7 +63,7 @@
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="{Binding Character}" VerticalAlignment="Center"/>
-                                        <Image Grid.Column="1" Source="{Binding Sprite.Image}" Width="30" Height="30"/>
+                                        <Image Source="{Binding Sprite.Crop}" Width="30" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1"/>
                                         <Button Grid.Column="2">
                                             <Button.Content>
                                                 <TextBlock Text="&#xf044;" FontFamily="{StaticResource FontAwesome}"/>

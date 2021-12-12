@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Shuriken.ViewModels;
+using System.Collections.ObjectModel;
 
 namespace Shuriken
 {
@@ -32,6 +33,14 @@ namespace Shuriken
             DataContext = vm;
 
             editorSelect.SelectedIndex = 0;
+
+            // Initialize editor view models after MainViewModel to initialize the GL control before the renderer.
+            vm.Editors = new ObservableCollection<ViewModelBase>
+            {
+                new ScenesViewModel(),
+                new SpritesViewModel(),
+                new FontsViewModel()
+            };
         }
 
         private void OpenMenu_Click(object sender, RoutedEventArgs e)

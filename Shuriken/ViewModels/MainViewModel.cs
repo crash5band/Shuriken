@@ -24,12 +24,6 @@ namespace Shuriken.ViewModels
         public MainViewModel()
         {
             MissingTextures = new ObservableCollection<string>();
-            Editors = new ObservableCollection<ViewModelBase>
-            {
-                new ScenesViewModel(),
-                new SpritesViewModel(),
-                new FontsViewModel()
-            };
 #if DEBUG
             //LoadTestXNCP();
 #endif
@@ -89,9 +83,6 @@ namespace Shuriken.ViewModels
                 }
             }
 
-            foreach (SceneID sceneID in xIDs)
-                Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name.Value, texList, Project.Fonts));
-
             foreach (var entry in xFontList.FontIDTable)
             {
                 UIFont font = new UIFont(entry.Name.Value);
@@ -103,6 +94,9 @@ namespace Shuriken.ViewModels
 
                 Project.Fonts.Add(font);
             }
+
+            foreach (SceneID sceneID in xIDs)
+                Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name.Value, texList, Project.Fonts));
 
             Project.TextureLists.Add(texList);
         }
