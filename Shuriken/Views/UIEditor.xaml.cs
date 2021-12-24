@@ -317,8 +317,11 @@ namespace Shuriken.Views
             float up = diff * renderer.RenderHeight * scale.Y;
             pivot.Y -= up / 2.0f;
 
-            Vector4 cF = Vector4.Multiply(color.ToFloats(), transform.Color.ToFloats());
-            color = new Color(cF.X, cF.Y, cF.Z, cF.W);
+            if ((lyr.Field34 & 8) != 0)
+            {
+                Vector4 cF = Vector4.Multiply(color.ToFloats(), transform.Color.ToFloats());
+                color = new Color(cF.X, cF.Y, cF.Z, cF.W);
+            }
 
             if (lyr.Visible && lyr.IsEnabled)
             {
