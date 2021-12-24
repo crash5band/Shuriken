@@ -46,7 +46,7 @@ namespace Shuriken.Controls
             window.ShowDialog();
             if (window.DialogResult == true)
             {
-                Value = window.SelectedColor;
+                Value = new Color(window.SelectedColor.R, window.SelectedColor.G, window.SelectedColor.B, window.SelectedColor.A);
             }
         }
 

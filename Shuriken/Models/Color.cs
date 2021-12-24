@@ -9,73 +9,12 @@ using System.Runtime.CompilerServices;
 
 namespace Shuriken.Models
 {
-    public class Color : INotifyPropertyChanged
+    public class Color
     {
-        private byte r, g, b, a;
-
-        public byte R
-        {
-            get
-            {
-                return r;
-            }
-            set
-            {
-                if (r != value)
-                {
-                    r = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public byte G
-        {
-            get
-            {
-                return g;
-            }
-            set
-            {
-                if (g != value)
-                {
-                    g = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public byte B
-        {
-            get
-            {
-                return b;
-            }
-            set
-            {
-                if (b != value)
-                {
-                    b = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public byte A
-        {
-            get
-            {
-                return a;
-            }
-            set
-            {
-                if (a != value)
-                {
-                    a = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+        public byte R { get; set; }
+        public byte G { get; set; }
+        public byte B { get; set; }
+        public byte A { get; set; }
 
         public Color(byte r = 0, byte g = 0, byte b = 0, byte a = 255)
         {
@@ -128,7 +67,7 @@ namespace Shuriken.Models
 
         public Vector4 ToFloats()
         {
-            return new Vector4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+            return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

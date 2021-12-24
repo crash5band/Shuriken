@@ -15,54 +15,31 @@
     </UserControl.Resources>
     
     <Grid Name="LayoutRoot">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
         <Grid.Resources>
-            <DataTemplate x:Key="RGBATemplate">
-                <Grid>
-                    <Grid.Resources>
-                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockBaseStyle}">
-                            <Setter Property="Padding" Value="5 0"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </Grid.Resources>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="R"/>
-                    <TextBox Grid.Column="1" Text="{Binding Value.R}"/>
-                    <TextBlock Grid.Column="2" Text="G"/>
-                    <TextBox Grid.Column="3" Text="{Binding Value.G}"/>
-                    <TextBlock Grid.Column="4" Text="B"/>
-                    <TextBox Grid.Column="5" Text="{Binding Value.B}"/>
-                    <TextBlock Grid.Column="6" Text="A"/>
-                    <TextBox Grid.Column="7" Text="{Binding Value.A}"/>
-                </Grid>
-            </DataTemplate>
-
-            <DataTemplate x:Key="HexTemplate">
-                <TextBox Grid.Column="0" Text="{Binding Value, Converter={StaticResource RgbaToHexConverter}}"/>
-            </DataTemplate>
-
-            <Style x:Key="ViewStyle" TargetType="ContentPresenter">
-                <Setter Property="ContentTemplate" Value="{StaticResource RGBATemplate}"/>
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding View}" Value="List">
-                        <Setter Property="ContentTemplate" Value="{StaticResource HexTemplate}"/>
-                    </DataTrigger>
-                </Style.Triggers>
+            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockBaseStyle}">
+                <Setter Property="Padding" Value="5 0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
         </Grid.Resources>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="35"/>
-        </Grid.ColumnDefinitions>
-        <ContentPresenter Style="{StaticResource ViewStyle}" Content="{Binding }"/>
+        <TextBlock Grid.Column="0" Text="R"/>
+        <TextBox Grid.Column="1" Text="{Binding Value.R}"/>
+        <TextBlock Grid.Column="2" Text="G"/>
+        <TextBox Grid.Column="3" Text="{Binding Value.G}"/>
+        <TextBlock Grid.Column="4" Text="B"/>
+        <TextBox Grid.Column="5" Text="{Binding Value.B}"/>
+        <TextBlock Grid.Column="6" Text="A"/>
+        <TextBox Grid.Column="7" Text="{Binding Value.A}"/>
         <Button Name="ColorBtn" Grid.Column="8" Width="30" Height="30" Background="{Binding Value, Converter={StaticResource ColorToBrushConverter}}" Click="ColorBtnClick"/>
     </Grid>
 </UserControl>

@@ -92,19 +92,19 @@
                 <Border>
                     <StackPanel>
                         <Label>Color</Label>
-                        <local:ColorControl Value="{Binding Color}"/>
+                        <local:ColorControl Value="{Binding Color, Mode=TwoWay}"/>
 
                         <Label>Top-Left Gradient</Label>
-                        <local:ColorControl Value="{Binding GradientTopLeft}"/>
+                        <local:ColorControl Value="{Binding GradientTopLeft, Mode=TwoWay}"/>
 
                         <Label>Top-Right Gradient</Label>
-                        <local:ColorControl Value="{Binding GradientTopRight}"/>
+                        <local:ColorControl Value="{Binding GradientTopRight, Mode=TwoWay}"/>
 
                         <Label>Bottom-Left Gradient</Label>
-                        <local:ColorControl Value="{Binding GradientBottomLeft}"/>
+                        <local:ColorControl Value="{Binding GradientBottomLeft, Mode=TwoWay}"/>
 
                         <Label>Bottom-Right Gradient</Label>
-                        <local:ColorControl Value="{Binding GradientBottomRight}"/>
+                        <local:ColorControl Value="{Binding GradientBottomRight, Mode=TwoWay}"/>
                     </StackPanel>
                 </Border>
             </Expander>
