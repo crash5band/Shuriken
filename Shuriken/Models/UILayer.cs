@@ -39,10 +39,8 @@ namespace Shuriken.Models
 
         public Vector2 BottomRight { get; set; }
 
-        public ushort Field2C { get; set; }
-        public ushort Field2E { get; set; }
+        public uint Field2C { get; set; }
         public uint Field34 { get; set; }
-        public ushort Field36 { get; set; }
         public uint Flags { get; set; }
         public uint Field3C { get; set; }
 
@@ -143,7 +141,6 @@ namespace Shuriken.Models
             BottomRight = new Vector2(cast.BottomRight);
 
             Field2C = cast.Field2C;
-            Field2E = cast.Field2E;
             Field34 = cast.Field34;
             Flags = cast.Field38;
             Field3C = cast.Field3C;

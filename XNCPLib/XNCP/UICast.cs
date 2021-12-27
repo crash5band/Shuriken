@@ -17,8 +17,7 @@ namespace XNCPLib.XNCP
         public Vector2 BottomLeft { get; set; }
         public Vector2 TopRight { get; set; }
         public Vector2 BottomRight { get; set; }
-        public ushort Field2C { get; set; }
-        public ushort Field2E { get; set; }
+        public uint Field2C { get; set; }
         public uint CastInfoOffset { get; set; }
         public uint Field34 { get; set; }
         public uint Field38 { get; set; }
@@ -60,8 +59,7 @@ namespace XNCPLib.XNCP
             TopRight = new Vector2(reader.ReadSingle(), reader.ReadSingle());
             BottomRight = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 
-            Field2C = reader.ReadUInt16();
-            Field2E = reader.ReadUInt16();
+            Field2C = reader.ReadUInt32();
             CastInfoOffset = reader.ReadUInt32();
             Field34 = reader.ReadUInt32();
             Field38 = reader.ReadUInt32();
