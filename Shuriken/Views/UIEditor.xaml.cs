@@ -70,13 +70,15 @@ namespace Shuriken.Views
             if (sv != null)
             {
                 sv.Tick(delta);
-                UpdateScenes(Project.Scenes, Project.Fonts, sv.Time);
+                List<UIScene> sortedScenes = Project.Scenes.ToList();
+                sortedScenes.Sort();
+
+                UpdateScenes(sortedScenes, Project.Fonts, sv.Time);
             }
         }
 
         private void UpdateScenes(IEnumerable<UIScene> scenes, IEnumerable<UIFont> fonts, float time)
         {
-            renderer.BeginBatch();
             renderer.ConfigureShader(renderer.shaderDictionary["basic"]);
             foreach (var scene in scenes)
             {
@@ -88,14 +90,14 @@ namespace Shuriken.Views
                     if (!group.Visible)
                         continue;
 
+                    renderer.Start();
                     foreach (var lyr in group.Layers)
                     {
                         UpdateCast(scene, lyr, new CastTransform(), time);
                     }
+                    renderer.End();
                 }
             }
-
-            renderer.EndBatch();
         }
 
         private Vec2 GetPosition(UIScene scn, UILayer lyr, float time)
@@ -231,7 +233,64 @@ namespace Shuriken.Views
             return hasClr ? result : lyr.Color;
         }
 
-        private void DrawCastFont(UILayer lyr, Vec2 pos, Vec2 pivot, float rot, Vec2 sz)
+        private Color[] GetGradients(UIScene scn, UILayer lyr, float time)
+        {
+            bool hasTL = false;
+            bool hasBL = false;
+            bool hasTR = false;
+            bool hasBR = false;
+            Color[] results = new Color[4];
+
+            foreach (var anim in scn.Animations)
+            {
+                if (anim.Enabled)
+                {
+                    var clrAnim = anim.GetTrack(lyr, AnimationType.GradientTL);
+                    if (clrAnim != null)
+                    {
+                        results[0] = new Color(clrAnim.GetValue(time));
+                        hasTL = true;
+                    }
+
+                    clrAnim = anim.GetTrack(lyr, AnimationType.GradientBL);
+                    if (clrAnim != null)
+                    {
+                        results[1] = new Color(clrAnim.GetValue(time));
+                        hasBL = true;
+                    }
+
+                    clrAnim = anim.GetTrack(lyr, AnimationType.GradientTR);
+                    if (clrAnim != null)
+                    {
+                        results[2] = new Color(clrAnim.GetValue(time));
+                        hasTR = true;
+                    }
+
+                    clrAnim = anim.GetTrack(lyr, AnimationType.GradientBR);
+                    if (clrAnim != null)
+                    {
+                        results[3] = new Color(clrAnim.GetValue(time));
+                        hasBR = true;
+                    }
+                }
+            }
+
+            if (!hasTL)
+                results[0] = lyr.GradientTopLeft;
+
+            if (!hasBL)
+                results[1] = lyr.GradientBottomLeft;
+
+            if (!hasTR)
+                results[2] = lyr.GradientTopRight;
+
+            if (!hasBR)
+                results[3] = lyr.GradientBottomRight;
+
+            return results;
+        }
+
+        private void DrawCastFont(UILayer lyr, Vec2 pos, Vec2 pivot, float rot, Vec2 sz, Color[] gradients)
         {
             float xOffset = 0.0f;
             foreach (var c in lyr.FontCharacters)
@@ -248,49 +307,31 @@ namespace Shuriken.Views
 
                 if (spr != null)
                 {
-                    if (spr.Texture.ID != renderer.TexID)
-                    {
-                        renderer.EndBatch();
-                        renderer.BeginBatch();
-                        spr.Texture.Use();
-                        renderer.TexID = spr.Texture.ID;
-                    }
-
                     xOffset += spr.Width / 2.1f * sz.X;
                     Vec2 sprPos = new Vec2(pos.X + xOffset - (lyr.Width / 2.0f * sz.X), pos.Y);
 
-                    DrawSprite(sprPos, pivot, rot, new Vec2(sz.X * spr.Width, sz.Y * spr.Height), spr, lyr.Flags, lyr.Color, lyr.GradientTopLeft, lyr.GradientTopRight, lyr.GradientBottomRight, lyr.GradientBottomLeft);
+                    renderer.DrawSprite(new System.Numerics.Vector2(sprPos.X, sprPos.Y), new System.Numerics.Vector2(pivot.X, pivot.Y), rot, new System.Numerics.Vector2(sz.X * spr.Width, sz.Y * spr.Height), spr, lyr.Flags, lyr.Color.ToFloats(),
+                        gradients[0].ToFloats(), gradients[2].ToFloats(), gradients[3].ToFloats(), gradients[1].ToFloats(), lyr.ZIndex);
+
                     xOffset += spr.Width / 2.25f * sz.X;
                 }
             }
         }
 
-        private void DrawSprite(Vec2 pos, Vec2 pivot, float rot, Vec2 sz, Sprite spr, uint flags, Color col, Color tl, Color tr, Color br, Color bl)
+        private Vec2 GetPivot(UILayer lyr, Vec2 scale, int width, int height)
         {
-            bool mirrorX = (flags & 1024) != 0;
-            bool mirrorY = (flags & 2048) != 0;
-            Matrix4x4 mat = renderer.CreateModelMatrix(new System.Numerics.Vector2(pos.X, pos.Y), new System.Numerics.Vector2(pivot.X, pivot.Y), rot, new System.Numerics.Vector2(sz.X, sz.Y));
-            renderer.PushQuadBuffer(mat, renderer.GetUVCoords(new System.Numerics.Vector2(spr.Start.X, spr.Start.Y), new System.Numerics.Vector2(spr.Dimensions.X, spr.Dimensions.Y), spr.Texture.Width, spr.Texture.Height, mirrorX, mirrorY), col.ToFloats(), tr.ToFloats(), br.ToFloats(), bl.ToFloats(), tl.ToFloats());
+            float diff = Math.Abs(lyr.TopRight.X) - Math.Abs(lyr.TopLeft.X);
+            float right = diff * renderer.RenderWidth * scale.X;
+
+            diff = Math.Abs(lyr.BottomRight.Y) - Math.Abs(lyr.TopRight.Y);
+            float up = diff * renderer.RenderHeight * scale.Y;
+
+            return new Vec2(right / 2.0f, -up / 2.0f);
         }
 
         private void UpdateCast(UIScene scene, UILayer lyr, CastTransform transform, float time)
         {
-            GL.ActiveTexture(TextureUnit.Texture0);
-
             Sprite spr = GetSprite(scene, lyr, time);
-            if (lyr.Type == DrawType.Sprite)
-            {
-                if (spr != null)
-                {
-                    if (spr.Texture.ID != renderer.TexID)
-                    {
-                        renderer.EndBatch();
-                        renderer.BeginBatch();
-                        spr.Texture.Use();
-                        renderer.TexID = spr.Texture.ID;
-                    }
-                }
-            }
 
             Vec2 position = GetPosition(scene, lyr, time);
             position.X *= renderer.RenderWidth;
@@ -300,23 +341,21 @@ namespace Shuriken.Views
 
             Color color = GetColor(scene, lyr, time);
 
+            // 0: top-left, 1: bottom-left, 2: top-right, 3: bottom-right
+            Color[] gradients = GetGradients(scene, lyr, time);
+
             position += transform.Position;
             rotation += transform.Rotation;
 
             if ((lyr.Field34 & (1 << 10)) != 0)
                 scale.X *= transform.Scale.X;
+
+            if ((lyr.Field34 & (1 << 11)) != 0)
                 scale.Y *= transform.Scale.Y;
 
-            // pivot
-            Vec2 pivot = new Vec2();
-            float diff = Math.Abs(lyr.TopRight.X) - Math.Abs(lyr.TopLeft.X);
-            float right = diff * renderer.RenderWidth * scale.X;
-            pivot.X += right / 2.0f;
+            Vec2 pivot = GetPivot(lyr, scale, renderer.RenderWidth, renderer.RenderHeight);
 
-            diff = Math.Abs(lyr.BottomRight.Y) - Math.Abs(lyr.TopRight.Y);
-            float up = diff * renderer.RenderHeight * scale.Y;
-            pivot.Y -= up / 2.0f;
-
+            // inherit color
             if ((lyr.Field34 & 8) != 0)
             {
                 Vector4 cF = Vector4.Multiply(color.ToFloats(), transform.Color.ToFloats());
@@ -327,16 +366,19 @@ namespace Shuriken.Views
             {
                 if (lyr.Type == DrawType.Sprite && spr != null)
                 {
-                    DrawSprite(position, pivot, rotation, new Vec2(spr.Dimensions.X * scale.X, spr.Dimensions.Y * scale.Y), spr, lyr.Flags, color, lyr.GradientTopLeft, lyr.GradientTopRight, lyr.GradientBottomRight, lyr.GradientBottomLeft);
+                    renderer.DrawSprite(new System.Numerics.Vector2(position.X, position.Y), new System.Numerics.Vector2(pivot.X, pivot.Y), rotation, new System.Numerics.Vector2(spr.Dimensions.X * scale.X, spr.Dimensions.Y * scale.Y), spr,
+                        lyr.Flags, color.ToFloats(), gradients[0].ToFloats(), gradients[2].ToFloats(), gradients[3].ToFloats(), gradients[1].ToFloats(), lyr.ZIndex);
                 }
                 else if (lyr.Type == DrawType.Font)
                 {
-                    DrawCastFont(lyr, position, pivot, rotation, scale);
+                    DrawCastFont(lyr, position, pivot, rotation, scale, gradients);
                 }
 
                 foreach (var child in lyr.Children)
                 {
                     Vec2 posAdjust = new Vec2();
+
+                    // continue from area of parent cast?
                     if ((child.Flags & 1) == 0)
                     {
                         float xAdjust = Math.Abs(lyr.TopRight.X) - Math.Abs(lyr.TopLeft.X);
@@ -344,6 +386,8 @@ namespace Shuriken.Views
 
                         posAdjust.X = ((xAdjust * scale.X) - xAdjust) * renderer.RenderWidth;
                         posAdjust.Y = ((yAdjust * scale.Y) - yAdjust) * renderer.RenderHeight;
+                        //posAdjust.X += lyr.Field68 * scale.X;
+                        //posAdjust.Y += lyr.Field6C * scale.Y;
                     }
 
                     CastTransform childTransform = new CastTransform(position + posAdjust, rotation, scale, color);

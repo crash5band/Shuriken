@@ -23,6 +23,7 @@ namespace Shuriken.Rendering
         Vertex[] buffer;
         Vector2[] uvCoords;
         Vector4[] vPos;
+        List<Quad> quads;
 
         Dictionary<uint, string> shaderAttribs;
 
@@ -62,6 +63,7 @@ namespace Shuriken.Rendering
             }
 
             buffer = new Vertex[MaxVertices];
+            quads = new List<Quad>();
             Init();
 
             RenderWidth = width;
@@ -165,432 +167,41 @@ namespace Shuriken.Rendering
             return uvCoords;
         }
 
-        /*
-        public void DrawLayerSprite(UIScene scene, UILayer layer, float time)
+        public void PushQuadBuffer(Quad q)
         {
-            
-            if (layer.SubImageIndices[0] == -1 || layer.SubImageIndices[0] > scene.Sprites.Count)
-                return;
 
-            Sprite spr = scene.Sprites[layer.SubImageIndices[0]].Sprite;
-            if (TexID != spr.Texture.ID)
-            {
-                EndBatch();
-                BeginBatch();
-                TexID = spr.Texture.ID;
-            }
-
-            GL.ActiveTexture(TextureUnit.Texture0);
-            spr.Texture.Use();
-
-            UIVector2 resultTranslate = new UIVector2();
-            UIVector2 resultScale = new UIVector2(1.0f, 1.0f);
-            UIVector2 pivot = new UIVector2(0.0f, 0.0f);
-            UIVector2 tpivot = new UIVector2(0.0f, 0.0f);
-            Color resultColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
-            int spriteIndex = layer.SubImageIndices[0];
-            float resultRotation = 0.0f;
-
-            UILayer current = layer;
-            foreach (var anim in scene.Animations)
-            {
-                foreach (var layerAnimList in anim.LayerAnimations)
-                {
-                    AnimationTrack a = layerAnimList.GetTrack(AnimationType.SubImage);
-                    if (a != null && anim.Enabled)
-                    {
-                        int value = (int)a.GetValue(time);
-                        if (value >= 0 && value < layer.SubImageIndices.Length)
-                        {
-                            int index = layer.SubImageIndices[value];
-                            if (index >= 0 && index < scene.Sprites.Count)
-                            {
-                                spriteIndex = index;
-                                spr = scene.Sprites[spriteIndex].Sprite;
-                            }
-                        }
-                    }
-                }
-            }
-
-            while (current != null)
-            {
-                bool hasTx = false;
-                bool hasTy = false;
-                bool hasRot = false;
-                bool hasSx = false;
-                bool hasSy = false;
-                bool hasCol = false;
-                foreach (var anim in scene.Animations)
-                {
-                    AnimationTrack a = anim.GetTrack(current, AnimationType.XPosition);
-                    if (a != null)
-                    {
-                        if (anim.Enabled)
-                        {
-                            hasTx = true;
-                            resultTranslate.X += a.GetValue(time);
-                        }
-                    }
-
-                    a = anim.GetTrack(current, AnimationType.YPosition);
-                    if (a != null)
-                    {
-                        if (anim.Enabled)
-                        {
-                            hasTy = true;
-                            resultTranslate.Y += a.GetValue(time);
-                        }
-                    }
-
-                    a = anim.GetTrack(current, AnimationType.Rotation);
-                    if (a != null)
-                    {
-                        if (anim.Enabled)
-                        {
-                            hasRot = true;
-                            resultRotation += a.GetValue(time);
-                        }
-                    }
-
-                    a = anim.GetTrack(current, AnimationType.XScale);
-                    if (a != null)
-                    {
-                        if (anim.Enabled)
-                        {
-                            hasSx = true;
-                            resultScale.X *= a.GetValue(time);
-                        }
-                    }
-
-                    a = anim.GetTrack(current, AnimationType.YScale);
-                    if (a != null)
-                    {
-                        if (anim.Enabled)
-                        {
-                            hasSy = true;
-                            resultScale.Y *= a.GetValue(time);
-                        }
-                    }
-
-                    a = anim.GetTrack(current, AnimationType.Color);
-                    if (a != null)
-                    {
-                        if (anim.Enabled)
-                        {
-                            hasCol = true;
-                            float val = a.GetValue(time);
-
-                            Color c = new Color();
-                            byte[] bytes = BitConverter.GetBytes(val);
-
-                            c.R = bytes[3];
-                            c.G = bytes[2];
-                            c.B = bytes[1];
-                            c.A = bytes[0];
-
-                            Vector4 v = resultColor.ToFloats() * c.ToFloats();
-                            resultColor = new Color(v.X, v.Y, v.Z, v.W);
-                        }
-                    }
-                }
-
-                if (!hasTx)
-                    resultTranslate.X += current.Translation.X;
-                if (!hasTy)
-                    resultTranslate.Y += current.Translation.Y;
-
-                if (!hasRot)
-                    resultRotation += current.Rotation;
-
-                if (!hasSx)
-                    resultScale.X *= current.Scale.X;
-                if (!hasSy)
-                    resultScale.Y *= current.Scale.Y;
-
-                if (!hasCol)
-                {
-                    Vector4 v = resultColor.ToFloats() * current.Color.ToFloats();
-                    resultColor = new Color(v.X, v.Y, v.Z, v.W);
-                }    
-
-                resultTranslate += current.Offset;
-                current = current.Parent;
-            }
-
-            if ((layer.Field34 & (1 << 10)) == 0)
-                resultScale = layer.Scale;
-
-            // pivot
-            float diff = Math.Abs(layer.TopRight.X) - Math.Abs(layer.TopLeft.X);
-            float right = diff * RenderWidth * resultScale.X;
-            pivot.X += right / 2.0f;
-
-            diff = Math.Abs(layer.BottomRight.Y) - Math.Abs(layer.TopRight.Y);
-            float up = diff * RenderHeight * resultScale.Y;
-            pivot.Y -= up / 2.0f;
-
-            /*
-            if (layer.Parent != null)
-            {
-                bool hasSx = false;
-                bool hasSy = false;
-                UIVector2 parentScale = new UIVector2(1.0f, 1.0f);
-
-                foreach (var anim in scene.Animations)
-                {
-                    AnimationTrack a = anim.GetTrack(layer.Parent, AnimationType.XScale);
-                    if (a != null && anim.Enabled)
-                    {
-                        hasSx = true;
-                        parentScale.X *= a.GetValue(time);
-                    }
-
-                    a = anim.GetTrack(layer.Parent, AnimationType.YScale);
-                    if (a != null && anim.Enabled)
-                    {
-                        hasSy = true;
-                        parentScale.Y *= a.GetValue(time);
-                    }
-                }
-
-                if (!hasSx)
-                    parentScale.X *= layer.Parent.Scale.X;
-                if (!hasSy)
-                    parentScale.Y *= layer.Parent.Scale.Y;
-
-                UIVector2 adjust = new UIVector2();
-                float xAdjust = Math.Abs(layer.Parent.TopRight.X) - Math.Abs(layer.Parent.TopLeft.X);
-                adjust.X = (xAdjust * parentScale.X) - xAdjust;
-
-                float yAdjust = Math.Abs(layer.Parent.BottomRight.Y) - Math.Abs(layer.Parent.TopRight.Y);
-                adjust.Y = (yAdjust * parentScale.Y) - yAdjust;
-
-                resultTranslate.X += adjust.X;
-                resultTranslate.Y += adjust.Y;
-            }
-            
-
-            // subtract half of the render dimensions to transform the point (0, 0) from the center to the top left corner
-            float x = (resultTranslate.X * RenderWidth) - (RenderWidth / 2.0f);
-            float y = (RenderHeight / 2.0f) - (resultTranslate.Y * RenderHeight);
-
-            Matrix4 model = CreateModelMatrix(new Vector2(x, y), new Vector2(pivot.X, pivot.Y), resultRotation,
-                new Vector2(spr.Dimensions.X * resultScale.X, spr.Dimensions.Y * resultScale.Y));
-
-            var uvCoords = GetUVCoords(spr, spr.Texture.Width, spr.Texture.Height, (layer.Field38 & 1024) != 0, (layer.Field38 & 2048) != 0);
-            PushQuadBuffer(model, uvCoords, resultColor.ToFloats(), layer.GradientTopRight.ToFloats(), layer.GradientBottomRight.ToFloats(),
-                layer.GradientBottomLeft.ToFloats(), layer.GradientTopLeft.ToFloats());
-            
-        }
-        */
-
-        public void PushQuadBuffer(Matrix4x4 model, Vector2[] uvCoords, Vector4 color, Vector4 colorTopRight, Vector4 colorBottomRight, Vector4 colorBottomLeft, Vector4 colorTopLeft)
-        {
             int offset = 0;
-            buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], model);
-            buffer[BufferPos + offset].Color = color * colorTopRight;
-            buffer[BufferPos + offset].UV = uvCoords[offset];
+            buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], q.M);
+            buffer[BufferPos + offset].Color = q.Color * q.TopRight;
+            buffer[BufferPos + offset].UV = q.UVCoords[offset];
             ++offset;
 
-            buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], model);
-            buffer[BufferPos + offset].Color = color * colorBottomRight;
-            buffer[BufferPos + offset].UV = uvCoords[offset];
+            buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], q.M);
+            buffer[BufferPos + offset].Color = q.Color * q.BottomRight;
+            buffer[BufferPos + offset].UV = q.UVCoords[offset];
             ++offset;
 
-            buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], model);
-            buffer[BufferPos + offset].Color = color * colorBottomLeft;
-            buffer[BufferPos + offset].UV = uvCoords[offset];
+            buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], q.M);
+            buffer[BufferPos + offset].Color = q.Color * q.BottomLeft;
+            buffer[BufferPos + offset].UV = q.UVCoords[offset];
             ++offset;
 
-            buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], model);
-            buffer[BufferPos + offset].Color = color * colorTopLeft;
-            buffer[BufferPos + offset].UV = uvCoords[offset];
+            buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], q.M);
+            buffer[BufferPos + offset].Color = q.Color * q.TopLeft;
+            buffer[BufferPos + offset].UV = q.UVCoords[offset];
 
             BufferPos += 4;
             ++NumQuads;
             NumIndices += 6;
         }
 
-        /*
-        public void DrawLayerFont(UIScene scene, IEnumerable<UIFont> fonts, UILayer layer, float time)
-        {
-            
-            if (string.IsNullOrEmpty(layer.FontName) || string.IsNullOrEmpty(layer.FontCharacters))
-                return;
-
-            UIFont targetFont = null;
-            foreach (var font in fonts)
-            {
-                if (font.Name == layer.FontName)
-                {
-                    targetFont = font;
-                    break;
-                }
-            }
-
-            float xOffset = 0.0f;
-            foreach (var character in layer.FontCharacters)
-            {
-                int sprIndex = -1;
-                foreach (var mapping in targetFont.Mappings)
-                {
-                    if (character == mapping.Character)
-                    {
-                        sprIndex = mapping.SpriteIndex;
-                        break;
-                    }
-                }
-
-                if (sprIndex != -1)
-                {
-                    var spr = scene.Sprites[sprIndex].Sprite;
-                    if (TexID != spr.Texture.ID)
-                    {
-                        EndBatch();
-                        BeginBatch();
-                        TexID = spr.Texture.ID;
-                    }
-
-                    GL.ActiveTexture(TextureUnit.Texture0);
-                    spr.Texture.Use();
-
-                    UIVector2 resultTranslate = new UIVector2();
-                    UIVector2 resultScale = new UIVector2(1.0f, 1.0f);
-                    UIVector2 pivot = new UIVector2(0.0f, 0.0f);
-                    int spriteIndex = layer.SubImageIndices[0];
-                    float resultRotation = 0.0f;
-
-                    UILayer current = layer;
-                    foreach (var anim in scene.Animations)
-                    {
-                        if (anim.LayerHasAnimation(current, AnimationType.SubImage) && anim.Enabled)
-                        {
-                            AnimationTrack a = anim.GetTrack(current, AnimationType.SubImage);
-                            if (a != null)
-                            {
-                                int value = (int)a.GetValue(time);
-                                if (value >= 0 && value < layer.SubImageIndices.Length)
-                                {
-                                    int index = layer.SubImageIndices[value];
-                                    if (index >= 0 && index < scene.Sprites.Count)
-                                    {
-                                        spriteIndex = index;
-                                        spr = scene.Sprites[spriteIndex].Sprite;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    while (current != null)
-                    {
-                        bool hasTx = false;
-                        bool hasTy = false;
-                        bool hasRot = false;
-                        bool hasSx = false;
-                        bool hasSy = false;
-                        bool hasCol = false;
-                        foreach (var anim in scene.Animations)
-                        {
-                            AnimationTrack a = anim.GetTrack(current, AnimationType.XPosition);
-                            if (a != null)
-                            {
-                                if (anim.Enabled)
-                                {
-                                    hasTx = true;
-                                    resultTranslate.X += a.GetValue(time);
-                                }
-                            }
-
-                            a = anim.GetTrack(current, AnimationType.YPosition);
-                            if (a != null)
-                            {
-                                if (anim.Enabled)
-                                {
-                                    hasTy = true;
-                                    resultTranslate.Y += a.GetValue(time);
-                                }
-                            }
-
-                            a = anim.GetTrack(current, AnimationType.Rotation);
-                            if (a != null)
-                            {
-                                if (anim.Enabled)
-                                {
-                                    hasRot = true;
-                                    resultRotation += a.GetValue(time);
-                                }
-                            }
-
-                            a = anim.GetTrack(current, AnimationType.XScale);
-                            if (a != null)
-                            {
-                                if (anim.Enabled)
-                                {
-                                    hasSx = true;
-                                    resultScale.X *= a.GetValue(time);
-                                }
-                            }
-
-                            a = anim.GetTrack(current, AnimationType.YScale);
-                            if (a != null)
-                            {
-                                if (anim.Enabled)
-                                {
-                                    hasSy = true;
-                                    resultScale.Y *= a.GetValue(time);
-                                }
-                            }
-                        }
-
-                        if (!hasTx)
-                            resultTranslate.X += current.Translation.X;
-                        if (!hasTy)
-                            resultTranslate.Y += current.Translation.Y;
-
-                        if (!hasRot)
-                            resultRotation += current.Rotation;
-
-                        if (!hasSx)
-                            resultScale.X *= current.Scale.X;
-                        if (!hasSy)
-                            resultScale.Y *= current.Scale.Y;
-
-                        resultTranslate += current.Offset;
-                        current = current.Parent;
-                    }
-
-                    float diffX = Math.Abs(layer.TopRight.X) - Math.Abs(layer.TopLeft.X);
-                    pivot = GetPivot(layer);
-
-                    xOffset += spr.Dimensions.X / 2.0f * resultScale.X;// - (Math.Abs(diffX) * spr.Dimensions.X / 2.0f * resultScale.X / 2.0f);
-
-                    resultTranslate.X -= layer.Width / 2.0f * resultScale.X / RenderWidth;
-                    float x = (resultTranslate.X * RenderWidth) + xOffset - (RenderWidth / 2.0f);
-                    float y = (RenderHeight / 2.0f) - (resultTranslate.Y * RenderHeight);
-
-                    Matrix4 model = CreateModelMatrix(new Vector2(x, y), new Vector2(pivot.X, pivot.Y), resultRotation,
-                        new Vector2(spr.Dimensions.X * resultScale.X, spr.Dimensions.Y * resultScale.Y));
-
-                    var uvCoords = GetUVCoords(spr, spr.Texture.Width, spr.Texture.Height, false, false);
-                    PushQuadBuffer(model, uvCoords, layer.Color.ToFloats(), layer.GradientTopRight.ToFloats(), layer.GradientBottomRight.ToFloats(),
-                        layer.GradientBottomLeft.ToFloats(), layer.GradientTopLeft.ToFloats());
-
-                    xOffset += (spr.Dimensions.X / 2.0f * resultScale.X) - (Math.Abs(diffX) * spr.Dimensions.X / 2.0f * resultScale.X);
-                }
-            }
-            
-        }
-        */
-
         public void ConfigureShader(ShaderProgram shader)
         {
             shader.Use();
-            shader.SetMatrix4("projection", OpenTK.Mathematics.Matrix4.CreateOrthographicOffCenter(0.0f, RenderWidth, -RenderHeight, 0.0f, -1.0f, 2.0f));
+            shader.SetMatrix4("projection", OpenTK.Mathematics.Matrix4.CreateOrthographicOffCenter(0.0f, RenderWidth, -RenderHeight, 0.0f, -100.0f, 100.0f));
         }
 
-        public Matrix4x4 CreateModelMatrix(Vector2 position, Vector2 pivot, float rotation, Vector2 size)
+        public Matrix4x4 CreateModelMatrix(Vector2 position, int drawIndex, Vector2 pivot, float rotation, Vector2 size)
         {
             Matrix4x4 model = Matrix4x4.Identity;
             model = Matrix4x4.Multiply(model, Matrix4x4.CreateScale(size.X, size.Y, 1.0f));
@@ -599,6 +210,43 @@ namespace Shuriken.Rendering
             model = Matrix4x4.Multiply(model, Matrix4x4.CreateTranslation(position.X, position.Y, 0.0f));
 
             return model;
+        }
+
+        public void DrawSprite(Vector2 pos, Vector2 pivot, float rot, Vector2 sz, Shuriken.Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 tr, Vector4 br, Vector4 bl, int index)
+        {
+            bool mirrorX = (flags & 1024) != 0;
+            bool mirrorY = (flags & 2048) != 0;
+            Matrix4x4 mat = CreateModelMatrix(new Vector2(pos.X, pos.Y), index, new Vector2(pivot.X, pivot.Y), rot, new Vector2(sz.X, sz.Y));
+            Vector2[] uvCoords = GetUVCoords(new Vector2(spr.Start.X, spr.Start.Y), new Vector2(spr.Width, spr.Height), spr.Texture.Width, spr.Texture.Height, mirrorX, mirrorY);
+            quads.Add(new Quad(mat, uvCoords, col, tl, tr, bl, br, spr, index));
+            //PushQuadBuffer(mat, GetUVCoords(new Vector2(spr.Start.X, spr.Start.Y), new Vector2(spr.Dimensions.X, spr.Dimensions.Y), spr.Texture.Width, spr.Texture.Height, mirrorX, mirrorY), col, tr, br, bl, tl);
+        }
+
+        public void Start()
+        {
+            quads.Clear();
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            BeginBatch();
+        }
+
+        public void End()
+        {
+            quads.Sort();
+            foreach (var quad in quads)
+            {
+                if (quad.Sprite.Texture.ID != TexID)
+                {
+                    EndBatch();
+                    BeginBatch();
+                    quad.Sprite.Texture.Use();
+                    TexID = quad.Sprite.Texture.ID;
+                }
+
+                PushQuadBuffer(quad);
+            }
+
+            EndBatch();
         }
 
         public void DrawBoundingBox(BoundingBox box)
