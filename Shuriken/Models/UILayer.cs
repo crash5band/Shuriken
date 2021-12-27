@@ -121,18 +121,26 @@ namespace Shuriken.Models
             set { visible = value; NotifyPropertyChanged(); }
         }
 
+        private int zIndex;
+        public int ZIndex
+        {
+            get => zIndex;
+            set { zIndex = value; NotifyPropertyChanged(); }
+        }
+
         public UILayer Parent { get; set; }
 
         [Browsable(false)]
         public ObservableCollection<UILayer> Children { get; set; }
 
-        public UILayer(UICast cast, string name)
+        public UILayer(UICast cast, string name, int index)
         {
             Name = name;
             Field00 = cast.Field00;
             Type = (DrawType)cast.Field04;
             IsEnabled = cast.IsEnabled != 0;
             Visible = true;
+            ZIndex = index;
             Children = new ObservableCollection<UILayer>();
 
             TopLeft = new Vector2(cast.TopLeft);

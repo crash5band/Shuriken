@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace Shuriken.Models
 {
-    public class UIScene : INotifyPropertyChanged
+    public class UIScene : INotifyPropertyChanged, IComparable<UIScene>
     {
         private string name;
         public string Name
@@ -150,7 +150,7 @@ namespace Shuriken.Models
             {
                 for (int c = 0; c < scene.UICastGroups[g].CastCount; ++c)
                 {
-                    UILayer layer = new UILayer(scene.UICastGroups[g].Casts[c], GetCastName(g, c, scene.CastDictionaries));
+                    UILayer layer = new UILayer(scene.UICastGroups[g].Casts[c], GetCastName(g, c, scene.CastDictionaries), c);
 
                     // sprite
                     if (layer.Type == DrawType.Sprite)
@@ -182,7 +182,7 @@ namespace Shuriken.Models
                         List<AnimationTrack> tracks = new List<AnimationTrack>((int)XNCPLib.Utilities.Utilities.CountSetBits(castAnimData.Flags));
 
                         int castAnimDataIndex = 0;
-                        for (int i = 0; i < 8; ++i)
+                        for (int i = 0; i < 12; ++i)
                         {
                             // check each animation type if it exists in Flags
                             if ((castAnimData.Flags & (1 << i)) != 0)
@@ -270,6 +270,11 @@ namespace Shuriken.Models
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public int CompareTo(UIScene other)
+        {
+            return (int)(zIndex - other.zIndex);
         }
     }
 }

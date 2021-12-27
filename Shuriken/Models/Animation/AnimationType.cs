@@ -16,6 +16,10 @@ namespace Shuriken.Models.Animation
         XScale      = 16,
         YScale      = 32,
         SubImage    = 64,
-        Color       = 128
+        Color       = 128,
+        GradientTL  = 256,
+        GradientBL  = 512,
+        GradientTR  = 1024,
+        GradientBR  = 2048
     }
 }
