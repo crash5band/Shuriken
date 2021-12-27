@@ -122,9 +122,15 @@
             <Expander Header="Unknown" IsExpanded="True">
                 <Border>
                     <StackPanel>
-                        <Label>Field34</Label>
+                        <Label>Field2C</Label>
+                        <TextBox Text="{Binding Field2C}"/>
+
+                        <Label>Inheritance</Label>
                         <TextBox Text="{Binding Field34}"/>
 
+                        <Label>Flags</Label>
+                        <TextBox Text="{Binding Flags}"/>
+                        
                         <Label>Field3C</Label>
                         <TextBox Text="{Binding Field3C}"/>
 
@@ -143,8 +149,29 @@
                         <Label>Field6C</Label>
                         <TextBox Text="{Binding Field6C}"/>
 
-                        <Label>Flags</Label>
-                        <TextBox Text="{Binding Flags}"/>
+                        <Label>Field70</Label>
+                        <TextBox Text="{Binding Field70}"/>
+
+                    </StackPanel>
+                </Border>
+            </Expander>
+            <Expander Header="Unknown InfoField" IsExpanded="True">
+                <Border>
+                    <StackPanel>
+                        <Label>InfoField00</Label>
+                        <TextBox Text="{Binding InfoField00}"/>
+
+                        <Label>InfoField18</Label>
+                        <TextBox Text="{Binding InfoField18}"/>
+
+                        <Label>InfoField30</Label>
+                        <TextBox Text="{Binding InfoField30}"/>
+
+                        <Label>InfoField34</Label>
+                        <TextBox Text="{Binding InfoField34}"/>
+
+                        <Label>InfoField38</Label>
+                        <TextBox Text="{Binding InfoField38}"/>
                     </StackPanel>
                 </Border>
             </Expander>
