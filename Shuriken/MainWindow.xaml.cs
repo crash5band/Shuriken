@@ -39,7 +39,8 @@ namespace Shuriken
             {
                 new ScenesViewModel(),
                 new SpritesViewModel(),
-                new FontsViewModel()
+                new FontsViewModel(),
+                new AboutViewModel()
             };
         }
 

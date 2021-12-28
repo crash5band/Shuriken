@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Shuriken.Views"
              xmlns:vm="clr-namespace:Shuriken.ViewModels"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance Type={x:Type vm:MainViewModel}}"
+             d:DataContext="{d:DesignInstance Type={x:Type vm:AboutViewModel}}"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
@@ -23,7 +23,7 @@
             <Run Text="&#xf1f9;" FontFamily="{StaticResource FontAwesome}"/>
             <Run Text="2021"/>
             <LineBreak/>
-            <Hyperlink NavigateUri="https://github.com/crash5band/Shuriken">Github</Hyperlink>
+            <Hyperlink NavigateUri="{Binding GithubLink}" RequestNavigate="HyperlinkRequestNavigate">Github</Hyperlink>
         </TextBlock>
     </Grid>
 </UserControl>
