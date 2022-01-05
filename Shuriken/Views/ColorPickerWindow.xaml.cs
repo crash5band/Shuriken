@@ -30,11 +30,5 @@ namespace Shuriken.Views
         {
             DialogResult = false;
         }
-
-        private void ColorPicker_Confirmed(object sender, HandyControl.Data.FunctionEventArgs<System.Windows.Media.Color> e)
-        {
-            SelectedColor = new Color(ColorPicker.SelectedBrush.Color);
-            DialogResult = true;
-        }
     }
 }

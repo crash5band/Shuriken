@@ -6,7 +6,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="30" d:DesignWidth="450">
     <UserControl.Resources>
-        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockBaseStyle}">
+        <Style TargetType="{x:Type TextBlock}">
             <Setter Property="Padding" Value="8 0"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>

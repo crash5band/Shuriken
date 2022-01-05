@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Shuriken.Models;
 
 namespace Shuriken.Controls
 {
@@ -20,9 +21,19 @@ namespace Shuriken.Controls
     /// </summary>
     public partial class SpriteControl : UserControl
     {
+        public Sprite Sprite
+        {
+            get => (Sprite)GetValue(SpriteProperty);
+            set => SetValue(SpriteProperty, value);
+        }
+
+        private static readonly DependencyProperty SpriteProperty = DependencyProperty.Register(
+            "Sprite", typeof(Sprite), typeof(SpriteControl), new PropertyMetadata(null));
+
         public SpriteControl()
         {
             InitializeComponent();
+            LayoutRoot.DataContext = this;
         }
     }
 }

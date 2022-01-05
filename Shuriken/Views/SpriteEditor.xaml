@@ -55,12 +55,12 @@
                     </Grid.ColumnDefinitions>
                     <ComboBox Grid.Column="0" Margin="0 5" Name="TextureSelect" ItemsSource="{Binding SelectedTexList.Textures}"
                               SelectedItem="{Binding SelectedTexture}" DisplayMemberPath="Name"/>
-                    <Button Grid.Column="1" Style="{StaticResource TransparentButton}" ToolTip="Open texture">
+                    <Button Grid.Column="1" Style="{StaticResource TransparentButton}" ToolTip="Open texture" Command="{Binding CreateTextureCmd}">
                         <Button.Content>
                             <TextBlock Text="&#xf07c;" FontFamily="{StaticResource FontAwesome}"/>
                         </Button.Content>
                     </Button>
-                    <Button Grid.Column="2" Style="{StaticResource TransparentButton}" ToolTip="Remove texture">
+                    <Button Grid.Column="2" Style="{StaticResource TransparentButton}" ToolTip="Remove texture" Command="{Binding RemoveTextureCmd}">
                         <Button.Content>
                             <TextBlock Text="&#xf2ed;" FontFamily="{StaticResource FontAwesome}"/>
                         </Button.Content>
@@ -68,7 +68,7 @@
                 </Grid>
                 <TextBlock Text="Sprites" Padding="5 0"/>
             </StackPanel>
-            <ListBox Margin="0 5" Grid.Row="2" Name="ScenesTreeView" ItemsSource="{Binding SelectedTexture.Sprites}">
+            <ListBox Margin="0 5" Grid.Row="2" Name="SpritesListView" ItemsSource="{Binding SelectedTexture.Sprites}" SelectedItem="{Binding SelectedSprite}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:Sprite}">
                         <StackPanel Orientation="Horizontal">
@@ -83,47 +83,52 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="New Sprite" HorizontalAlignment="Stretch" Margin="5" Style="{StaticResource ButtonPrimary}"
-                            />
-                <Button Grid.Column="1" Content="Remove Sprite" HorizontalAlignment="Stretch" Margin="0 5 5 5"/>
+                <Button Grid.Column="0" Content="New Sprite" HorizontalAlignment="Stretch" Margin="5"
+                        Command="{Binding CreateSpriteCmd}"/>
+                <Button Grid.Column="1" Content="Remove Sprite" HorizontalAlignment="Stretch" Margin="0 5 5 5"
+                        Command="{Binding RemoveSpriteCmd}"/>
             </Grid>
         </Grid>
-        <GroupBox Header="Sprite Properties" Grid.Column="1">
-            <Grid>
+        <Grid Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="{Binding SelectedTexture.ImageSource}" MaxWidth="{Binding SelectedTexture.Width}" MaxHeight="{Binding SelectedTexture.Height}"/>
+            <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="2*"/>
-                    </Grid.ColumnDefinitions>
-                    <Image Margin="5" Grid.Column="0" Source="{Binding SelectedTexture.ImageSource}" Width="auto" Height="auto"
-                           MaxWidth="{Binding SelectedTexture.Width}" MaxHeight="{Binding SelectedTexture.Height}"/>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Stretch" Background="{StaticResource RegionBrush}">
-                        <StackPanel.Resources>
-                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockBaseStyle}">
-                                <Setter Property="Margin" Value="5"/>
-                                <Setter Property="HorizontalAlignment" Value="Left"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </StackPanel.Resources>
-                        <TextBlock>
-                            <Run Text="Name: "/>
-                            <Run Text="{Binding SelectedTexture.Name, Mode=OneWay}"/>
-                        </TextBlock>
-                        <TextBlock>
-                            <Run Text="Width: "/>
-                            <Run Text="{Binding SelectedTexture.Width, Mode=OneWay}"/>
-                        </TextBlock>
-                        <TextBlock>
-                            <Run Text="Height: "/>
-                            <Run Text="{Binding SelectedTexture.Height, Mode=OneWay}"/>
-                        </TextBlock>
-                    </StackPanel>
-                </Grid>
+                <GroupBox Grid.Row="0" Header="Texture">
+                    <ScrollViewer>
+                        <StackPanel>
+                            <StackPanel.Resources>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Margin" Value="3"/>
+                                </Style>
+                            </StackPanel.Resources>
+                            <TextBlock>
+                                <Run Text="Name: "/>
+                                <Run Text="{Binding SelectedTexture.Name, Mode=OneWay}"/>
+                            </TextBlock>
+                            <TextBlock>                              
+                                <Run Text="Width: "/>
+                                <Run Text="{Binding SelectedTexture.Width, Mode=OneWay}"/>
+                            </TextBlock>
+                            <TextBlock>
+                                <Run Text="Height: "/>
+                                <Run Text="{Binding SelectedTexture.Height, Mode=OneWay}"/>
+                            </TextBlock>
+
+                            <Button Content="Change Texture" Margin="0 5 0 5" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </GroupBox>
+                <GroupBox Grid.Row="1" Header="Sprite" Margin="0 10 0 0">
+                    <controls:SpriteControl Sprite="{Binding SelectedSprite}"/>
+                </GroupBox>
             </Grid>
-        </GroupBox>
+        </Grid>
     </Grid>
 </UserControl>

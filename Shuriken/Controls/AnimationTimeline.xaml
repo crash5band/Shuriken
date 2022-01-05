@@ -1,0 +1,72 @@
+﻿<UserControl x:Class="Shuriken.Controls.AnimationTimeline"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Shuriken.Controls"
+             xmlns:animation="clr-namespace:Shuriken.Models.Animation"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="800">
+    <Grid Name="LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="Animation"/>
+
+        <Grid Name="Control" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="4*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="+"/>
+                    <Button Content="-"/>
+                    <Button Content="*"/>
+                </StackPanel>
+                <TreeView Grid.Row="1" Name="AnimationTreeView" ItemsSource="{Binding Animations}">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type animation:AnimationGroup}" ItemsSource="{Binding LayerAnimations}">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding Enabled}" Margin="0 0 5 0"/>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type animation:AnimationList}" ItemsSource="{Binding Tracks}">
+                            <TextBlock Text="{Binding Layer.Name}"/>
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type animation:AnimationTrack}">
+                            <TextBlock Text="{Binding TypeString}"/>
+                        </HierarchicalDataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+            </Grid>
+
+            <GridSplitter Grid.Row="1" Grid.Column="1" Width="5" ResizeBehavior="PreviousAndNext" Margin="2.5 0"/>
+            <ListBox Grid.Row="1" Grid.Column="2" HorizontalContentAlignment="Stretch" ItemsSource="{Binding ElementName=AnimationTreeView, Path=SelectedItem.Keyframes}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type animation:Keyframe}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Frame" Margin="5 0 0 0"/>
+                            <TextBox Grid.Column="1" Text="{Binding Frame}" Margin="0 0 5 0"/>
+                            <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="Value" Margin="5 0 0 0"/>
+                            <TextBox Grid.Column="3" Text="{Binding KValue}" Margin="0 0 5 0"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </Grid>
+</UserControl>

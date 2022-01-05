@@ -14,7 +14,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Shuriken.Models;
 using Shuriken.Views;
-using HandyControl.Controls;
 using System.Runtime.CompilerServices;
 
 namespace Shuriken.Controls
@@ -41,7 +40,7 @@ namespace Shuriken.Controls
             c.G = Value.G;
             c.B = Value.B;
             c.A = Value.A;
-            window.ColorPicker.SelectedBrush = new System.Windows.Media.SolidColorBrush(c);
+            //window.ColorPicker.SelectedBrush = new System.Windows.Media.SolidColorBrush(c);
 
             window.ShowDialog();
             if (window.DialogResult == true)

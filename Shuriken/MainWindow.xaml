@@ -3,19 +3,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:local="clr-namespace:Shuriken"
         xmlns:views ="clr-namespace:Shuriken.Views"
         xmlns:vm ="clr-namespace:Shuriken.ViewModels"
-        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        mc:Ignorable="d" Background="Transparent"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}" 
+        mc:Ignorable="d"
     Title="Shuriken" d:DesignWidth="960" d:DesignHeight="450">
-    <Grid Background="Transparent">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Menu>
+        <Menu Grid.Row="0">
             <MenuItem Header="File">
                 <MenuItem Header="Open" Click="OpenMenu_Click"/>
                 <MenuItem Header="Exit"/>

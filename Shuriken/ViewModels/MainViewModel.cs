@@ -113,8 +113,6 @@ namespace Shuriken.ViewModels
             builder.AppendLine("The loaded UI file uses textures that were not found.\n");
             foreach (var texture in MissingTextures)
                 builder.AppendLine(texture);
-
-            HandyControl.Controls.MessageBox.Show(builder.ToString(), "Missing Textures", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 }

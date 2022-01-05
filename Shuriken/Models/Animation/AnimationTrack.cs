@@ -28,7 +28,7 @@ namespace Shuriken.Models.Animation
                 return 0.0f;
 
             if (frame >= Keyframes[^1].Frame)
-                return Keyframes[^1].Value;
+                return Keyframes[^1].KValue;
 
             if (Keyframes.Count > 1)
             {
@@ -42,7 +42,7 @@ namespace Shuriken.Models.Animation
                 float diff = Keyframes[k2].Frame - Keyframes[k1].Frame;
                 float bias = (frame - Keyframes[k1].Frame) / diff;
 
-                return Keyframes[k1].Value + bias * (Keyframes[k2].Value - Keyframes[k1].Value);
+                return Keyframes[k1].KValue + bias * (Keyframes[k2].KValue - Keyframes[k1].KValue);
             }
 
             return 0.0f;

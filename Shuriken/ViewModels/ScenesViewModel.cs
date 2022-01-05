@@ -127,6 +127,28 @@ namespace Shuriken.ViewModels
             }
         }
 
+        private RelayCommand createSceneCmd;
+        public RelayCommand CreateSceneCmd
+        {
+            get => createSceneCmd ?? new RelayCommand(CreateScene, null);
+            set
+            {
+                createSceneCmd = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private RelayCommand removeSceneCmd;
+        public RelayCommand RemoveSceneCmd
+        {
+            get => removeSceneCmd ?? new RelayCommand(RemoveScene, null);
+            set
+            {
+                removeSceneCmd = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public void TogglePlaying()
         {
             Playing ^= true;
@@ -154,6 +176,17 @@ namespace Shuriken.ViewModels
         public void Tick(float d)
         {
             Time += d * playbackSpeed * (playing ? 1 : 0);
+        }
+
+        public void CreateScene()
+        {
+            Scenes.Add(new UIScene("scene"));
+        }
+
+        public void RemoveScene()
+        {
+            if (SelectedScene != null)
+                Scenes.Remove(SelectedScene);
         }
 
         public ObservableCollection<UIScene> Scenes => Project.Scenes;

@@ -10,6 +10,6 @@
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner">
     <Grid>
-        <hc:ColorPicker Name="ColorPicker" Canceled="ColorPicker_Canceled" Confirmed="ColorPicker_Confirmed" VerticalAlignment="Center"/>
+        
     </Grid>
 </Window>

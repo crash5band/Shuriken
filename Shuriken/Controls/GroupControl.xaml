@@ -9,18 +9,17 @@
              d:DataContext="{d:DesignInstance Type=models:LayerGroup}"
              d:DesignHeight="500" d:DesignWidth="300">
     <UserControl.Resources>
-        <Style TargetType="Label" BasedOn="{StaticResource BaseStyle}">
+        <Style TargetType="Label">
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="VerticalContentAlignment" Value="Bottom"/>
             <Setter Property="Padding" Value="5 2.5"/>
             <Setter Property="Margin" Value="0 5 0 0"/>
         </Style>
-        <Style TargetType="Expander" BasedOn="{StaticResource ExpanderBaseStyle}">
+        <Style TargetType="Expander">
             <Setter Property="Margin" Value="2"/>
         </Style>
         <Style TargetType="Border">
             <Setter Property="Padding" Value="5"/>
-            <Setter Property="Background" Value="{StaticResource RegionBrush}"/>
             <Setter Property="CornerRadius" Value="1"/>
         </Style>
     </UserControl.Resources>

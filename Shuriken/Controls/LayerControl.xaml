@@ -13,18 +13,17 @@
              d:DataContext="{d:DesignInstance Type=models:UILayer}"
              d:DesignHeight="1500" d:DesignWidth="300">
     <UserControl.Resources>
-        <Style TargetType="Label" BasedOn="{StaticResource BaseStyle}">
+        <Style TargetType="Label">
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="VerticalContentAlignment" Value="Bottom"/>
             <Setter Property="Padding" Value="5 2.5"/>
             <Setter Property="Margin" Value="0 5 0 0"/>
         </Style>
-        <Style TargetType="Expander" BasedOn="{StaticResource ExpanderBaseStyle}">
+        <Style TargetType="Expander">
             <Setter Property="Margin" Value="2"/>
         </Style>
         <Style TargetType="Border">
             <Setter Property="Padding" Value="5"/>
-            <Setter Property="Background" Value="{StaticResource RegionBrush}"/>
             <Setter Property="CornerRadius" Value="1"/>
         </Style>
         <converters:EnumToCollectionConverter x:Key="EnumConverter"/>
@@ -52,10 +51,10 @@
                 <Border>
                     <StackPanel>
                         <Label>Width</Label>
-                        <hc:NumericUpDown Value="{Binding Width}"/>
+                        <TextBox Text="{Binding Width}"/>
 
                         <Label>Height</Label>
-                        <hc:NumericUpDown Value="{Binding Height}"/>
+                        <TextBlock Text="{Binding Height}"/>
 
                         <Label>Top Left</Label>
                         <local:Vector2Control Value="{Binding TopLeft}"/>
@@ -81,7 +80,7 @@
                         <local:Vector2Control Value="{Binding Offset}"/>
 
                         <Label>Rotation</Label>
-                        <hc:NumericUpDown Value="{Binding Rotation}"/>
+                        <TextBlock Text="{Binding Rotation}"/>
 
                         <Label>Scale</Label>
                         <local:Vector2Control Value="{Binding Scale}"/>
@@ -180,7 +179,7 @@
                     <ListBox ItemsSource="{Binding Sprites}" Height="100">
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type models:Sprite}">
-                                <Image Source="{Binding Image}" Width="auto" Height="30"/>
+                                <Image Source="{Binding Crop}" Width="auto" Height="30"/>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>

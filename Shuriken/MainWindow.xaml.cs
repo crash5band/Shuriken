@@ -57,12 +57,10 @@ namespace Shuriken
 
         private void HelpClick(object sender, RoutedEventArgs e)
         {
-            HandyControl.Controls.MessageBox.Show("Help is on the way...", "Send Help", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void ViewClick(object sender, RoutedEventArgs e)
         {
-            HandyControl.Controls.MessageBox.Show("Same tbh...", "IDK", MessageBoxButton.OK, MessageBoxImage.Question);
         }
     }
 }

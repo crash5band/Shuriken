@@ -2,16 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <FontFamily x:Key="FontAwesome">/Fonts/fa-solid-900.ttf#Font Awesome 5 Free Solid</FontFamily>
 
-    <!--Handy Controls does not style grid splitter for some reason...-->
-    <Style TargetType="{x:Type GridSplitter}">
-        <Setter Property="Background" Value="{StaticResource BorderBrush}"/>
-    </Style>
-    <Style x:Key="TransparentButton" TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonBaseStyle}">
+    <Style x:Key="TransparentButton" TargetType="{x:Type Button}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
-    </Style>
-    <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource TabItemStyle}">
-        <Setter Property="Padding" Value="1 5"/>
     </Style>
 </ResourceDictionary>

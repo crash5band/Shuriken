@@ -2,17 +2,15 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Shuriken"
-             xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:models="clr-namespace:Shuriken.Models"
              xmlns:viewmodels="clr-namespace:Shuriken.ViewModels"
              xmlns:controls="clr-namespace:Shuriken.Controls"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:ui="http://schemas.modernwpf.com/2019"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/SkinDark.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml"/>
                 <ResourceDictionary Source="Styles.xaml"/>
                 <ResourceDictionary Source="DataTemplates.xaml"/>
             </ResourceDictionary.MergedDictionaries>
