@@ -55,11 +55,11 @@ namespace Shuriken.ViewModels
             TextureList texList = new TextureList("textures");
             foreach (XTexture texture in xTextures)
             {
-                string texPath = Path.Combine(root, texture.Name.Value);
+                string texPath = Path.Combine(root, texture.Name);
                 if (File.Exists(texPath))
                     texList.Textures.Add(new Texture(texPath));
                 else
-                    MissingTextures.Add(texture.Name.Value);
+                    MissingTextures.Add(texture.Name);
             }
 
             if (MissingTextures.Count > 0)
@@ -85,7 +85,7 @@ namespace Shuriken.ViewModels
 
             foreach (var entry in xFontList.FontIDTable)
             {
-                UIFont font = new UIFont(entry.Name.Value);
+                UIFont font = new UIFont(entry.Name);
                 foreach (var mapping in xFontList.Fonts[(int)entry.Index].CharacterMappings)
                 {
                     var sprite = Utilities.FindSpriteFromNCPScene((int)mapping.SubImageIndex, xScenes[0].SubImages, texList.Textures);
@@ -96,7 +96,7 @@ namespace Shuriken.ViewModels
             }
 
             foreach (SceneID sceneID in xIDs)
-                Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name.Value, texList, Project.Fonts));
+                Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name, texList, Project.Fonts));
 
             Project.TextureLists.Add(texList);
         }

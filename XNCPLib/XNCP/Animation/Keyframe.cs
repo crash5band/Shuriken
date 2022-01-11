@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
 
 namespace XNCPLib.XNCP.Animation
 {
@@ -16,7 +16,7 @@ namespace XNCPLib.XNCP.Animation
         public float Offset2 { get; set; }
         public uint Field14 { get; set; }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             Frame = reader.ReadUInt32();
             Value = reader.ReadSingle();

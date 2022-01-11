@@ -1,27 +1,29 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
 using XNCPLib.XNCP.Animation;
-using AmicitiaLibrary.IO;
+using XNCPLib.Extensions;
+using Amicitia.IO.Binary;
 
 namespace XNCPLib.XNCP
 {
     public class SceneID
     {
-        public StringOffset Name { get; set; }
+        public string Name { get; set; }
         public uint Index { get; set; }
 
         public SceneID()
         {
-            Name = new StringOffset();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
-            Name.Read(reader);
+            uint nameOffset = reader.ReadUInt32();
+            Name = reader.ReadStringOffset(nameOffset);
             Index = reader.ReadUInt32();
         }
     }
@@ -68,7 +70,7 @@ namespace XNCPLib.XNCP
             AnimationData2List = new List<AnimationData2>();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             Field00 = reader.ReadUInt32();
             ZIndex = reader.ReadSingle();
@@ -90,8 +92,8 @@ namespace XNCPLib.XNCP
             AnimationFrameDataListOffset = reader.ReadUInt32();
             AnimationCastTableOffset = reader.ReadUInt32();
 
-            long baseOffset = reader.PeekBaseOffset();
-            reader.SeekBegin(baseOffset + Data1Offset);
+            long baseOffset = reader.GetOffsetOrigin();
+            reader.Seek(baseOffset + Data1Offset, SeekOrigin.Begin);
 
             for (int i = 0; i < Data1Count; ++i)
             {
@@ -108,14 +110,14 @@ namespace XNCPLib.XNCP
 
             for (int i = 0; i < GroupCount; ++i)
             {
-                reader.SeekBegin(baseOffset + CastGroupTableOffset + (16 * i));
+                reader.Seek(baseOffset + CastGroupTableOffset + (16 * i), SeekOrigin.Begin);
                 UICastGroup group = new UICastGroup();
                 group.Read(reader);
 
                 UICastGroups.Add(group);
             }
 
-            reader.SeekBegin(baseOffset + CastDictionaryOffset);
+            reader.Seek(baseOffset + CastDictionaryOffset, SeekOrigin.Begin);
             for (int i = 0; i < CastCount; ++i)
             {
                 CastDictionary dictionary = new CastDictionary();
@@ -126,7 +128,7 @@ namespace XNCPLib.XNCP
 
             for (int i = 0; i < AnimationCount; ++i)
             {
-                reader.SeekBegin(baseOffset + AnimationKeyframeDataListOffset + (8 * i));
+                reader.Seek(baseOffset + AnimationKeyframeDataListOffset + (8 * i), SeekOrigin.Begin);
 
                 AnimationKeyframeData keyframeData = new AnimationKeyframeData();
                 keyframeData.Read(reader);
@@ -134,7 +136,7 @@ namespace XNCPLib.XNCP
                 AnimationKeyframeDataList.Add(keyframeData);
             }
 
-            reader.SeekBegin(baseOffset + AnimationDictionaryOffset);
+            reader.Seek(baseOffset + AnimationDictionaryOffset, SeekOrigin.Begin);
             for (int i = 0; i < AnimationCount; ++i)
             {
                 AnimationDictionary dictionary = new AnimationDictionary();
@@ -143,7 +145,7 @@ namespace XNCPLib.XNCP
                 AnimationDictionaries.Add(dictionary);
             }
 
-            reader.SeekBegin(baseOffset + AnimationFrameDataListOffset);
+            reader.Seek(baseOffset + AnimationFrameDataListOffset, SeekOrigin.Begin);
             for (int i = 0; i < AnimationCount; ++i)
             {
                 AnimationFrameData frameData = new AnimationFrameData();
@@ -152,6 +154,7 @@ namespace XNCPLib.XNCP
                 AnimationFrameDataList.Add(frameData);
             }
 
+            /*
             long pos = reader.Position;
             for (int a = 0; a < AnimationCount; ++a)
             {
@@ -265,6 +268,7 @@ namespace XNCPLib.XNCP
 
                 AnimationData2List.Add(data2);
             }
+            */
         }
     }
 }

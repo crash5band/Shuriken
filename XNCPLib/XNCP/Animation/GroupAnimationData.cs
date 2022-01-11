@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP.Animation
 {
@@ -18,7 +20,7 @@ namespace XNCPLib.XNCP.Animation
             CastAnimationDataList = new List<CastAnimationData>();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             CastCount = reader.ReadUInt32();
             CastDataOffset = reader.ReadUInt32();
@@ -27,7 +29,7 @@ namespace XNCPLib.XNCP.Animation
 
             for (int i = 0; i < CastCount; ++i)
             {
-                reader.SeekBegin(reader.PeekBaseOffset() + CastDataOffset + (8 * i));
+                reader.Seek(reader.GetOffsetOrigin() + CastDataOffset + (8 * i), SeekOrigin.Begin);
 
                 CastAnimationData animationData = new CastAnimationData();
                 animationData.Read(reader);

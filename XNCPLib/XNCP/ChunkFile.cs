@@ -1,9 +1,13 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
+using Amicitia.IO.Binary.Extensions;
+using XNCPLib.Extensions;
+using XNCPLib.Misc;
 
 namespace XNCPLib.XNCP
 {
@@ -24,25 +28,25 @@ namespace XNCPLib.XNCP
             End = new EndChunk();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
-            reader.PushBaseOffset(reader.Position);
+            reader.PushOffsetOrigin();
             Info = new InfoChunk();
             Info.Read(reader);
 
-            reader.SeekBegin(reader.PeekBaseOffset() + Info.NextChunkOffset);
+            reader.Seek(reader.GetOffsetOrigin() + Info.NextChunkOffset, SeekOrigin.Begin);
 
             // check whether the next chunk is a NCPJChunk or XTextureListChunk.
             // signature check is always little endian.
-            bool bigEndian = reader.Endianness == Endianness.BigEndian;
-            reader.Endianness = Endianness.LittleEndian;
+            bool bigEndian = reader.Endianness == Endianness.Big;
+            reader.Endianness = Endianness.Little;
             uint nextSignature = reader.ReadUInt32();
 
             if (bigEndian)
-                reader.Endianness = Endianness.BigEndian;
+                reader.Endianness = Endianness.Big;
 
-            reader.SeekBegin(reader.PeekBaseOffset() + Info.NextChunkOffset);
-            if (nextSignature != Utilities.Utilities.Make4CCLE("NXTL"))
+            reader.Seek(reader.GetOffsetOrigin() + Info.NextChunkOffset, SeekOrigin.Begin);
+            if (nextSignature != Utilities.Make4CCLE("NXTL"))
             {
                 CsdmProject.Read(reader);
             }
@@ -51,11 +55,11 @@ namespace XNCPLib.XNCP
                 TextureList.Read(reader);
             }
 
-            reader.SeekBegin(reader.PeekBaseOffset() + Info.NextChunkOffset + Info.ChunkListSize);
+            reader.Seek(reader.GetOffsetOrigin() + Info.NextChunkOffset + Info.ChunkListSize, SeekOrigin.Begin);
             Offset.Read(reader);
             End.Read(reader);
 
-            reader.PopBaseOffset();
+            reader.PopOffsetOrigin();
         }
     }
 }

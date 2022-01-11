@@ -154,7 +154,7 @@ namespace Shuriken.Models
             Field3C = cast.Field3C;
 
             Font = null;
-            FontCharacters = cast.FontCharactersOffset.Offset != 0 ? cast.FontCharactersOffset.Value : "";
+            FontCharacters = cast.FontCharacters;
 
             Field4C = cast.Field4C;
             Width = cast.Width;

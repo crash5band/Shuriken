@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
 
 namespace XNCPLib.XNCP
 {
@@ -29,7 +29,7 @@ namespace XNCPLib.XNCP
 
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             Field00     = reader.ReadInt32();
             Translation = new Vector2(reader.ReadSingle(), reader.ReadSingle());

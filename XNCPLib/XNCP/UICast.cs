@@ -1,10 +1,13 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
+using Amicitia.IO.Binary.Extensions;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP
 {
@@ -23,8 +26,8 @@ namespace XNCPLib.XNCP
         public uint Field38 { get; set; }
         public uint Field3C { get; set; }
         public uint CastMaterialInfoOffset { get; set; }
-        public StringOffset FontCharactersOffset { get; set; }
-        public StringOffset FontNameOffset { get; set; }
+        public string FontCharacters{ get; set; }
+        public string FontName { get; set; }
         public uint Field4C { get; set; }
         public uint Width { get; set; }
         public uint Height { get; set; }
@@ -39,16 +42,13 @@ namespace XNCPLib.XNCP
 
         public UICast()
         {
-            FontCharactersOffset = new StringOffset();
-            FontNameOffset = new StringOffset();
-
             Offset = new Vector2(0.0f, 0.0f);
 
             CastInfoData = new CastInfo();
             CastMaterialData = new CastMaterialInfo();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             Field00 = reader.ReadUInt32();
             Field04 = reader.ReadUInt32();
@@ -66,8 +66,11 @@ namespace XNCPLib.XNCP
             Field3C = reader.ReadUInt32();
             CastMaterialInfoOffset = reader.ReadUInt32();
 
-            FontCharactersOffset.Read(reader);
-            FontNameOffset.Read(reader);
+            uint fontCharactersOffset = reader.ReadUInt32();
+            FontCharacters = reader.ReadStringOffset(fontCharactersOffset);
+
+            uint fontNameOffset = reader.ReadUInt32();
+            FontName = reader.ReadStringOffset(fontNameOffset);
 
             Field4C = reader.ReadUInt32();
             Width = reader.ReadUInt32();
@@ -80,17 +83,17 @@ namespace XNCPLib.XNCP
             Field6C = reader.ReadSingle();
             Field70 = reader.ReadUInt32();
 
-            long baseOffset = reader.PeekBaseOffset();
+            long baseOffset = reader.GetOffsetOrigin();
 
             if (CastInfoOffset != 0)
             {
-                reader.SeekBegin(baseOffset + CastInfoOffset);
+                reader.Seek(baseOffset + CastInfoOffset, SeekOrigin.Begin);
                 CastInfoData.Read(reader);
             }
 
             if (CastMaterialInfoOffset != 0)
             {
-                reader.SeekBegin(baseOffset + CastMaterialInfoOffset);
+                reader.Seek(baseOffset + CastMaterialInfoOffset, SeekOrigin.Begin);
                 CastMaterialData.Read(reader);
             }
         }

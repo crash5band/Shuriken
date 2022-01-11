@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP
 {
@@ -30,7 +32,7 @@ namespace XNCPLib.XNCP
             NodeDictionaries = new List<NodeDictionary>();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             SceneCount = reader.ReadUInt32();
             SceneTableOffset = reader.ReadUInt32();
@@ -39,7 +41,7 @@ namespace XNCPLib.XNCP
             NodeListOffset = reader.ReadUInt32();
             NodeDictionaryOffset = reader.ReadUInt32();
 
-            reader.SeekBegin(reader.PeekBaseOffset() + SceneTableOffset);
+            reader.Seek(reader.GetOffsetOrigin() + SceneTableOffset, SeekOrigin.Begin);
             for (int i = 0; i < SceneCount; ++i)
             {
                 SceneOffsets.Add(reader.ReadUInt32());
@@ -47,7 +49,7 @@ namespace XNCPLib.XNCP
 
             for (int i = 0; i < SceneCount; ++i)
             {
-                reader.SeekBegin(reader.PeekBaseOffset() + SceneOffsets[i]);
+                reader.Seek(reader.GetOffsetOrigin() + SceneOffsets[i], SeekOrigin.Begin);
 
                 Scene scene = new Scene();
                 scene.Read(reader);
@@ -55,7 +57,7 @@ namespace XNCPLib.XNCP
                 Scenes.Add(scene);
             }
 
-            reader.SeekBegin(reader.PeekBaseOffset() + SceneIDTableOffset);
+            reader.Seek(reader.GetOffsetOrigin() + SceneIDTableOffset, SeekOrigin.Begin);
             for (int i = 0; i < SceneCount; ++i)
             {
                 SceneID id = new SceneID();

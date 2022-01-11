@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP
 {
@@ -24,7 +26,7 @@ namespace XNCPLib.XNCP
             CastHierarchyTree = new List<CastHierarchyTreeNode>();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             CastCount = reader.ReadUInt32();
             Casts.Capacity = (int)CastCount;
@@ -34,8 +36,8 @@ namespace XNCPLib.XNCP
             Field08 = reader.ReadUInt32();
             CastHierarchyTreeOffset = reader.ReadUInt32();
 
-            long baseOffset = reader.PeekBaseOffset();
-            reader.SeekBegin(baseOffset + CastTableOffset);
+            long baseOffset = reader.GetOffsetOrigin();
+            reader.Seek(baseOffset + CastTableOffset, SeekOrigin.Begin);
 
             for (int i = 0; i < CastCount; ++i)
             {
@@ -44,7 +46,7 @@ namespace XNCPLib.XNCP
 
             for (int i = 0; i < CastCount; ++i)
             {
-                reader.SeekBegin(baseOffset + CastOffsets[i]);
+                reader.Seek(baseOffset + CastOffsets[i], SeekOrigin.Begin);
 
                 UICast cast = new UICast();
                 cast.Read(reader);
@@ -52,7 +54,7 @@ namespace XNCPLib.XNCP
                 Casts.Add(cast);
             }
 
-            reader.SeekBegin(baseOffset + CastHierarchyTreeOffset);
+            reader.Seek(baseOffset + CastHierarchyTreeOffset, SeekOrigin.Begin);
             for (int i = 0; i < CastCount; ++i)
             {
                 CastHierarchyTree.Add(new CastHierarchyTreeNode(reader.ReadInt32(), reader.ReadInt32()));

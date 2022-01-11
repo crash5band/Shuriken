@@ -135,7 +135,7 @@ namespace Shuriken.Models
             int animIndex = 0;
             foreach (var entry in scene.AnimationDictionaries)
             {
-                Animations.Add(new AnimationGroup(entry.Name.Value)
+                Animations.Add(new AnimationGroup(entry.Name)
                 {
                     Field00 = scene.AnimationFrameDataList[(int)entry.Index].Field00,
                     Duration = scene.AnimationFrameDataList[(int)entry.Index].FrameCount
@@ -165,7 +165,7 @@ namespace Shuriken.Models
                     {
                         foreach (var font in fonts)
                         {
-                            if (font.Name == scene.UICastGroups[g].Casts[c].FontNameOffset.Value)
+                            if (font.Name == scene.UICastGroups[g].Casts[c].FontName)
                                 layer.Font = font;
                         }
                     }
@@ -179,7 +179,7 @@ namespace Shuriken.Models
                     for (int c = 0; c < keyframeData.GroupAnimationDataList[g].CastCount; ++c)
                     {
                         XNCPLib.XNCP.Animation.CastAnimationData castAnimData = keyframeData.GroupAnimationDataList[g].CastAnimationDataList[c];
-                        List<AnimationTrack> tracks = new List<AnimationTrack>((int)XNCPLib.Utilities.Utilities.CountSetBits(castAnimData.Flags));
+                        List<AnimationTrack> tracks = new List<AnimationTrack>((int)XNCPLib.Misc.Utilities.CountSetBits(castAnimData.Flags));
 
                         int castAnimDataIndex = 0;
                         for (int i = 0; i < 12; ++i)
@@ -259,7 +259,7 @@ namespace Shuriken.Models
             foreach (var entry in castDictionary)
             {
                 if (entry.GroupIndex == groupIndex && entry.CastIndex == castIndex)
-                    return entry.Name.Value;
+                    return entry.Name;
             }
 
             return String.Empty;

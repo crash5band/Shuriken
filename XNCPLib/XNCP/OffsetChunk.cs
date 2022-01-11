@@ -1,9 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
 
 namespace XNCPLib.XNCP
 {
@@ -20,7 +21,7 @@ namespace XNCPLib.XNCP
             OffsetLocations = new List<uint>();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             long start = reader.Position;
             Header.Read(reader);
@@ -33,7 +34,7 @@ namespace XNCPLib.XNCP
                 OffsetLocations.Add(reader.ReadUInt32());
             }
 
-            reader.SeekBegin(Header.EndPosition);
+            reader.Seek(Header.EndPosition, SeekOrigin.Begin);
         }
     }
 }

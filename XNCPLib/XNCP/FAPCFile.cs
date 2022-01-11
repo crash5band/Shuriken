@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
+using XNCPLib.Misc;
 
 namespace XNCPLib.XNCP
 {
@@ -20,21 +20,16 @@ namespace XNCPLib.XNCP
 
         public void Load(string filename)
         {
-            FileStream stream = new FileStream(filename, FileMode.Open);
-            EndianBinaryReader reader = new EndianBinaryReader(stream, Endianness.LittleEndian);
+            BinaryObjectReader reader = new BinaryObjectReader(filename, Endianness.Little, Encoding.UTF8);
 
             Signature = reader.ReadUInt32();
-            if (Signature == Utilities.Utilities.Make4CCLE("CPAF"))
-                reader.Endianness = Endianness.BigEndian;
+            if (Signature == Utilities.Make4CCLE("CPAF"))
+                reader.Endianness = Endianness.Big;
 
             Resources[0].Read(reader);
             Resources[1].Read(reader);
 
-            reader.Close();
-            stream.Close();
-
             reader.Dispose();
-            stream.Dispose();
         }
     }
 }

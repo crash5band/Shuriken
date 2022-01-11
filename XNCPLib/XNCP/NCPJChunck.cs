@@ -1,5 +1,8 @@
 ﻿using System;
-using AmicitiaLibrary.IO;
+using System.IO;
+using Amicitia.IO.Binary;
+using Amicitia.IO.Binary.Extensions;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP
 {
@@ -9,7 +12,7 @@ namespace XNCPLib.XNCP
         public uint Field08 { get; set; }
         public uint Field0C { get; set; }
         public uint RootNodeOffset { get; set; }
-        public StringOffset ProjectName { get; set; }
+        public string ProjectName { get; set; }
         public uint DXLSignature { get; set; }
         public uint FontListOffset { get; set; }
         public CSDNode Root { get; set; }
@@ -18,14 +21,13 @@ namespace XNCPLib.XNCP
         public NCPJChunck()
         {
             Header = new ChunkHeader();
-            ProjectName = new StringOffset();
             Root = new CSDNode();
             Fonts = new FontList();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
-            reader.PushBaseOffset(reader.Position);
+            reader.PushOffsetOrigin();
             Header = new ChunkHeader();
             Header.Read(reader);
 
@@ -33,18 +35,19 @@ namespace XNCPLib.XNCP
             Field0C = reader.ReadUInt32();
             RootNodeOffset = reader.ReadUInt32();
 
-            ProjectName.Read(reader);
+            uint projectNameOffset = reader.ReadUInt32();
+            ProjectName = reader.ReadStringOffset(projectNameOffset);
 
             DXLSignature = reader.ReadUInt32();
             FontListOffset = reader.ReadUInt32();
 
-            reader.SeekBegin(reader.PeekBaseOffset() + RootNodeOffset);
+            reader.Seek(reader.GetOffsetOrigin() + RootNodeOffset, SeekOrigin.Begin);
             Root.Read(reader);
 
-            reader.SeekBegin(reader.PeekBaseOffset() + FontListOffset);
+            reader.Seek(reader.GetOffsetOrigin() + FontListOffset, SeekOrigin.Begin);
             Fonts.Read(reader);
 
-            reader.PopBaseOffset();
+            reader.PopOffsetOrigin();
         }
     }
 }

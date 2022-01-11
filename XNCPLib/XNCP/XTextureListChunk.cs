@@ -1,9 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
+using Amicitia.IO.Binary.Extensions;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP
 {
@@ -22,9 +25,9 @@ namespace XNCPLib.XNCP
             Textures = new List<XTexture>();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
-            reader.PushBaseOffset(reader.Position);
+            reader.PushOffsetOrigin();
             Header.Read(reader);
 
             ListOffset = reader.ReadUInt32();
@@ -32,7 +35,7 @@ namespace XNCPLib.XNCP
             TextureCount = reader.ReadUInt32();
             DataOffset = reader.ReadUInt32();
 
-            reader.SeekBegin(reader.PeekBaseOffset() + DataOffset);
+            reader.Seek(reader.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
             for (int i = 0; i < TextureCount; ++i)
             {
                 XTexture texture = new XTexture();
@@ -41,7 +44,7 @@ namespace XNCPLib.XNCP
                 Textures.Add(texture);
             }
 
-            reader.PopBaseOffset();
+            reader.PopOffsetOrigin();
         }
     }
 }

@@ -1,9 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
+using Amicitia.IO.Binary.Extensions;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP
 {
@@ -24,20 +27,25 @@ namespace XNCPLib.XNCP
             CharacterMappings = new List<CharacterMapping>();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             CharacterCount = reader.ReadUInt32();
             CharacterMappingTableOffset = reader.ReadUInt32();
             
             CharacterMappings.Capacity = (int)CharacterCount;
-            reader.SeekBegin(reader.PeekBaseOffset() + CharacterMappingTableOffset);
+            reader.Seek(reader.GetOffsetOrigin() + CharacterMappingTableOffset, SeekOrigin.Begin);
 
             for (int m = 0; m < CharacterCount; ++m)
             {
                 CharacterMapping mapping = new CharacterMapping();
-                char[] c = reader.ReadChars(4);
+                char[] c = new char[4];
+                for (int i = 0; i < 4; ++i)
+                {
+                    string s = reader.ReadString(StringBinaryFormat.FixedLength, 1);
+                    c[i] = s.Length > 0 ? s[0] : '.';
+                }
 
-                mapping.SourceCharacter = c[reader.Endianness == Endianness.LittleEndian ? 0 : 3];
+                mapping.SourceCharacter = c[reader.Endianness == Endianness.Little ? 0 : 3];
                 mapping.SubImageIndex = reader.ReadUInt32();
                 CharacterMappings.Add(mapping);
             }
