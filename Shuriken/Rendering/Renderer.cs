@@ -248,10 +248,5 @@ namespace Shuriken.Rendering
 
             EndBatch();
         }
-
-        public void DrawBoundingBox(BoundingBox box)
-        {
-
-        }
     }
 }
