@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shuriken.Models;
 using Shuriken.Commands;
+using Microsoft.Win32;
 
 namespace Shuriken.ViewModels
 {
@@ -57,7 +59,21 @@ namespace Shuriken.ViewModels
         public RelayCommand RemoveTextureCmd
         {
             get { return removeTextureCmd ?? new RelayCommand(RemoveTexture, () => SelectedTexture != null); }
-            set { RemoveTextureCmd = value; NotifyPropertyChanged(); }
+            set { removeTextureCmd = value; NotifyPropertyChanged(); }
+        }
+
+        private RelayCommand createTexListCmd;
+        public RelayCommand CreateTexListCmd
+        {
+            get { return createTexListCmd ?? new RelayCommand(CreateTexList, null); }
+            set { createTexListCmd = value; NotifyPropertyChanged(); }
+        }
+
+        private RelayCommand removeTexListCmd;
+        public RelayCommand RemoveTexListCmd
+        {
+            get { return removeTexListCmd ?? new RelayCommand(RemoveTexList, () => SelectedTexList != null); }
+            set { removeTexListCmd = value; NotifyPropertyChanged(); }
         }
 
         public ObservableCollection<TextureList> TextureLists => Project.TextureLists;
@@ -77,13 +93,32 @@ namespace Shuriken.ViewModels
         public void CreateTexture()
         {
             if (SelectedTexList != null)
-                SelectedTexList.Textures.Add(new Texture());
+            {
+                OpenFileDialog dlg = new OpenFileDialog();
+                dlg.Filter = "Direct Draw Surface Textures |*.dds";
+
+                if (dlg.ShowDialog() == true)
+                {
+                    SelectedTexList.Textures.Add(new Texture(dlg.FileName));
+                }
+            }
         }
 
         public void RemoveTexture()
         {
             if (SelectedTexList != null && SelectedTexture != null)
                 SelectedTexList.Textures.Remove(SelectedTexture);
+        }
+
+        public void CreateTexList()
+        {
+            TextureLists.Add(new TextureList("tex_list"));
+        }
+
+        public void RemoveTexList()
+        {
+            if (SelectedTexList != null)
+                TextureLists.Remove(SelectedTexList);
         }
 
         public SpritesViewModel()
