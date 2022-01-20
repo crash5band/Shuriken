@@ -19,25 +19,25 @@ namespace Shuriken.Models
         public int X
         {
             get { return (int)Start.X; }
-            set { Start.X = value; NotifyPropertyChanged(); }
+            set { Start.X = value; NotifyPropertyChanged(); CreateCrop(); }
         }
 
         public int Y
         {
             get { return (int)Start.Y; }
-            set { Start.Y = value; NotifyPropertyChanged(); }
+            set { Start.Y = value; NotifyPropertyChanged(); CreateCrop(); }
         }
 
         public int Width
         {
             get { return (int)Dimensions.X; }
-            set { Dimensions.X = value; NotifyPropertyChanged(); }
+            set { Dimensions.X = value; NotifyPropertyChanged(); CreateCrop(); }
         }
 
         public int Height
         {
             get { return (int)Dimensions.Y; }
-            set { Dimensions.Y = value; NotifyPropertyChanged(); }
+            set { Dimensions.Y = value; NotifyPropertyChanged(); CreateCrop(); }
         }
 
         private CroppedBitmap crop;
@@ -61,7 +61,7 @@ namespace Shuriken.Models
             Texture = tex;
             Start = new Vector2(left * tex.Width, top * tex.Height);
             Dimensions = new Vector2((right - left) * tex.Width, (bottom - top) * tex.Height);
-            //CreateCrop();
+            CreateCrop();
         }
 
         public Sprite()

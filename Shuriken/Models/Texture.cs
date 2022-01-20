@@ -37,11 +37,14 @@ namespace Shuriken.Models
 
             ID = id;
 
-            ScratchImage img = TexHelper.Instance.LoadFromDDSFile(filename, DDS_FLAGS.NONE)
-                .Decompress(DXGI_FORMAT.R8G8B8A8_UNORM).FlipRotate(TEX_FR_FLAGS.FLIP_VERTICAL);
+            ScratchImage img = TexHelper.Instance.LoadFromDDSFile(filename, DDS_FLAGS.NONE);
+            ScratchImage bimg = img.Decompress(DXGI_FORMAT.B8G8R8A8_UNORM);
+            img = img.Decompress(DXGI_FORMAT.R8G8B8A8_UNORM).FlipRotate(TEX_FR_FLAGS.FLIP_VERTICAL);
 
             Width = img.GetImage(0).Width;
             Height = img.GetImage(0).Height;
+            
+            ImageSource = BitmapConverter.Bitmap2BitmapImage(new Bitmap(Width, Height, (int)(bimg.GetImage(0).RowPitch), System.Drawing.Imaging.PixelFormat.Format32bppArgb, bimg.GetImage(0).Pixels));
 
             GL.BindTexture(TextureTarget.Texture2D, ID);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
@@ -49,8 +52,9 @@ namespace Shuriken.Models
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.LinearSharpenAlphaSgis);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Width, Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, img.GetImage(0).Pixels);
-
+            
             img.Dispose();
+            bimg.Dispose();
         }
 
         public void Use()
