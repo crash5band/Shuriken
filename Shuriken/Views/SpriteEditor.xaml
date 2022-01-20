@@ -118,7 +118,7 @@
                 
                 <!-- Texture properties -->
                 <GroupBox Grid.Row="0" Header="Texture">
-                    <ScrollViewer>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
                             <StackPanel.Resources>
                                 <Style TargetType="{x:Type TextBlock}">
