@@ -5,5 +5,6 @@
     <Style x:Key="TransparentButton" TargetType="{x:Type Button}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Padding" Value="5"/>
     </Style>
 </ResourceDictionary>
