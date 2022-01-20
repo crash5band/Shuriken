@@ -5,32 +5,55 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Shuriken.Controls"
              xmlns:animation="clr-namespace:Shuriken.Models.Animation"
+             xmlns:converters="clr-namespace:Shuriken.Converters"
              mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance local:AnimationTimeline}"
              d:DesignHeight="200" d:DesignWidth="800">
     <Grid Name="LayoutRoot">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="Animation"/>
+        
+        <!-- label -->
+        <TextBlock>
+            <Run Text="&#xf017;" FontFamily="{StaticResource FontAwesome}"/>
+            <Run Text="Animation"/>
+        </TextBlock>
 
         <Grid Name="Control" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
+            
+            <!-- Animation tree view -->
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="+"/>
-                    <Button Content="-"/>
-                    <Button Content="*"/>
+                    <Button Style="{StaticResource TransparentButton}">
+                        <Button.Content>
+                            <TextBlock Text="&#xf067;" FontFamily="{StaticResource FontAwesome}"/>
+                        </Button.Content>
+                    </Button>
+                    <Button Style="{StaticResource TransparentButton}">
+                        <Button.Content>
+                            <TextBlock Text="&#xf068;" FontFamily="{StaticResource FontAwesome}"/>
+                        </Button.Content>
+                    </Button>
+                    <Button Style="{StaticResource TransparentButton}">
+                        <Button.Content>
+                            <TextBlock Text="&#xf069;" FontFamily="{StaticResource FontAwesome}"/>
+                        </Button.Content>
+                    </Button>
                 </StackPanel>
-                <TreeView Grid.Row="1" Name="AnimationTreeView" ItemsSource="{Binding Animations}">
+                <TreeView Grid.Row="1" Name="AnimationTreeView" ItemsSource="{Binding Animations}" TreeViewItem.Selected="AnimationTreeViewSelected">
                     <TreeView.Resources>
                         <HierarchicalDataTemplate DataType="{x:Type animation:AnimationGroup}" ItemsSource="{Binding LayerAnimations}">
                             <StackPanel Orientation="Horizontal">
@@ -49,24 +72,91 @@
             </Grid>
 
             <GridSplitter Grid.Row="1" Grid.Column="1" Width="5" ResizeBehavior="PreviousAndNext" Margin="2.5 0"/>
-            <ListBox Grid.Row="1" Grid.Column="2" HorizontalContentAlignment="Stretch" ItemsSource="{Binding ElementName=AnimationTreeView, Path=SelectedItem.Keyframes}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type animation:Keyframe}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="2*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Frame" Margin="5 0 0 0"/>
-                            <TextBox Grid.Column="1" Text="{Binding Frame}" Margin="0 0 5 0"/>
-                            <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="Value" Margin="5 0 0 0"/>
-                            <TextBox Grid.Column="3" Text="{Binding KValue}" Margin="0 0 5 0"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            
+            <!-- Animation timeline -->
+            <Grid Grid.Column="2" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Toolbar -->
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Style="{StaticResource TransparentButton}">
+                            <Button.Content>
+                                <TextBlock Text="&#xf010;" FontFamily="{StaticResource FontAwesome}"/>
+                            </Button.Content>
+                        </Button>
+                        <Slider Value="{Binding Zoom}" Minimum="{Binding MinZoom}" Maximum="{Binding MaxZoom}" MinWidth="50" Width="100" VerticalAlignment="Center"/>
+                        <Button Style="{StaticResource TransparentButton}">
+                            <Button.Content>
+                                <TextBlock Text="&#xf00e;" FontFamily="{StaticResource FontAwesome}"/>
+                            </Button.Content>
+                        </Button>
+                        
+                        <!-- Min/Max value adjustment -->
+                        <TextBlock Text="{Binding Zoom, StringFormat={}{0:P2}, FallbackValue=100%}" VerticalAlignment="Center"/>
+                        <Separator HorizontalAlignment="Center" VerticalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5"/>
+                        <TextBlock Text="Min" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding MinValue}" MinWidth="30" Width="50" VerticalAlignment="Center" Margin="5 0"/>
+                        <TextBlock Text="Max" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding MaxValue}" MinWidth="30" Width="50" VerticalAlignment="Center" Margin="5 0"/>
+                        <Separator HorizontalAlignment="Center" VerticalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5"/>
+                        
+                        <!-- Timeline controls -->
+                        <Button Style="{StaticResource TransparentButton}">
+                            <Button.Content>
+                                <TextBlock Text="&#xf049;" FontFamily="{StaticResource FontAwesome}"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Style="{StaticResource TransparentButton}">
+                            <Button.Content>
+                                <TextBlock Text="&#xf04a;" FontFamily="{StaticResource FontAwesome}"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Style="{StaticResource TransparentButton}">
+                            <Button.Content>
+                                <TextBlock Text="&#xf04e;" FontFamily="{StaticResource FontAwesome}"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Style="{StaticResource TransparentButton}">
+                            <Button.Content>
+                                <TextBlock Text="&#xf050;" FontFamily="{StaticResource FontAwesome}"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Style="{StaticResource TransparentButton}">
+                            <Button.Content>
+                                <TextBlock Text="&#xf055;" FontFamily="{StaticResource FontAwesome}"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Style="{StaticResource TransparentButton}">
+                            <Button.Content>
+                                <TextBlock Text="&#xf056;" FontFamily="{StaticResource FontAwesome}"/>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
+                
+                <!-- Timeline canvas -->
+                <ScrollViewer Grid.Row="1" Name="TimelineContainer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <Canvas Name="Timeline" Background="LightGray" VerticalAlignment="Top" HorizontalAlignment="Left" MouseLeftButtonDown="TimelineMouseLeftButtonDown"/>
+                </ScrollViewer>
+            </Grid>
+            
+            <GridSplitter Grid.Row="1" Grid.Column="3" Width="5" ResizeBehavior="PreviousAndNext" Margin="2.5 0"/>
+            
+            <!-- Keyframe properties -->
+            <GroupBox Grid.Row="1" Grid.Column="4" Header="Keyframe properties">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <Label>Frame</Label>
+                        <TextBox Text="{Binding SelectedKey.Frame}" IsEnabled="{Binding KeySelected}"/>
+                        <Label>Value</Label>
+                        <TextBox Text="{Binding SelectedKey.KValue}" IsEnabled="{Binding KeySelected}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </GroupBox>
         </Grid>
     </Grid>
 </UserControl>
