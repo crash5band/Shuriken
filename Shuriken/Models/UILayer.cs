@@ -111,7 +111,7 @@ namespace Shuriken.Models
         public uint InfoField38 { get; set; }
 
         [Category("Sprite")]
-        public Sprite[] Sprites { get; set; }
+        public ObservableCollection<Sprite> Sprites { get; set; }
 
         [Browsable(false)]
         private bool visible;
@@ -182,8 +182,65 @@ namespace Shuriken.Models
             InfoField34 = cast.CastInfoData.Field34;
             InfoField38 = cast.CastInfoData.Field38;
 
-            Sprites = new Sprite[32];
+            Sprites = new ObservableCollection<Sprite>();
+            for (int i = 0; i < 32; ++i)
+                Sprites.Add(new Sprite());
         }
+
+        public UILayer()
+        {
+            Name = "Cast";
+            Field00 = 0;
+            Type = DrawType.Sprite;
+            IsEnabled = true;
+            Visible = true;
+            ZIndex = 0;
+            Children = new ObservableCollection<UILayer>();
+
+            TopLeft = new Vector2();
+            BottomLeft = new Vector2();
+            TopRight = new Vector2();
+            BottomRight = new Vector2();
+
+            Field2C = 0;
+            Field34 = 0;
+            Flags = 0;
+            Field3C = 0;
+
+            Font = null;
+            FontCharacters = "";
+
+            Field4C = 0;
+            Width = 0;
+            Height = 0;
+            Field58 = 0;
+            Field5C = 0;
+
+            Offset = new Vector2();
+
+            Field68 = 0;
+            Field6C = 0;
+            Field70 = 0;
+
+            InfoField00 = 0;
+            Translation = new Vector2();
+            Rotation = 0;
+            Scale = new Vector2(1.0f, 1.0f);
+            InfoField18 = 0;
+            Color = new Color(255, 255, 255, 255);
+            GradientTopLeft = new Color(255, 255, 255, 255);
+            GradientBottomLeft = new Color(255, 255, 255, 255);
+            GradientTopRight = new Color(255, 255, 255, 255);
+            GradientBottomRight = new Color(255, 255, 255, 255);
+            InfoField30 = 0;
+            InfoField34 = 0;
+            InfoField38 = 0;
+
+            Sprites = new ObservableCollection<Sprite>();
+            for (int i = 0; i < 32; ++i)
+                Sprites.Add(new Sprite());
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 

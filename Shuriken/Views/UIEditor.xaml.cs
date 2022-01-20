@@ -203,7 +203,7 @@ namespace Shuriken.Views
                     if (sprAnim != null)
                     {
                         int i = (int)sprAnim.GetValue(time);
-                        if (i > 0 && i < lyr.Sprites.Length)
+                        if (i > 0 && i < lyr.Sprites.Count)
                             sprIndex = i;
                     }
                 }
@@ -400,13 +400,17 @@ namespace Shuriken.Views
         {
             // Move up the tree view until we reach the TreeViewItem holding the UIScene
             TreeViewItem item = e.OriginalSource as TreeViewItem;
+            
             while (item != null && item.DataContext != null && item.DataContext is not UIScene)
                 item = Utilities.GetParentTreeViewItem(item);
 
             var vm = DataContext as ScenesViewModel;
-            if (vm != null && item != null)
+            if (vm != null)
             {
-                vm.SelectedScene = item.DataContext as UIScene;
+                if (item != null)
+                    vm.SelectedScene = item.DataContext as UIScene;
+
+                vm.SelectedNode = (e.OriginalSource as TreeViewItem).DataContext;
             }
         }
     }

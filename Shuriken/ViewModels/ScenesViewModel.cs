@@ -8,6 +8,7 @@ using System.Numerics;
 using Shuriken.Models;
 using Shuriken.Commands;
 using Shuriken.Rendering;
+using Shuriken.Views;
 
 namespace Shuriken.ViewModels
 {
@@ -141,11 +142,39 @@ namespace Shuriken.ViewModels
         private RelayCommand removeSceneCmd;
         public RelayCommand RemoveSceneCmd
         {
-            get => removeSceneCmd ?? new RelayCommand(RemoveScene, null);
+            get => removeSceneCmd ?? new RelayCommand(RemoveScene, () => SelectedScene != null);
             set
             {
                 removeSceneCmd = value;
                 NotifyPropertyChanged();
+            }
+        }
+
+        private RelayCommand<int> changeCastSpriteCmd;
+        public RelayCommand<int> ChangeCastSpriteCmd
+        {
+            get { return changeCastSpriteCmd ?? new RelayCommand<int>(SelectCastSprite, null); }
+            set { changeCastSpriteCmd = value; NotifyPropertyChanged(); }
+        }
+
+        public void SelectCastSprite(object index)
+        {
+            SpritePickerWindow dialog = new SpritePickerWindow();
+            dialog.ShowDialog();
+
+            if (dialog.DialogResult == true)
+            {
+                var sprIndex = (int)index;
+                ChangeCastSprite(sprIndex, dialog.SelectedSprite);
+            }
+        }
+
+        public void ChangeCastSprite(int index, Sprite spr)
+        {
+            if (SelectedNode is UILayer)
+            {
+                var cast = (UILayer)SelectedNode;
+                cast.Sprites[index] = spr;
             }
         }
 
@@ -189,6 +218,31 @@ namespace Shuriken.ViewModels
                 Scenes.Remove(SelectedScene);
         }
 
+        public void CreateGroup(UIScene scene)
+        {
+            scene.Groups.Add(new LayerGroup());
+        }
+
+        public void CreateCast(LayerGroup group)
+        {
+            group.Layers.Add(new UILayer());
+        }
+
+        public void CreateCast(UILayer parent)
+        {
+            parent.Children.Add(new UILayer());
+        }
+
+        public void RemoveCast(LayerGroup group, UILayer cast)
+        {
+            group.Layers.Remove(cast);
+        }
+
+        public void RemoveCast(UILayer parent, UILayer cast)
+        {
+            parent.Children.Remove(cast);
+        }
+
         public ObservableCollection<UIScene> Scenes => Project.Scenes;
 
         private UIScene scene;
@@ -196,6 +250,13 @@ namespace Shuriken.ViewModels
         {
             get { return scene; }
             set { scene = value; NotifyPropertyChanged(); }
+        }
+
+        private object selectedNode;
+        public object SelectedNode
+        {
+            get { return selectedNode; }
+            set { selectedNode = value; NotifyPropertyChanged(); }
         }
 
         public ScenesViewModel()

@@ -156,7 +156,7 @@ namespace Shuriken.Models
                     if (layer.Type == DrawType.Sprite)
                     {
                         int[] castSprites = scene.UICastGroups[g].Casts[c].CastMaterialData.SubImageIndices;
-                        for (int index = 0; index < layer.Sprites.Length; ++index)
+                        for (int index = 0; index < layer.Sprites.Count; ++index)
                         {
                             layer.Sprites[index] = Utilities.FindSpriteFromNCPScene(castSprites[index], scene.SubImages, texList.Textures);
                         }
