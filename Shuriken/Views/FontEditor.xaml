@@ -12,6 +12,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
         <GroupBox Header="Fonts">
@@ -24,18 +25,21 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <ListBox Grid.Row="0" Grid.ColumnSpan="2" Name="FontsView" ItemsSource="{Binding Fonts}">
+                <ListBox Grid.Row="0" Grid.ColumnSpan="2" Name="FontsView" ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type models:UIFont}">
                             <TextBlock Text="{Binding Name}"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <Button Content="Add Font" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" Margin="5"/>
-                <Button Content="Remove Font" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5"/>
+                <Button Content="Add Font" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" Margin="5" Command="{Binding CreateFontCommand}"/>
+                <Button Content="Remove Font" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5" Command="{Binding RemoveFontCommand}"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Properties" Grid.Column="1">
+
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="5" ResizeBehavior="PreviousAndNext"/>
+
+        <GroupBox Header="Properties" Grid.Column="2">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
@@ -43,16 +47,16 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0">
-                    <TextBlock HorizontalAlignment="Left" Margin="5">Name</TextBlock>
-                    <TextBox Text="{Binding ElementName=FontsView, Path=SelectedItem.Name}"/>
+                    <Label>Name</Label>
+                    <TextBox Text="{Binding SelectedFont.Name}"/>
                 </StackPanel>
                 <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Character Definitions" Margin="5"/>
-                    <ListBox Grid.Row="2" ItemsSource="{Binding ElementName=FontsView, Path=SelectedItem.Mappings}" HorizontalContentAlignment="Stretch">
+                    <Label>Character Definitions</Label>
+                    <ListBox Grid.Row="2" ItemsSource="{Binding SelectedFont.Mappings}" SelectedItem="{Binding SelectedMapping}" HorizontalContentAlignment="Stretch">
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type models:CharacterMapping}">
                                 <StackPanel>
@@ -60,15 +64,19 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>
                                             <ColumnDefinition/>
-                                            <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding Character}" VerticalAlignment="Center"/>
-                                        <Image Source="{Binding Sprite.Crop}" Width="30" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1"/>
-                                        <Button Grid.Column="2">
-                                            <Button.Content>
-                                                <TextBlock Text="&#xf044;" FontFamily="{StaticResource FontAwesome}"/>
-                                            </Button.Content>
-                                        </Button>
+                                        <TextBox Grid.Column="0" Text="{Binding Character}" VerticalAlignment="Center" MaxLength="1" Width="100" HorizontalAlignment="Left"/>
+                                        <Border HorizontalAlignment="Right" Grid.Column="2" Background="LightGray" BorderBrush="Gray" CornerRadius="2" BorderThickness="1" Width="50" Height="30" >
+                                            <Border.Effect>
+                                                <DropShadowEffect BlurRadius="6" ShadowDepth="2" Direction="-45" Color="#333" Opacity="0.3"/>
+                                            </Border.Effect>
+                                            <Button Width="50" Height="30" Click="FontSpriteClick" Background="Transparent" BorderBrush="Transparent" Padding="2"
+                                                    Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.ChangeMappingSpriteCmd}" CommandParameter="{Binding}">
+                                                <Button.Content>
+                                                    <Image Source="{Binding Sprite.Crop}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1"/>
+                                                </Button.Content>
+                                            </Button>
+                                        </Border>
                                     </Grid>
                                     <Separator/>
                                 </StackPanel>
@@ -77,8 +85,8 @@
                     </ListBox>
                 </Grid>
                 <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-                    <Button Content="New Definition" Margin="5" />
-                    <Button Content="Remove Definition" Margin="5"/>
+                    <Button Content="New Definition" Margin="5" Command="{Binding CreateCharDefCommand}"/>
+                    <Button Content="Remove Definition" Margin="5" Command="{Binding RemoveCharDefCmd}"/>
                 </StackPanel>
             </Grid>
         </GroupBox>

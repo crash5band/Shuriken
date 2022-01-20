@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Shuriken.Models;
 
 namespace Shuriken.Views
 {
@@ -23,6 +24,10 @@ namespace Shuriken.Views
         public FontEditor()
         {
             InitializeComponent();
+        }
+
+        private void FontSpriteClick(object sender, EventArgs e)
+        {
         }
     }
 }
