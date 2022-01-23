@@ -17,6 +17,9 @@ namespace XNCPLib.Extensions
         }
         public static string ReadStringOffset(this BinaryObjectReader reader, long offset)
         {
+            if (offset == 0)
+                return "";
+
             long savedPosition = reader.Position;
             reader.Seek(reader.GetOffsetOrigin() + offset, SeekOrigin.Begin);
 
