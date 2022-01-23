@@ -40,7 +40,7 @@
                         <TextBox Text="{Binding Field00}"/>
 
                         <Label>Type</Label>
-                        <ComboBox ItemsSource="{Binding Type, Converter={StaticResource EnumConverter}}"
+                        <ComboBox ItemsSource="{Binding Type, Converter={StaticResource EnumConverter}, Mode=OneTime}"
                               SelectedValue="{Binding Type}" SelectedValuePath="Value" DisplayMemberPath="Description"/>
 
                         <CheckBox Content="Enabled" IsChecked="{Binding IsEnabled}" HorizontalAlignment="Left" Margin="5 10"/>

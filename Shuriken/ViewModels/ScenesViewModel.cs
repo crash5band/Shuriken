@@ -7,12 +7,10 @@ using System.Threading.Tasks;
 using System.Numerics;
 using Shuriken.Models;
 using Shuriken.Commands;
-using Shuriken.Rendering;
 using Shuriken.Views;
 
 namespace Shuriken.ViewModels
 {
-    using Vec2 = Shuriken.Models.Vector2;
     public class ScenesViewModel : ViewModelBase
     {
         public float MinZoom => 0.25f;
@@ -22,132 +20,98 @@ namespace Shuriken.ViewModels
         public float Time
         {
             get => time;
-            set
-            {
-                time = value;
-                NotifyPropertyChanged();
-            }
+            set { time = value; NotifyPropertyChanged(); }
         }
 
         private bool playing;
         public bool Playing
         {
             get => playing;
-            set
-            {
-                playing = value;
-                NotifyPropertyChanged();
-            }
+            set { playing = value; NotifyPropertyChanged(); }
         }
 
         private float playbackSpeed;
         public float PlaybackSpeed
         {
             get => playbackSpeed;
-            set
-            {
-                playbackSpeed = value;
-                NotifyPropertyChanged();
-            }
+            set { playbackSpeed = value; NotifyPropertyChanged(); }
         }
 
         private float zoom;
         public float Zoom
         {
             get => zoom;
-            set
-            {
-                zoom = Math.Clamp(value, MinZoom, MaxZoom);
-                NotifyPropertyChanged();
-            }
+            set { zoom = Math.Clamp(value, MinZoom, MaxZoom); NotifyPropertyChanged(); }
         }
 
         private RelayCommand togglePlayingCmd;
         public RelayCommand TogglePlayingCmd
         {
             get => togglePlayingCmd ?? new RelayCommand(() => Playing ^= true, null);
-            set
-            {
-                togglePlayingCmd = value;
-                NotifyPropertyChanged();
-            }
+            set { togglePlayingCmd = value; NotifyPropertyChanged(); }
         }
 
         private RelayCommand stopPlayingCmd;
         public RelayCommand StopPlayingCmd
         {
             get => stopPlayingCmd ?? new RelayCommand(Stop, null);
-            set
-            {
-                stopPlayingCmd = value;
-                NotifyPropertyChanged();
-            }
+            set { stopPlayingCmd = value; NotifyPropertyChanged(); }
         }
 
         private RelayCommand replayCmd;
         public RelayCommand ReplayCmd
         {
             get => replayCmd ?? new RelayCommand(Replay, null);
-            set
-            {
-                replayCmd = value;
-                NotifyPropertyChanged();
-            }
+            set { replayCmd = value; NotifyPropertyChanged(); }
         }
 
         private RelayCommand<float> seekCmd;
         public RelayCommand<float> SeekCmd
         {
             get => seekCmd ?? new RelayCommand<float>(Seek, () => !Playing);
-            set
-            {
-                seekCmd = value;
-                NotifyPropertyChanged();
-            }
+            set { seekCmd = value; NotifyPropertyChanged(); }
         }
 
         private RelayCommand zoomOutCmd;
         public RelayCommand ZoomOutCmd
         {
             get => zoomOutCmd ?? new RelayCommand(() => Zoom -= 0.25f, null);
-            set
-            {
-                zoomOutCmd = value;
-                NotifyPropertyChanged();
-            }
+            set { zoomOutCmd = value; NotifyPropertyChanged(); }
         }
 
         private RelayCommand zoomInCmd;
         public RelayCommand ZoomInCmd
         {
             get => zoomInCmd ?? new RelayCommand(() => Zoom += 0.25f, null);
-            set
-            {
-                zoomInCmd = value;
-                NotifyPropertyChanged();
-            }
+            set { zoomInCmd = value; NotifyPropertyChanged(); }
         }
 
         private RelayCommand createSceneCmd;
         public RelayCommand CreateSceneCmd
         {
             get => createSceneCmd ?? new RelayCommand(CreateScene, null);
-            set
-            {
-                createSceneCmd = value;
-                NotifyPropertyChanged();
-            }
+            set { createSceneCmd = value; NotifyPropertyChanged(); }
         }
 
         private RelayCommand removeSceneCmd;
         public RelayCommand RemoveSceneCmd
         {
             get => removeSceneCmd ?? new RelayCommand(RemoveScene, () => SelectedScene != null);
-            set
-            {
-                removeSceneCmd = value;
-                NotifyPropertyChanged();
-            }
+            set { removeSceneCmd = value; NotifyPropertyChanged(); }
+        }
+
+        private RelayCommand createGroupCmd;
+        public RelayCommand CreateGroupCmd
+        {
+            get { return createGroupCmd ?? new RelayCommand(CreateGroup, () => SelectedScene != null); }
+            set { createGroupCmd = value; NotifyPropertyChanged(); }
+        }
+
+        private RelayCommand removeGroupCmd;
+        public RelayCommand RemoveGroupCmd
+        {
+            get { return removeGroupCmd ?? new RelayCommand(RemoveGroup, () => SelectedNode != null && SelectedNode is LayerGroup); }
+            set { removeGroupCmd = value; NotifyPropertyChanged(); }
         }
 
         private RelayCommand<int> changeCastSpriteCmd;
@@ -157,6 +121,20 @@ namespace Shuriken.ViewModels
             set { changeCastSpriteCmd = value; NotifyPropertyChanged(); }
         }
 
+        private RelayCommand createCastCmd;
+        public RelayCommand CreateCastCmd
+        {
+            get { return createCastCmd ?? new RelayCommand(CreateCast, () => SelectedNode != null && SelectedNode is not UIScene); }
+            set { createCastCmd = value; NotifyPropertyChanged(); }
+        }
+
+        private RelayCommand removeCastCmd;
+        public RelayCommand RemoveCastCmd
+        {
+            get { return removeCastCmd ?? new RelayCommand(RemoveCast, () => SelectedNode is UILayer); }
+            set { removeCastCmd = value; NotifyPropertyChanged(); }
+        }
+
         public void SelectCastSprite(object index)
         {
             SpritePickerWindow dialog = new SpritePickerWindow();
@@ -164,8 +142,11 @@ namespace Shuriken.ViewModels
 
             if (dialog.DialogResult == true)
             {
-                var sprIndex = (int)index;
-                ChangeCastSprite(sprIndex, dialog.SelectedSprite);
+                if (dialog.SelectedSprite != null)
+                {
+                    var sprIndex = (int)index;
+                    ChangeCastSprite(sprIndex, dialog.SelectedSprite);
+                }
             }
         }
 
@@ -218,19 +199,52 @@ namespace Shuriken.ViewModels
                 Scenes.Remove(SelectedScene);
         }
 
-        public void CreateGroup(UIScene scene)
+        public void CreateGroup()
         {
-            scene.Groups.Add(new LayerGroup());
+            if (SelectedScene != null)
+                SelectedScene.Groups.Add(new LayerGroup());
         }
 
-        public void CreateCast(LayerGroup group)
+        public void RemoveGroup()
         {
-            group.Layers.Add(new UILayer());
+            if (SelectedNode is LayerGroup)
+            {
+                var group = SelectedNode as LayerGroup;
+                SelectedScene.Groups.Remove(group);
+            }
         }
 
-        public void CreateCast(UILayer parent)
+        public void CreateCast()
         {
-            parent.Children.Add(new UILayer());
+            if (SelectedNode is LayerGroup)
+            {
+                (SelectedNode as LayerGroup).Layers.Add(new UILayer());
+            }
+            else if (SelectedNode is UILayer)
+            {
+                (SelectedNode as UILayer).Children.Add(new UILayer());
+            }
+        }
+
+        public void RemoveCast()
+        {
+            if (SelectedNode != null && ParentNode != null)
+            {
+                if (ParentNode is LayerGroup)
+                {
+                    var parent = ParentNode as LayerGroup;
+                    var cast = SelectedNode as UILayer;
+                    if (cast != null)
+                        parent.Layers.Remove(cast);
+                }
+                else if (ParentNode is UILayer)
+                {
+                    var parent = ParentNode as UILayer;
+                    var cast = SelectedNode as UILayer;
+                    if (cast != null)
+                        parent.Children.Remove(cast);
+                }
+            }
         }
 
         public void RemoveCast(LayerGroup group, UILayer cast)
@@ -243,7 +257,6 @@ namespace Shuriken.ViewModels
             parent.Children.Remove(cast);
         }
 
-        public ObservableCollection<UIScene> Scenes => Project.Scenes;
 
         private UIScene scene;
         public UIScene SelectedScene
@@ -252,13 +265,20 @@ namespace Shuriken.ViewModels
             set { scene = value; NotifyPropertyChanged(); }
         }
 
+        private object parentNode;
+        public object ParentNode
+        {
+            get { return parentNode; }
+            set { parentNode = value; NotifyPropertyChanged(); }
+        }
+
         private object selectedNode;
         public object SelectedNode
         {
             get { return selectedNode; }
             set { selectedNode = value; NotifyPropertyChanged(); }
         }
-
+        public ObservableCollection<UIScene> Scenes => Project.Scenes;
         public ScenesViewModel()
         {
             DisplayName = "Scenes";

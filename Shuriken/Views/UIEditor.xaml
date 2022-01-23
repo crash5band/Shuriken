@@ -102,18 +102,17 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Content="Create" HorizontalAlignment="Stretch" Margin="5">
-                        <Button.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Create Scene" Command="{Binding CreateSceneCmd}"/>
-                                <MenuItem Header="Create Group" Command="{Binding CreateGroupCmd}"/>
-                                <MenuItem Header="Create Cast" Command="{Binding CreateCastCmd}"/>
-                            </ContextMenu>
-                        </Button.ContextMenu>
-                    </Button>
-                    <Button Grid.Column="1" Content="Remove" HorizontalAlignment="Stretch" Margin="0 5 5 5"
-                        Command="{Binding RemoveSceneCmd}"/>
+                    <Button Grid.Column="0" Content="+C" Command="{Binding CreateCastCmd}"/>
+                    <Button Grid.Column="1" Content="-C" Command="{Binding RemoveCastCmd}"/>
+                    <Button Grid.Column="2" Content="+G" Command="{Binding CreateGroupCmd}"/>
+                    <Button Grid.Column="3" Content="-G" Command="{Binding RemoveGroupCmd}"/>
+                    <Button Grid.Column="4" Content="+S" Command="{Binding CreateSceneCmd}"/>
+                    <Button Grid.Column="5" Content="-S" Command="{Binding RemoveSceneCmd}"/>
                 </Grid>
             </Grid>
 

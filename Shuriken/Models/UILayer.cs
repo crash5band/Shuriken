@@ -14,7 +14,6 @@ namespace Shuriken.Models
 {
     public class UILayer : INotifyPropertyChanged
     {
-        [Category("Layer")]
         private string name { get; set; }
         public string Name
         { 
@@ -22,14 +21,21 @@ namespace Shuriken.Models
             set { name = value; NotifyPropertyChanged(); }
         }
 
-        [Category("Layer")]
         public uint Field00 { get; set; }
 
-        [Category("Layer")]
-        public DrawType Type { get; set; }
+        private DrawType type;
+        public DrawType Type
+        {
+            get { return type; }
+            set { type = value; NotifyPropertyChanged(); }
+        }
 
-        [Category("Layer")]
-        public bool IsEnabled { get; set; }
+        private bool enabled;
+        public bool IsEnabled
+        {
+            get { return enabled; }
+            set { enabled = value; NotifyPropertyChanged(); }
+        }
 
         public Vector2 TopLeft { get; set; }
 
@@ -40,25 +46,45 @@ namespace Shuriken.Models
         public Vector2 BottomRight { get; set; }
 
         public uint Field2C { get; set; }
-        public uint Field34 { get; set; }
-        public uint Flags { get; set; }
+
+        private uint field34;
+        public uint Field34
+        {
+            get { return field34; }
+            set { field34 = value; NotifyPropertyChanged();}
+        }
+
+        private uint flags;
+        public uint Flags
+        {
+            get { return flags; }
+            set { flags = value; NotifyPropertyChanged(); }
+        }
+
         public uint Field3C { get; set; }
 
-        [Category("Font")]
         public UIFont Font { get; set; }
 
-        [Category("Font")]
-        public string FontCharacters { get; set; }
+        private string fontChars;
+        public string FontCharacters
+        {
+            get { return fontChars; }
+            set { fontChars = value; NotifyPropertyChanged(); }
+        }
         public uint Field4C { get; set; }
 
-        [Category("Dimensions")]
         public uint Width { get; set; }
 
-        [Category("Dimensions")]
         public uint Height { get; set; }
         public uint Field58 { get; set; }
         public uint Field5C { get; set; }
-        public Vector2 Offset { get; set; }
+
+        private Vector2 offset;
+        public Vector2 Offset
+        {
+            get { return offset; }
+            set { offset = value; NotifyPropertyChanged(); }
+        }
         public float Field68 { get; set; }
         public float Field6C { get; set; }
         public uint Field70 { get; set; }
@@ -94,17 +120,33 @@ namespace Shuriken.Models
             set { color = value; NotifyPropertyChanged(); }
         }
 
-        [Category("Color")]
-        public Color GradientTopLeft { get; set; }
+        private Color gradientTopLeft;
+        public Color GradientTopLeft
+        {
+            get { return gradientTopLeft; }
+            set { gradientTopLeft = value; NotifyPropertyChanged();}
+        }
 
-        [Category("Color")]
-        public Color GradientBottomLeft { get; set; }
+        private Color gradientBottomLeft;
+        public Color GradientBottomLeft
+        {
+            get { return gradientBottomLeft; }
+            set { gradientBottomLeft = value; NotifyPropertyChanged(); }
+        }
+        
+        private Color gradientTopRight;
+        public Color GradientTopRight
+        {
+            get { return gradientTopRight; }
+            set { gradientTopRight = value; NotifyPropertyChanged(); }
+        }
 
-        [Category("Color")]
-        public Color GradientTopRight { get; set; }
-
-        [Category("Color")]
-        public Color GradientBottomRight { get; set; }
+        private Color gradientBottomRight;
+        public Color GradientBottomRight
+        {
+            get { return gradientBottomRight; }
+            set { gradientBottomRight = value; NotifyPropertyChanged(); }
+        }
 
         public uint InfoField30 { get; set; }
         public uint InfoField34 { get; set; }
@@ -113,7 +155,6 @@ namespace Shuriken.Models
         [Category("Sprite")]
         public ObservableCollection<Sprite> Sprites { get; set; }
 
-        [Browsable(false)]
         private bool visible;
         public bool Visible
         {
@@ -128,9 +169,6 @@ namespace Shuriken.Models
             set { zIndex = value; NotifyPropertyChanged(); }
         }
 
-        public UILayer Parent { get; set; }
-
-        [Browsable(false)]
         public ObservableCollection<UILayer> Children { get; set; }
 
         public UILayer(UICast cast, string name, int index)

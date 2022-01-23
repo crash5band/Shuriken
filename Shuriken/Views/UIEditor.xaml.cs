@@ -398,9 +398,10 @@ namespace Shuriken.Views
 
         private void ScenesTreeViewSelected(object sender, RoutedEventArgs e)
         {
-            // Move up the tree view until we reach the TreeViewItem holding the UIScene
-            TreeViewItem item = e.OriginalSource as TreeViewItem;
+            TreeViewItem source = e.OriginalSource as TreeViewItem;
+            TreeViewItem item = source;
             
+            // Move up the tree view until we reach the TreeViewItem holding the UIScene
             while (item != null && item.DataContext != null && item.DataContext is not UIScene)
                 item = Utilities.GetParentTreeViewItem(item);
 
@@ -410,7 +411,17 @@ namespace Shuriken.Views
                 if (item != null)
                     vm.SelectedScene = item.DataContext as UIScene;
 
-                vm.SelectedNode = (e.OriginalSource as TreeViewItem).DataContext;
+                vm.SelectedNode = source.DataContext;
+
+                TreeViewItem parent = Utilities.GetParentTreeViewItem(source);
+                if (parent != null)
+                {
+                    vm.ParentNode = parent.DataContext;
+                }
+                else
+                {
+                    vm.ParentNode = null;
+                }
             }
         }
     }
