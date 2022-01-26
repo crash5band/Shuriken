@@ -24,11 +24,6 @@ namespace Shuriken.Models
 
         private void CreateTexture(string filename)
         {
-            uint id = 0;
-            GL.GenTextures(1, out id);
-
-            ID = id;
-
             ScratchImage img = TexHelper.Instance.LoadFromDDSFile(filename, DDS_FLAGS.NONE);
             ScratchImage bimg = img.Decompress(DXGI_FORMAT.B8G8R8A8_UNORM);
             img = img.Decompress(DXGI_FORMAT.R8G8B8A8_UNORM).FlipRotate(TEX_FR_FLAGS.FLIP_VERTICAL);
@@ -39,16 +34,26 @@ namespace Shuriken.Models
             var bmp = BitmapConverter.FromTextureImage(bimg, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             ImageSource = BitmapConverter.FromBitmap(bmp);
 
+            CreateGLTexture(img);
+            
+            img.Dispose();
+            bimg.Dispose();
+            bmp.Dispose();
+        }
+
+        private void CreateGLTexture(ScratchImage img)
+        {
+            uint id = 0;
+            GL.GenTextures(1, out id);
+
+            ID = id;
+
             GL.BindTexture(TextureTarget.Texture2D, ID);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.LinearSharpenAlphaSgis);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Width, Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, img.GetImage(0).Pixels);
-            
-            img.Dispose();
-            bimg.Dispose();
-            bmp.Dispose();
         }
 
         public void Use()

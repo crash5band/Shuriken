@@ -12,7 +12,7 @@ using System.Collections.ObjectModel;
 
 namespace Shuriken.Models
 {
-    public class UILayer : INotifyPropertyChanged
+    public class UICast : INotifyPropertyChanged, ICastContainer
     {
         private string name { get; set; }
         public string Name
@@ -169,9 +169,19 @@ namespace Shuriken.Models
             set { zIndex = value; NotifyPropertyChanged(); }
         }
 
-        public ObservableCollection<UILayer> Children { get; set; }
+        public ObservableCollection<UICast> Children { get; set; }
 
-        public UILayer(UICast cast, string name, int index)
+        public void AddCast(UICast cast)
+        {
+            Children.Add(cast);
+        }
+
+        public void RemoveCast(UICast cast)
+        {
+            Children.Remove(cast);
+        }
+
+        public UICast(Cast cast, string name, int index)
         {
             Name = name;
             Field00 = cast.Field00;
@@ -179,7 +189,7 @@ namespace Shuriken.Models
             IsEnabled = cast.IsEnabled != 0;
             Visible = true;
             ZIndex = index;
-            Children = new ObservableCollection<UILayer>();
+            Children = new ObservableCollection<UICast>();
 
             TopLeft = new Vector2(cast.TopLeft);
             BottomLeft = new Vector2(cast.BottomLeft);
@@ -225,7 +235,7 @@ namespace Shuriken.Models
                 Sprites.Add(new Sprite());
         }
 
-        public UILayer()
+        public UICast()
         {
             Name = "Cast";
             Field00 = 0;
@@ -233,7 +243,7 @@ namespace Shuriken.Models
             IsEnabled = true;
             Visible = true;
             ZIndex = 0;
-            Children = new ObservableCollection<UILayer>();
+            Children = new ObservableCollection<UICast>();
 
             TopLeft = new Vector2();
             BottomLeft = new Vector2();

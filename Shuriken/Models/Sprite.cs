@@ -31,35 +31,52 @@ namespace Shuriken.Models
         public int Width
         {
             get { return (int)Dimensions.X; }
-            set { Dimensions.X = value; NotifyPropertyChanged(); CreateCrop(); }
+            set
+            {
+                if (X + value <= Texture.Width)
+                {
+                    Width = value;
+                    NotifyPropertyChanged();
+                    CreateCrop();
+                }
+            }
         }
 
         public int Height
         {
             get { return (int)Dimensions.Y; }
-            set { Dimensions.Y = value; NotifyPropertyChanged(); CreateCrop(); }
+            set
+            {
+                if (Y + value <= Texture.Height)
+                {
+                    Height = value;
+                    NotifyPropertyChanged();
+                    CreateCrop();
+                }
+            }
         }
 
         private CroppedBitmap crop;
         public CroppedBitmap Crop
         {
             get => crop;
-            set
-            {
-                crop = value;
-                NotifyPropertyChanged();
-            }
+            set { crop = value; NotifyPropertyChanged(); }
         }
 
         private void CreateCrop()
         {
-            Crop = new CroppedBitmap(Texture.ImageSource, new Int32Rect(X, Y, Width, Height));
+            if (X + Width <= Texture.Width && Y + Height <= Texture.Height)
+                Crop = new CroppedBitmap(Texture.ImageSource, new Int32Rect(X, Y, Width, Height));
         }
 
         public Sprite(Texture tex, float top = 0.0f, float left = 0.0f, float bottom = 1.0f, float right = 1.0f)
         {
             Texture = tex;
+
             Start = new Vector2(left * tex.Width, top * tex.Height);
+            Start.X = Math.Clamp(Start.X, 0, Texture.Width);
+            Start.Y = Math.Clamp(Start.Y, 0, Texture.Height);
+
             Dimensions = new Vector2((right - left) * tex.Width, (bottom - top) * tex.Height);
             CreateCrop();
         }

@@ -26,7 +26,7 @@ namespace Shuriken.ViewModels
             set { mapping = value; NotifyPropertyChanged(); }
         }
 
-        public ObservableCollection<UIFont> Fonts => Project.Fonts;
+        public ObservableCollection<UIFont> Fonts => MainViewModel.Project.Fonts;
 
         private RelayCommand createFontCmd;
         public RelayCommand CreateFontCommand

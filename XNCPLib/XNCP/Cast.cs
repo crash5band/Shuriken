@@ -11,7 +11,7 @@ using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP
 {
-    public class UICast
+    public class Cast
     {
         public uint Field00 { get; set; }
         public uint Field04 { get; set; }
@@ -40,7 +40,7 @@ namespace XNCPLib.XNCP
         public CastInfo CastInfoData { get; set; }
         public CastMaterialInfo CastMaterialData { get; set; }
 
-        public UICast()
+        public Cast()
         {
             Offset = new Vector2(0.0f, 0.0f);
 

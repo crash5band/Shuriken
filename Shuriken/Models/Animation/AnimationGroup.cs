@@ -55,7 +55,7 @@ namespace Shuriken.Models.Animation
             Time = 0.0f;
         }
 
-        public bool LayerHasAnimation(UILayer layer, AnimationType type)
+        public bool LayerHasAnimation(UICast layer, AnimationType type)
         {
             foreach (var animation in LayerAnimations)
             {
@@ -72,7 +72,7 @@ namespace Shuriken.Models.Animation
             return false;
         }
 
-        public AnimationTrack GetTrack(UILayer layer, AnimationType type)
+        public AnimationTrack GetTrack(UICast layer, AnimationType type)
         {
             foreach (var animation in LayerAnimations)
             {

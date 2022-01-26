@@ -9,19 +9,19 @@ using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP
 {
-    public class UICastGroup
+    public class CastGroup
     {
         public uint CastCount { get; set; }
         public uint CastTableOffset { get; set; }
         public uint Field08 { get; set; }
         public uint CastHierarchyTreeOffset { get; set; }
         public List<uint> CastOffsets { get; set; }
-        public List<UICast> Casts { get; set; }
+        public List<Cast> Casts { get; set; }
         public List<CastHierarchyTreeNode> CastHierarchyTree { get; set; }
 
-        public UICastGroup()
+        public CastGroup()
         {
-            Casts = new List<UICast>();
+            Casts = new List<Cast>();
             CastOffsets = new List<uint>();
             CastHierarchyTree = new List<CastHierarchyTreeNode>();
         }
@@ -48,7 +48,7 @@ namespace XNCPLib.XNCP
             {
                 reader.Seek(baseOffset + CastOffsets[i], SeekOrigin.Begin);
 
-                UICast cast = new UICast();
+                Cast cast = new Cast();
                 cast.Read(reader);
 
                 Casts.Add(cast);

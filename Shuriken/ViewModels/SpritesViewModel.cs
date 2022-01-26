@@ -76,7 +76,7 @@ namespace Shuriken.ViewModels
             set { removeTexListCmd = value; NotifyPropertyChanged(); }
         }
 
-        public ObservableCollection<TextureList> TextureLists => Project.TextureLists;
+        public ObservableCollection<TextureList> TextureLists => MainViewModel.Project.TextureLists;
 
         public void CreateSprite()
         {

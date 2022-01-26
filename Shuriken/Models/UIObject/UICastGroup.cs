@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 
 namespace Shuriken.Models
 {
-    public class LayerGroup : INotifyPropertyChanged
+    public class UICastGroup : INotifyPropertyChanged, ICastContainer
     {
         private string name;
         public string Name
@@ -40,23 +40,33 @@ namespace Shuriken.Models
             set { visible = value; NotifyPropertyChanged(); }
         }
 
-        [Browsable(false)]
-        public ObservableCollection<UILayer> Layers { get; set; }
+        public ObservableCollection<UICast> Casts { get; set; }
 
-        public LayerGroup(UICastGroup castGroup, string name = "Group")
+        public void AddCast(UICast cast)
+        {
+            Casts.Add(cast);
+        }
+
+        public void RemoveCast(UICast cast)
+        {
+            Casts.Remove(cast);
+        }
+
+        public UICastGroup(CastGroup castGroup, string name = "Group")
         {
             Name = name;
             Field08 = castGroup.Field08;
             Visible = true;
-            Layers = new ObservableCollection<UILayer>();
+            Casts = new ObservableCollection<UICast>();
         }
 
-        public LayerGroup(string name = "Group")
+        public UICastGroup(string name = "Group")
         {
             Name = name;
             Visible = true;
-            Layers = new ObservableCollection<UILayer>();
+            Casts = new ObservableCollection<UICast>();
         }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 

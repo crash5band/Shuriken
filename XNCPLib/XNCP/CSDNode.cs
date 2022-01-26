@@ -32,6 +32,10 @@ namespace XNCPLib.XNCP
             NodeDictionaries = new List<NodeDictionary>();
         }
 
+        /// <summary>
+        /// TODO: handle multiple nodes.
+        /// </summary>
+        /// <param name="reader"></param>
         public void Read(BinaryObjectReader reader)
         {
             SceneCount = reader.ReadUInt32();

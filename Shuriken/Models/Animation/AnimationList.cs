@@ -9,16 +9,16 @@ namespace Shuriken.Models.Animation
 {
     public class AnimationList
     {
-        public UILayer Layer { get; set; }
+        public UICast Layer { get; set; }
         public ObservableCollection<AnimationTrack> Tracks { get; set; }
 
-        public AnimationList(UILayer lyr, List<AnimationTrack> tracks)
+        public AnimationList(UICast lyr, List<AnimationTrack> tracks)
         {
             Layer = lyr;
             Tracks = new ObservableCollection<AnimationTrack>(tracks);
         }
 
-        public AnimationList(UILayer lyr)
+        public AnimationList(UICast lyr)
         {
             Layer = lyr;
             Tracks = new ObservableCollection<AnimationTrack>();

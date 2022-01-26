@@ -12,6 +12,9 @@
     <UserControl.Resources>
         <converters:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
         <converters:RGBAToHexConverter x:Key="RgbaToHexConverter"/>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
     </UserControl.Resources>
     
     <Grid Name="LayoutRoot">

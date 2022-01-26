@@ -51,7 +51,7 @@ namespace XNCPLib.XNCP
         public uint AnimationCastTableOffset { get; set; }
         public List<Vector2> Data1 { get; set; }
         public List<SubImage> SubImages { get; set; }
-        public List<UICastGroup> UICastGroups { get; set; }
+        public List<CastGroup> UICastGroups { get; set; }
         public List<CastDictionary> CastDictionaries { get; set; }
         public List<AnimationKeyframeData> AnimationKeyframeDataList { get; set; }
         public List<AnimationDictionary> AnimationDictionaries { get; set; }
@@ -62,7 +62,7 @@ namespace XNCPLib.XNCP
         {
             Data1 = new List<Vector2>();
             SubImages = new List<SubImage>();
-            UICastGroups = new List<UICastGroup>();
+            UICastGroups = new List<CastGroup>();
             CastDictionaries = new List<CastDictionary>();
             AnimationKeyframeDataList = new List<AnimationKeyframeData>();
             AnimationDictionaries = new List<AnimationDictionary>();
@@ -111,7 +111,7 @@ namespace XNCPLib.XNCP
             for (int i = 0; i < GroupCount; ++i)
             {
                 reader.Seek(baseOffset + CastGroupTableOffset + (16 * i), SeekOrigin.Begin);
-                UICastGroup group = new UICastGroup();
+                CastGroup group = new CastGroup();
                 group.Read(reader);
 
                 UICastGroups.Add(group);
@@ -154,6 +154,7 @@ namespace XNCPLib.XNCP
                 AnimationFrameDataList.Add(frameData);
             }
 
+            // This is commented out for now so we can load 06 xncps
             /*
             long pos = reader.Position;
             for (int a = 0; a < AnimationCount; ++a)

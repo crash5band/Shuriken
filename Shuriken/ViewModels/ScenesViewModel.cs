@@ -96,21 +96,21 @@ namespace Shuriken.ViewModels
         private RelayCommand removeSceneCmd;
         public RelayCommand RemoveSceneCmd
         {
-            get => removeSceneCmd ?? new RelayCommand(RemoveScene, () => SelectedScene != null);
+            get => removeSceneCmd ?? new RelayCommand(RemoveSelectedScene, () => SelectedScene != null);
             set { removeSceneCmd = value; NotifyPropertyChanged(); }
         }
 
         private RelayCommand createGroupCmd;
         public RelayCommand CreateGroupCmd
         {
-            get { return createGroupCmd ?? new RelayCommand(CreateGroup, () => SelectedScene != null); }
+            get { return createGroupCmd ?? new RelayCommand(AddGroupToSelection, () => SelectedScene != null); }
             set { createGroupCmd = value; NotifyPropertyChanged(); }
         }
 
         private RelayCommand removeGroupCmd;
         public RelayCommand RemoveGroupCmd
         {
-            get { return removeGroupCmd ?? new RelayCommand(RemoveGroup, () => SelectedNode != null && SelectedNode is LayerGroup); }
+            get { return removeGroupCmd ?? new RelayCommand(RemoveSelectedGroup, () => SelectedNode is UICastGroup); }
             set { removeGroupCmd = value; NotifyPropertyChanged(); }
         }
 
@@ -124,14 +124,14 @@ namespace Shuriken.ViewModels
         private RelayCommand createCastCmd;
         public RelayCommand CreateCastCmd
         {
-            get { return createCastCmd ?? new RelayCommand(CreateCast, () => SelectedNode != null && SelectedNode is not UIScene); }
+            get { return createCastCmd ?? new RelayCommand(AddCastToSelection, () => SelectedNode != null && SelectedNode is ICastContainer); }
             set { createCastCmd = value; NotifyPropertyChanged(); }
         }
 
         private RelayCommand removeCastCmd;
         public RelayCommand RemoveCastCmd
         {
-            get { return removeCastCmd ?? new RelayCommand(RemoveCast, () => SelectedNode is UILayer); }
+            get { return removeCastCmd ?? new RelayCommand(RemoveSelectedCast, () => SelectedNode is UICast); }
             set { removeCastCmd = value; NotifyPropertyChanged(); }
         }
 
@@ -152,9 +152,9 @@ namespace Shuriken.ViewModels
 
         public void ChangeCastSprite(int index, Sprite spr)
         {
-            if (SelectedNode is UILayer)
+            if (SelectedNode is UICast)
             {
-                var cast = (UILayer)SelectedNode;
+                var cast = (UICast)SelectedNode;
                 cast.Sprites[index] = spr;
             }
         }
@@ -193,70 +193,33 @@ namespace Shuriken.ViewModels
             Scenes.Add(new UIScene("scene"));
         }
 
-        public void RemoveScene()
+        public void RemoveSelectedScene()
         {
-            if (SelectedScene != null)
-                Scenes.Remove(SelectedScene);
+            Scenes.Remove(SelectedScene);
         }
 
-        public void CreateGroup()
+        public void AddGroupToSelection()
         {
-            if (SelectedScene != null)
-                SelectedScene.Groups.Add(new LayerGroup());
+            SelectedScene.Groups.Add(new UICastGroup());
         }
 
-        public void RemoveGroup()
+        public void RemoveSelectedGroup()
         {
-            if (SelectedNode is LayerGroup)
-            {
-                var group = SelectedNode as LayerGroup;
+            if (SelectedNode is UICastGroup group)
                 SelectedScene.Groups.Remove(group);
-            }
         }
 
-        public void CreateCast()
+        public void AddCastToSelection()
         {
-            if (SelectedNode is LayerGroup)
-            {
-                (SelectedNode as LayerGroup).Layers.Add(new UILayer());
-            }
-            else if (SelectedNode is UILayer)
-            {
-                (SelectedNode as UILayer).Children.Add(new UILayer());
-            }
+            if (SelectedNode is ICastContainer container)
+                container.AddCast(new UICast());
         }
 
-        public void RemoveCast()
+        public void RemoveSelectedCast()
         {
-            if (SelectedNode != null && ParentNode != null)
-            {
-                if (ParentNode is LayerGroup)
-                {
-                    var parent = ParentNode as LayerGroup;
-                    var cast = SelectedNode as UILayer;
-                    if (cast != null)
-                        parent.Layers.Remove(cast);
-                }
-                else if (ParentNode is UILayer)
-                {
-                    var parent = ParentNode as UILayer;
-                    var cast = SelectedNode as UILayer;
-                    if (cast != null)
-                        parent.Children.Remove(cast);
-                }
-            }
+            if (ParentNode is ICastContainer container)
+                container.RemoveCast(SelectedNode as UICast);
         }
-
-        public void RemoveCast(LayerGroup group, UILayer cast)
-        {
-            group.Layers.Remove(cast);
-        }
-
-        public void RemoveCast(UILayer parent, UILayer cast)
-        {
-            parent.Children.Remove(cast);
-        }
-
 
         private UIScene scene;
         public UIScene SelectedScene
@@ -278,7 +241,7 @@ namespace Shuriken.ViewModels
             get { return selectedNode; }
             set { selectedNode = value; NotifyPropertyChanged(); }
         }
-        public ObservableCollection<UIScene> Scenes => Project.Scenes;
+        public ObservableCollection<UIScene> Scenes => MainViewModel.Project.Scenes;
         public ScenesViewModel()
         {
             DisplayName = "Scenes";

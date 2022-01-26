@@ -9,7 +9,7 @@ namespace Shuriken.Models
 {
     public enum DrawType : uint
     {
-        [Description("None")]
+        [Description("No Draw")]
         None,
 
         [Description("Sprite")]

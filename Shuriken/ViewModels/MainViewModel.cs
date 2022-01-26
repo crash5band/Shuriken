@@ -18,12 +18,15 @@ namespace Shuriken.ViewModels
     {
         public static string AppVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-        public ObservableCollection<string> MissingTextures { get; set; }
+        public List<string> MissingTextures { get; set; }
         public ObservableCollection<ViewModelBase> Editors { get; set; }
+
+        public static Project Project { get; set; }
 
         public MainViewModel()
         {
-            MissingTextures = new ObservableCollection<string>();
+            Project = new Project();
+            MissingTextures = new List<string>();
 #if DEBUG
             //LoadTestXNCP();
 #endif
@@ -113,6 +116,8 @@ namespace Shuriken.ViewModels
             builder.AppendLine("The loaded UI file uses textures that were not found.\n");
             foreach (var texture in MissingTextures)
                 builder.AppendLine(texture);
+
+            MessageBox.Show(builder.ToString(), "Missing Textures", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 }

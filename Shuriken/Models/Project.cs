@@ -9,35 +9,24 @@ using System.Runtime.CompilerServices;
 
 namespace Shuriken.Models
 {
-    public static class Project
+    public class Project
     {
-        private static ObservableCollection<UIScene> scenes = new ObservableCollection<UIScene>();
-        public static ObservableCollection<UIScene> Scenes
-        {
-            get { return scenes; }
-            set { scenes = value; }
-        }
+        public ObservableCollection<UIScene> Scenes { get; set; }
+        public ObservableCollection<TextureList> TextureLists { get; set; }
+        public ObservableCollection<UIFont> Fonts { get; set; }
 
-        private static ObservableCollection<TextureList> texLists = new ObservableCollection<TextureList>();
-        public static ObservableCollection<TextureList> TextureLists
-        {
-            get { return texLists; }
-            set { texLists = value; }
-        }
-
-        private static ObservableCollection<UIFont> fonts = new ObservableCollection<UIFont>();
-        public static ObservableCollection<UIFont> Fonts
-        {
-            get { return fonts; }
-            set { fonts = value; }
-        }
-
-
-        public static void Clear()
+        public void Clear()
         {
             Scenes.Clear();
             TextureLists.Clear();
             Fonts.Clear();
+        }
+
+        public Project()
+        {
+            Scenes = new ObservableCollection<UIScene>();
+            TextureLists = new ObservableCollection<TextureList>();
+            Fonts = new ObservableCollection<UIFont>();
         }
     }
 }
