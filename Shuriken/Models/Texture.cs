@@ -1,21 +1,13 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
-using System.Drawing;
 using System.Windows.Media.Imaging;
 using Shuriken.Converters;
-using Shuriken.ViewModels;
 using OpenTK.Graphics.OpenGL;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-using Pfim.dds;
 using DirectXTexNet;
 
 namespace Shuriken.Models
@@ -43,8 +35,9 @@ namespace Shuriken.Models
 
             Width = img.GetImage(0).Width;
             Height = img.GetImage(0).Height;
-            
-            ImageSource = BitmapConverter.Bitmap2BitmapImage(new Bitmap(Width, Height, (int)(bimg.GetImage(0).RowPitch), System.Drawing.Imaging.PixelFormat.Format32bppArgb, bimg.GetImage(0).Pixels));
+
+            var bmp = BitmapConverter.FromTextureImage(bimg, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            ImageSource = BitmapConverter.FromBitmap(bmp);
 
             GL.BindTexture(TextureTarget.Texture2D, ID);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
@@ -55,6 +48,7 @@ namespace Shuriken.Models
             
             img.Dispose();
             bimg.Dispose();
+            bmp.Dispose();
         }
 
         public void Use()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,16 +9,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using DirectXTexNet;
 
 
 namespace Shuriken.Converters
 {
     public static class BitmapConverter
     {
-        public static BitmapSource Bitmap2BitmapImage(Bitmap bitmap)
+        public static BitmapSource FromBitmap(Bitmap bitmap)
         {
             BitmapSource i = Imaging.CreateBitmapSourceFromHBitmap(
                            bitmap.GetHbitmap(),
@@ -27,16 +26,10 @@ namespace Shuriken.Converters
             return i;
         }
 
-        public static Image<TPixel> ToImageSharpImage<TPixel>(this System.Drawing.Bitmap bitmap) where TPixel : unmanaged, IPixel<TPixel>
+        public static Bitmap FromTextureImage(ScratchImage img, PixelFormat format)
         {
-            using (var memoryStream = new MemoryStream())
-            {
-                bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
-
-                memoryStream.Seek(0, SeekOrigin.Begin);
-
-                return SixLabors.ImageSharp.Image.Load<TPixel>(memoryStream);
-            }
+            return new Bitmap(img.GetImage(0).Width, img.GetImage(0).Height,
+                (int)img.GetImage(0).RowPitch, format, img.GetImage(0).Pixels);
         }
     }
 
