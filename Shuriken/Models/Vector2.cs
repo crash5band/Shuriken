@@ -21,6 +21,11 @@ namespace Shuriken.Models
             Y = v.Y;
         }
 
+        public System.Numerics.Vector2 ToSystemNumerics()
+        {
+            return new System.Numerics.Vector2(X, Y);
+        }
+
         public static Vector2 operator+(Vector2 v1, Vector2 v2)
         {
             return new Vector2(v1.X + v2.X, v1.Y + v2.Y);
@@ -31,9 +36,14 @@ namespace Shuriken.Models
             return new Vector2(v1.X - v2.X, v1.Y - v2.Y);
         }
 
+        public static Vector2 operator*(Vector2 v1, Vector2 v2)
+        {
+            return new Vector2(v1.X * v2.X, v1.Y * v2.Y);
+        }
+
         public override string ToString()
         {
-            return "<" + string.Join(", ", new float[] { X, Y }) + ">";
+            return $"<{X}, {Y}>";
         }
     }
 }
