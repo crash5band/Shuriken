@@ -10,6 +10,7 @@ using Shuriken.Models.Animation;
 using Shuriken.Misc;
 using Shuriken.ViewModels;
 using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace Shuriken.Models
 {
@@ -22,68 +23,21 @@ namespace Shuriken.Models
             set
             {
                 if (!string.IsNullOrEmpty(value))
-                {
                     name = value;
-                    NotifyPropertyChanged();
-                }
             }
         }
 
-        private uint field00;
-        public uint Field00
-        {
-            get => field00;
-            set { field00 = value; NotifyPropertyChanged(); }
-        }
-
-        private float zIndex;
-        public float ZIndex
-        {
-            get => zIndex;
-            set { zIndex = value; NotifyPropertyChanged(); }
-        }
-
-        private uint field0C;
-        public uint Field0C
-        {
-            get => field0C;
-            set { field0C = value; NotifyPropertyChanged(); }
-        }
-
-        private float field10;
-        public float Field10
-        {
-            get => field10;
-            set { field10 = value; NotifyPropertyChanged(); }
-        }
-
-        private float aspectRatio;
-        public float AspectRatio
-        {
-            get => aspectRatio;
-            set { aspectRatio = value; NotifyPropertyChanged(); }
-        }
-
-        private float animationFramerate;
-        public float AnimationFramerate
-        {
-            get => animationFramerate;
-            set { animationFramerate = value; NotifyPropertyChanged(); }
-        }
-
-        private bool visible;
-        public bool Visible
-        {
-            get => visible;
-            set { visible = value; NotifyPropertyChanged(); }
-        }
+        public uint Field00 { get; set; }
+        public float ZIndex { get; set; }
+        public uint Field0C { get; set; }
+        public float Field10 { get; set; }
+        public float AspectRatio { get; set; }
+        public float AnimationFramerate { get; set; }
+        public bool Visible { get; set; }
 
         public ObservableCollection<Vector2> TextureSizes { get; set; }
-
         public ObservableCollection<UICastGroup> Groups { get; set; }
-
         public ObservableCollection<AnimationGroup> Animations { get; set; }
-
         public UIScene(Scene scene, string sceneName, TextureList texList, IEnumerable<UIFont> fonts)
         {
             Name = sceneName;
@@ -267,15 +221,14 @@ namespace Shuriken.Models
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        protected void NotifyPropertyChanged(string propertyName, object before, object after)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public int CompareTo(UIScene other)
         {
-            return (int)(zIndex - other.zIndex);
+            return (int)(ZIndex - other.ZIndex);
         }
     }
 }

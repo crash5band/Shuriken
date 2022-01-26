@@ -12,18 +12,6 @@ namespace Shuriken.Models.Animation
         public UICast Layer { get; set; }
         public ObservableCollection<AnimationTrack> Tracks { get; set; }
 
-        public AnimationList(UICast lyr, List<AnimationTrack> tracks)
-        {
-            Layer = lyr;
-            Tracks = new ObservableCollection<AnimationTrack>(tracks);
-        }
-
-        public AnimationList(UICast lyr)
-        {
-            Layer = lyr;
-            Tracks = new ObservableCollection<AnimationTrack>();
-        }
-
         public bool HasAnimation(AnimationType type)
         {
             foreach (var track in Tracks)
@@ -44,6 +32,18 @@ namespace Shuriken.Models.Animation
             }
 
             return null;
+        }
+
+        public AnimationList(UICast lyr, List<AnimationTrack> tracks)
+        {
+            Layer = lyr;
+            Tracks = new ObservableCollection<AnimationTrack>(tracks);
+        }
+
+        public AnimationList(UICast lyr)
+        {
+            Layer = lyr;
+            Tracks = new ObservableCollection<AnimationTrack>();
         }
     }
 }

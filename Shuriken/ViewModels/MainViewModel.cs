@@ -27,6 +27,14 @@ namespace Shuriken.ViewModels
         {
             Project = new Project();
             MissingTextures = new List<string>();
+
+            Editors = new ObservableCollection<ViewModelBase>
+            {
+                new ScenesViewModel(),
+                new SpritesViewModel(),
+                new FontsViewModel(),
+                new AboutViewModel()
+            };
 #if DEBUG
             //LoadTestXNCP();
 #endif

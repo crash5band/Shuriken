@@ -16,11 +16,6 @@ namespace Shuriken.Models.Animation
         public string TypeString => Type.ToString();
         public ObservableCollection<Keyframe> Keyframes { get; set; }
 
-        public AnimationTrack(AnimationType type)
-        {
-            Type = type;
-            Keyframes = new ObservableCollection<Keyframe>();
-        }
 
         public float GetValue(float frame)
         {
@@ -46,6 +41,11 @@ namespace Shuriken.Models.Animation
             }
 
             return 0.0f;
+        }
+        public AnimationTrack(AnimationType type)
+        {
+            Type = type;
+            Keyframes = new ObservableCollection<Keyframe>();
         }
     }
 }

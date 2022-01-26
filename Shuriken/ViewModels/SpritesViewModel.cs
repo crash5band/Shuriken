@@ -17,63 +17,63 @@ namespace Shuriken.ViewModels
         public TextureList SelectedTexList
         {
             get { return texList; }
-            set { texList = value; NotifyPropertyChanged(); }
+            set { texList = value; }
         }
 
         private Texture texture;
         public Texture SelectedTexture
         {
             get { return texture; }
-            set { texture = value; NotifyPropertyChanged(); }
+            set { texture = value; }
         }
 
         private Sprite sprite;
         public Sprite SelectedSprite
         {
             get { return sprite; }
-            set { sprite = value; NotifyPropertyChanged(); }
+            set { sprite = value; }
         }
 
         private RelayCommand createSpriteCmd;
         public RelayCommand CreateSpriteCmd
         {
             get { return createSpriteCmd ?? new RelayCommand(CreateSprite, () => SelectedTexture != null); }
-            set { createSpriteCmd = value; NotifyPropertyChanged(); }
+            set { createSpriteCmd = value; }
         }
 
         private RelayCommand removeSpriteCmd;
         public RelayCommand RemoveSpriteCmd
         {
             get { return removeSpriteCmd ?? new RelayCommand(RemoveSprite, () => SelectedSprite != null); }
-            set { removeSpriteCmd = value; NotifyPropertyChanged(); }
+            set { removeSpriteCmd = value; }
         }
 
         private RelayCommand createTextureCmd;
         public RelayCommand CreateTextureCmd
         {
             get { return createTextureCmd ?? new RelayCommand(CreateTexture, () => SelectedTexList != null); }
-            set { createTextureCmd = value; NotifyPropertyChanged(); }
+            set { createTextureCmd = value; }
         }
 
         private RelayCommand removeTextureCmd;
         public RelayCommand RemoveTextureCmd
         {
             get { return removeTextureCmd ?? new RelayCommand(RemoveTexture, () => SelectedTexture != null); }
-            set { removeTextureCmd = value; NotifyPropertyChanged(); }
+            set { removeTextureCmd = value; }
         }
 
         private RelayCommand createTexListCmd;
         public RelayCommand CreateTexListCmd
         {
             get { return createTexListCmd ?? new RelayCommand(CreateTexList, null); }
-            set { createTexListCmd = value; NotifyPropertyChanged(); }
+            set { createTexListCmd = value; }
         }
 
         private RelayCommand removeTexListCmd;
         public RelayCommand RemoveTexListCmd
         {
             get { return removeTexListCmd ?? new RelayCommand(RemoveTexList, () => SelectedTexList != null); }
-            set { removeTexListCmd = value; NotifyPropertyChanged(); }
+            set { removeTexListCmd = value; }
         }
 
         public ObservableCollection<TextureList> TextureLists => MainViewModel.Project.TextureLists;

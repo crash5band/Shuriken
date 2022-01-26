@@ -19,21 +19,13 @@ namespace Shuriken.Models
             set
             {
                 if (!string.IsNullOrEmpty(value))
-                {
                     name = value;
-                    NotifyPropertyChanged();
-                }
             }
         }
 
         public ObservableCollection<CharacterMapping> Mappings { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         public UIFont(string name)
         {

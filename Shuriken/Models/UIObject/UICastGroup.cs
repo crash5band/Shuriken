@@ -19,26 +19,12 @@ namespace Shuriken.Models
             set
             {
                 if (!string.IsNullOrEmpty(value))
-                {
                     name = value;
-                    NotifyPropertyChanged();
-                }
             }
         }
 
-        private uint field08;
-        public uint Field08
-        {
-            get => field08;
-            set { field08 = value; NotifyPropertyChanged(); }
-        }
-
-        private bool visible;
-        public bool Visible
-        {
-            get => visible;
-            set { visible = value; NotifyPropertyChanged(); }
-        }
+        public uint Field08 { get; set; }
+        public bool Visible { get; set; }
 
         public ObservableCollection<UICast> Casts { get; set; }
 
@@ -67,12 +53,6 @@ namespace Shuriken.Models
             Casts = new ObservableCollection<UICast>();
         }
 
-
         public event PropertyChangedEventHandler PropertyChanged;
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

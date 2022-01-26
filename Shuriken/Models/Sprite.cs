@@ -19,13 +19,13 @@ namespace Shuriken.Models
         public int X
         {
             get { return (int)Start.X; }
-            set { Start.X = value; NotifyPropertyChanged(); CreateCrop(); }
+            set { Start.X = value;CreateCrop(); }
         }
 
         public int Y
         {
             get { return (int)Start.Y; }
-            set { Start.Y = value; NotifyPropertyChanged(); CreateCrop(); }
+            set { Start.Y = value; CreateCrop(); }
         }
 
         public int Width
@@ -35,8 +35,7 @@ namespace Shuriken.Models
             {
                 if (X + value <= Texture.Width)
                 {
-                    Width = value;
-                    NotifyPropertyChanged();
+                    Dimensions.X = value;
                     CreateCrop();
                 }
             }
@@ -49,19 +48,13 @@ namespace Shuriken.Models
             {
                 if (Y + value <= Texture.Height)
                 {
-                    Height = value;
-                    NotifyPropertyChanged();
+                    Dimensions.Y = value;
                     CreateCrop();
                 }
             }
         }
 
-        private CroppedBitmap crop;
-        public CroppedBitmap Crop
-        {
-            get => crop;
-            set { crop = value; NotifyPropertyChanged(); }
-        }
+        public CroppedBitmap Crop { get; set; }
 
         private void CreateCrop()
         {
@@ -90,9 +83,5 @@ namespace Shuriken.Models
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

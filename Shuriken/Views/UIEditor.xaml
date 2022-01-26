@@ -47,7 +47,7 @@
                     <Run Text="&#xf008;" FontFamily="{StaticResource FontAwesome}"/>
                     <Run Text="Scenes"/>
                 </TextBlock>
-                <TreeView Grid.Row="1" Name="ScenesTreeView" ItemsSource="{Binding Scenes}" TreeViewItem.Selected="ScenesTreeViewSelected">
+                <TreeView Grid.Row="1" Name="ScenesTreeView" TreeViewItem.Selected="ScenesTreeViewSelected" TreeView.SelectedItemChanged="SelectedItemChanged" ItemsSource="{Binding Scenes}">
                     <TreeView.Resources>
                         <HierarchicalDataTemplate DataType="{x:Type models:UIScene}" ItemsSource="{Binding Groups}">
                             <StackPanel Orientation="Horizontal">
@@ -64,7 +64,7 @@
                                 </StackPanel.ContextMenu>
                             </StackPanel>
                         </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type models:LayerGroup}" ItemsSource="{Binding Layers}">
+                        <HierarchicalDataTemplate DataType="{x:Type models:UICastGroup}" ItemsSource="{Binding Casts}">
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
                                 <TextBlock>
@@ -79,7 +79,7 @@
                                 </StackPanel.ContextMenu>
                             </StackPanel>
                         </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type models:UILayer}" ItemsSource="{Binding Children}">
+                        <HierarchicalDataTemplate DataType="{x:Type models:UICast}" ItemsSource="{Binding Children}">
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
                                 <TextBlock>

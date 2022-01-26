@@ -38,14 +38,14 @@ namespace Shuriken.Controls
         public int CurrentFrame
         {
             get { return currentFrame; }
-            set { currentFrame = value; NotifyPropertyChanged(); }
+            set { currentFrame = value; }
         }
 
         private double zoom = 1.5;
         public double Zoom
         {
             get { return zoom; }
-            set { zoom = value; NotifyPropertyChanged(); DrawTimeline(); }
+            set { zoom = value;DrawTimeline(); }
         }
         public double MinZoom => 0.5;
         public double MaxZoom => 3.0;
@@ -56,7 +56,7 @@ namespace Shuriken.Controls
         public Keyframe SelectedKey
         {
             get { return keyframe; }
-            set { keyframe = value; NotifyPropertyChanged(); NotifyPropertyChanged("KeySelected"); }
+            set { keyframe = value;NotifyPropertyChanged("KeySelected"); }
         }
 
         public bool KeySelected
@@ -68,14 +68,14 @@ namespace Shuriken.Controls
         public double MinValue
         {
             get { return minValue; }
-            set { minValue = value; NotifyPropertyChanged(); DrawTimeline(); }
+            set { minValue = value;DrawTimeline(); }
         }
 
         private double maxValue;
         public double MaxValue
         {
             get { return maxValue; }
-            set { maxValue = value; NotifyPropertyChanged(); DrawTimeline(); }
+            set { maxValue = value;DrawTimeline(); }
         }
 
         private bool holdingKey;

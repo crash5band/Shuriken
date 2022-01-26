@@ -20,124 +20,124 @@ namespace Shuriken.ViewModels
         public float Time
         {
             get => time;
-            set { time = value; NotifyPropertyChanged(); }
+            set { time = value; }
         }
 
         private bool playing;
         public bool Playing
         {
             get => playing;
-            set { playing = value; NotifyPropertyChanged(); }
+            set { playing = value; }
         }
 
         private float playbackSpeed;
         public float PlaybackSpeed
         {
             get => playbackSpeed;
-            set { playbackSpeed = value; NotifyPropertyChanged(); }
+            set { playbackSpeed = value; }
         }
 
         private float zoom;
         public float Zoom
         {
             get => zoom;
-            set { zoom = Math.Clamp(value, MinZoom, MaxZoom); NotifyPropertyChanged(); }
+            set { zoom = Math.Clamp(value, MinZoom, MaxZoom); }
         }
 
         private RelayCommand togglePlayingCmd;
         public RelayCommand TogglePlayingCmd
         {
             get => togglePlayingCmd ?? new RelayCommand(() => Playing ^= true, null);
-            set { togglePlayingCmd = value; NotifyPropertyChanged(); }
+            set { togglePlayingCmd = value; }
         }
 
         private RelayCommand stopPlayingCmd;
         public RelayCommand StopPlayingCmd
         {
             get => stopPlayingCmd ?? new RelayCommand(Stop, null);
-            set { stopPlayingCmd = value; NotifyPropertyChanged(); }
+            set { stopPlayingCmd = value; }
         }
 
         private RelayCommand replayCmd;
         public RelayCommand ReplayCmd
         {
             get => replayCmd ?? new RelayCommand(Replay, null);
-            set { replayCmd = value; NotifyPropertyChanged(); }
+            set { replayCmd = value; }
         }
 
         private RelayCommand<float> seekCmd;
         public RelayCommand<float> SeekCmd
         {
             get => seekCmd ?? new RelayCommand<float>(Seek, () => !Playing);
-            set { seekCmd = value; NotifyPropertyChanged(); }
+            set { seekCmd = value; }
         }
 
         private RelayCommand zoomOutCmd;
         public RelayCommand ZoomOutCmd
         {
             get => zoomOutCmd ?? new RelayCommand(() => Zoom -= 0.25f, null);
-            set { zoomOutCmd = value; NotifyPropertyChanged(); }
+            set { zoomOutCmd = value; }
         }
 
         private RelayCommand zoomInCmd;
         public RelayCommand ZoomInCmd
         {
             get => zoomInCmd ?? new RelayCommand(() => Zoom += 0.25f, null);
-            set { zoomInCmd = value; NotifyPropertyChanged(); }
+            set { zoomInCmd = value; }
         }
 
         private RelayCommand createSceneCmd;
         public RelayCommand CreateSceneCmd
         {
             get => createSceneCmd ?? new RelayCommand(CreateScene, null);
-            set { createSceneCmd = value; NotifyPropertyChanged(); }
+            set { createSceneCmd = value; }
         }
 
         private RelayCommand removeSceneCmd;
         public RelayCommand RemoveSceneCmd
         {
             get => removeSceneCmd ?? new RelayCommand(RemoveSelectedScene, () => SelectedScene != null);
-            set { removeSceneCmd = value; NotifyPropertyChanged(); }
+            set { removeSceneCmd = value; }
         }
 
         private RelayCommand createGroupCmd;
         public RelayCommand CreateGroupCmd
         {
             get { return createGroupCmd ?? new RelayCommand(AddGroupToSelection, () => SelectedScene != null); }
-            set { createGroupCmd = value; NotifyPropertyChanged(); }
+            set { createGroupCmd = value; }
         }
 
         private RelayCommand removeGroupCmd;
         public RelayCommand RemoveGroupCmd
         {
             get { return removeGroupCmd ?? new RelayCommand(RemoveSelectedGroup, () => SelectedNode is UICastGroup); }
-            set { removeGroupCmd = value; NotifyPropertyChanged(); }
+            set { removeGroupCmd = value; }
         }
 
         private RelayCommand<int> changeCastSpriteCmd;
         public RelayCommand<int> ChangeCastSpriteCmd
         {
             get { return changeCastSpriteCmd ?? new RelayCommand<int>(SelectCastSprite, null); }
-            set { changeCastSpriteCmd = value; NotifyPropertyChanged(); }
+            set { changeCastSpriteCmd = value; }
         }
 
         private RelayCommand createCastCmd;
         public RelayCommand CreateCastCmd
         {
             get { return createCastCmd ?? new RelayCommand(AddCastToSelection, () => SelectedNode != null && SelectedNode is ICastContainer); }
-            set { createCastCmd = value; NotifyPropertyChanged(); }
+            set { createCastCmd = value; }
         }
 
         private RelayCommand removeCastCmd;
         public RelayCommand RemoveCastCmd
         {
             get { return removeCastCmd ?? new RelayCommand(RemoveSelectedCast, () => SelectedNode is UICast); }
-            set { removeCastCmd = value; NotifyPropertyChanged(); }
+            set { removeCastCmd = value; }
         }
 
         public void SelectCastSprite(object index)
         {
-            SpritePickerWindow dialog = new SpritePickerWindow();
+            SpritePickerWindow dialog = new SpritePickerWindow(MainViewModel.Project.TextureLists);
             dialog.ShowDialog();
 
             if (dialog.DialogResult == true)
@@ -225,21 +225,21 @@ namespace Shuriken.ViewModels
         public UIScene SelectedScene
         {
             get { return scene; }
-            set { scene = value; NotifyPropertyChanged(); }
+            set { scene = value; }
         }
 
         private object parentNode;
         public object ParentNode
         {
             get { return parentNode; }
-            set { parentNode = value; NotifyPropertyChanged(); }
+            set { parentNode = value; }
         }
 
         private object selectedNode;
         public object SelectedNode
         {
             get { return selectedNode; }
-            set { selectedNode = value; NotifyPropertyChanged(); }
+            set { selectedNode = value; }
         }
         public ObservableCollection<UIScene> Scenes => MainViewModel.Project.Scenes;
         public ScenesViewModel()

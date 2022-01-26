@@ -41,6 +41,11 @@ namespace Shuriken.Models
             return new Vector2(v1.X * v2.X, v1.Y * v2.Y);
         }
 
+        public static implicit operator System.Numerics.Vector2(Vector2 v)
+        {
+            return new System.Numerics.Vector2(v.X, v.Y);
+        }
+
         public override string ToString()
         {
             return $"<{X}, {Y}>";

@@ -21,23 +21,23 @@ namespace Shuriken.Views
     /// </summary>
     public partial class SpritePickerWindow : Window
     {
-        public SpritePickerWindow()
+        public SpritePickerWindow(IEnumerable<TextureList> texCollection)
         {
             InitializeComponent();
             LayoutRoot.DataContext = this;
 
+            TextureLists = new ObservableCollection<TextureList>(texCollection);
+
             if (TextureLists.Count > 0)
                 TextureListSelect.SelectedIndex = 0;
         }
-
-        public Sprite SelectedSprite { get; set; }
 
         private void SelectClicked(object sender, EventArgs e)
         {
             SelectedSprite = SpriteList.SelectedItem as Sprite;
             DialogResult = true;
         }
-
-        public ObservableCollection<TextureList> TextureLists => Project.TextureLists;
+        public Sprite SelectedSprite { get; private set; }
+        public ObservableCollection<TextureList> TextureLists { get; }
     }
 }

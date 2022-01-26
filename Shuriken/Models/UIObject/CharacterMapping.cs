@@ -18,35 +18,19 @@ namespace Shuriken.Models
             set
             {
                 if (!string.IsNullOrEmpty(value.ToString()))
-                {
                     character = value;
-                    NotifyPropertyChanged();
-                }
             }
         }
 
-        private Sprite sprite;
-        public Sprite Sprite
-        {
-            get => sprite;
-            set
-            {
-                sprite = value;
-                NotifyPropertyChanged();
-            }
-        }
+        public Sprite Sprite { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         public CharacterMapping(char c, Sprite spr)
         {
-            character = c;
-            sprite = spr;
+            Character = c;
+            Sprite = spr;
         }
 
         public CharacterMapping()

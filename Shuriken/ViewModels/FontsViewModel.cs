@@ -12,19 +12,9 @@ namespace Shuriken.ViewModels
 {
     public class FontsViewModel : ViewModelBase
     {
-        private UIFont font;
-        public UIFont SelectedFont
-        {
-            get { return font; }
-            set { font = value; NotifyPropertyChanged(); }
-        }
+        public UIFont SelectedFont { get; set; }
 
-        private CharacterMapping mapping;
-        public CharacterMapping SelectedMapping
-        {
-            get { return mapping; }
-            set { mapping = value; NotifyPropertyChanged(); }
-        }
+        public CharacterMapping SelectedMapping { get; set; }
 
         public ObservableCollection<UIFont> Fonts => MainViewModel.Project.Fonts;
 
@@ -32,35 +22,35 @@ namespace Shuriken.ViewModels
         public RelayCommand CreateFontCommand
         {
             get { return createFontCmd ?? new RelayCommand(CreateFont, null); }
-            set { createFontCmd = value; NotifyPropertyChanged();}
+            set { createFontCmd = value; ; }
         }
 
         private RelayCommand removeFontCmd;
         public RelayCommand RemoveFontCommand
         {
             get { return removeFontCmd ?? new RelayCommand(RemoveFont, () => SelectedFont != null); }
-            set { removeFontCmd = value; NotifyPropertyChanged(); }
+            set { removeFontCmd = value; }
         }
 
         private RelayCommand createCharDefCmd;
         public RelayCommand CreateCharDefCommand
         {
             get { return createCharDefCmd ?? new RelayCommand(CreateCharacterDefinition, () => SelectedFont != null); }
-            set { createCharDefCmd = value; NotifyPropertyChanged(); }
+            set { createCharDefCmd = value; }
         }
 
         private RelayCommand removeCharDefCmd;
         public RelayCommand RemoveCharDefCmd
         {
             get { return removeCharDefCmd ?? new RelayCommand(RemoveCharacterDefinition, () => SelectedMapping != null); }
-            set { removeCharDefCmd = value; NotifyPropertyChanged(); }
+            set { removeCharDefCmd = value; }
         }
 
         private RelayCommand<CharacterMapping> changeMappingSpriteCmd;
         public RelayCommand<CharacterMapping> ChangeMappingSpriteCmd
         {
             get { return changeMappingSpriteCmd ?? new RelayCommand<CharacterMapping>(SelectSprite, null); }
-            set { changeMappingSpriteCmd = value;}
+            set { changeMappingSpriteCmd = value; }
         }
 
         public void CreateFont()
@@ -95,7 +85,7 @@ namespace Shuriken.ViewModels
 
         public void SelectSprite(object mapping)
         {
-            SpritePickerWindow dialog = new SpritePickerWindow();
+            SpritePickerWindow dialog = new SpritePickerWindow(MainViewModel.Project.TextureLists);
             dialog.ShowDialog();
 
             if (dialog.DialogResult == true)

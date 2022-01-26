@@ -33,15 +33,13 @@ namespace Shuriken
             DataContext = vm;
 
             editorSelect.SelectedIndex = 0;
-
-            // Initialize editor view models after MainViewModel to initialize the GL control before the renderer.
-            vm.Editors = new ObservableCollection<ViewModelBase>
+        }
+        private void NewClick(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
             {
-                new ScenesViewModel(),
-                new SpritesViewModel(),
-                new FontsViewModel(),
-                new AboutViewModel()
-            };
+                vm.Clear();
+            }
         }
 
         private void OpenMenu_Click(object sender, RoutedEventArgs e)
