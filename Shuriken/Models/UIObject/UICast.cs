@@ -74,7 +74,7 @@ namespace Shuriken.Models
         public bool Visible { get; set; }
         public int ZIndex { get; set; }
 
-        public ObservableCollection<Sprite> Sprites { get; set; }
+        public ObservableCollection<int> Sprites { get; set; }
         public ObservableCollection<UICast> Children { get; set; }
 
         public void AddCast(UICast cast)
@@ -136,9 +136,9 @@ namespace Shuriken.Models
             InfoField34 = cast.CastInfoData.Field34;
             InfoField38 = cast.CastInfoData.Field38;
 
-            Sprites = new ObservableCollection<Sprite>();
+            Sprites = new ObservableCollection<int>();
             for (int i = 0; i < 32; ++i)
-                Sprites.Add(new Sprite());
+                Sprites.Add(-1);
         }
 
         public UICast()
@@ -190,9 +190,9 @@ namespace Shuriken.Models
             InfoField34 = 0;
             InfoField38 = 0;
 
-            Sprites = new ObservableCollection<Sprite>();
+            Sprites = new ObservableCollection<int>();
             for (int i = 0; i < 32; ++i)
-                Sprites.Add(new Sprite());
+                Sprites.Add(-1);
         }
 
 

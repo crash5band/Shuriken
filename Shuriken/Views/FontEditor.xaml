@@ -6,9 +6,13 @@
              xmlns:local="clr-namespace:Shuriken.Views"
              xmlns:models="clr-namespace:Shuriken.Models"
              xmlns:vm="clr-namespace:Shuriken.ViewModels"
+             xmlns:converters="clr-namespace:Shuriken.Converters"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type={x:Type vm:FontsViewModel}}"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:SpriteIDConverter x:Key="SpriteIDConverter"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
@@ -73,7 +77,8 @@
                                             <Button Width="50" Height="30" Click="FontSpriteClick" Background="Transparent" BorderBrush="Transparent" Padding="2"
                                                     Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.ChangeMappingSpriteCmd}" CommandParameter="{Binding}">
                                                 <Button.Content>
-                                                    <Image Source="{Binding Sprite.Crop}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1"/>
+                                                    <Image Name="SpriteImg" Tag="{Binding Sprite, Converter={StaticResource SpriteIDConverter}}"
+                                                           Source="{Binding ElementName=SpriteImg, Path=Tag.Crop}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1"/>
                                                 </Button.Content>
                                             </Button>
                                         </Border>

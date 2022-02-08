@@ -7,9 +7,13 @@
              xmlns:models="clr-namespace:Shuriken.Models"
              xmlns:viewmodels="clr-namespace:Shuriken.ViewModels"
              xmlns:controls="clr-namespace:Shuriken.Controls"
+             xmlns:converters="clr-namespace:Shuriken.Converters"
              d:DataContext="{d:DesignInstance Type=viewmodels:SpritesViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:SpriteIDConverter x:Key="SpriteIDConverter"/>
+    </UserControl.Resources>
     <Grid>
         
         <!-- Main layout -->
@@ -78,12 +82,12 @@
             </StackPanel>
             
             <!-- Sprites list view-->
-            <ListBox Margin="0 5" Grid.Row="2" Name="SpritesListView" ItemsSource="{Binding SelectedTexture.Sprites}" SelectedItem="{Binding SelectedSprite}">
+            <ListBox Margin="0 5" Grid.Row="2" Name="SpritesListView" ItemsSource="{Binding SelectedTexture.Sprites, Mode=TwoWay}" SelectedItem="{Binding SelectedSprite, Converter={StaticResource SpriteIDConverter}}">
                 <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type models:Sprite}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding Crop}" Width="30" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding Texture.Name}" VerticalAlignment="Center" Margin="5 0 0 0"/>
+                    <DataTemplate>
+                        <StackPanel Name="SpritePanel" Orientation="Horizontal" Tag="{Binding Converter={StaticResource SpriteIDConverter}}">
+                            <Image Source="{Binding ElementName=SpritePanel, Path=Tag.Crop}" Width="30" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding ElementName=SpritePanel, Path=Tag.Texture.Name}" VerticalAlignment="Center" Margin="5 0 0 0"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -137,8 +141,6 @@
                                 <Run Text="Height: "/>
                                 <Run Text="{Binding SelectedTexture.Height, Mode=OneWay}"/>
                             </TextBlock>
-
-                            <Button Content="Change Texture" Margin="0 5 0 5" HorizontalAlignment="Stretch"/>
                         </StackPanel>
                     </ScrollViewer>
                 </GroupBox>

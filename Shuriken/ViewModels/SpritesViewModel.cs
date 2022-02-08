@@ -13,81 +13,38 @@ namespace Shuriken.ViewModels
 {
     public class SpritesViewModel : ViewModelBase
     {
-        private TextureList texList;
-        public TextureList SelectedTexList
-        {
-            get { return texList; }
-            set { texList = value; }
-        }
+        public TextureList SelectedTexList { get; set; }
+        public Texture SelectedTexture { get; set; }
+        public Sprite SelectedSprite { get; set; }
 
-        private Texture texture;
-        public Texture SelectedTexture
-        {
-            get { return texture; }
-            set { texture = value; }
-        }
+        public RelayCommand CreateSpriteCmd { get; }
+        public RelayCommand RemoveSpriteCmd { get; }
+        public RelayCommand CreateTextureCmd { get; }
+        public RelayCommand RemoveTextureCmd { get; }
+        public RelayCommand CreateTexListCmd { get; }
+        public RelayCommand RemoveTexListCmd { get; }
 
-        private Sprite sprite;
-        public Sprite SelectedSprite
-        {
-            get { return sprite; }
-            set { sprite = value; }
-        }
-
-        private RelayCommand createSpriteCmd;
-        public RelayCommand CreateSpriteCmd
-        {
-            get { return createSpriteCmd ?? new RelayCommand(CreateSprite, () => SelectedTexture != null); }
-            set { createSpriteCmd = value; }
-        }
-
-        private RelayCommand removeSpriteCmd;
-        public RelayCommand RemoveSpriteCmd
-        {
-            get { return removeSpriteCmd ?? new RelayCommand(RemoveSprite, () => SelectedSprite != null); }
-            set { removeSpriteCmd = value; }
-        }
-
-        private RelayCommand createTextureCmd;
-        public RelayCommand CreateTextureCmd
-        {
-            get { return createTextureCmd ?? new RelayCommand(CreateTexture, () => SelectedTexList != null); }
-            set { createTextureCmd = value; }
-        }
-
-        private RelayCommand removeTextureCmd;
-        public RelayCommand RemoveTextureCmd
-        {
-            get { return removeTextureCmd ?? new RelayCommand(RemoveTexture, () => SelectedTexture != null); }
-            set { removeTextureCmd = value; }
-        }
-
-        private RelayCommand createTexListCmd;
-        public RelayCommand CreateTexListCmd
-        {
-            get { return createTexListCmd ?? new RelayCommand(CreateTexList, null); }
-            set { createTexListCmd = value; }
-        }
-
-        private RelayCommand removeTexListCmd;
-        public RelayCommand RemoveTexListCmd
-        {
-            get { return removeTexListCmd ?? new RelayCommand(RemoveTexList, () => SelectedTexList != null); }
-            set { removeTexListCmd = value; }
-        }
-
-        public ObservableCollection<TextureList> TextureLists => MainViewModel.Project.TextureLists;
+        public ObservableCollection<TextureList> TextureLists => Project.TextureLists;
 
         public void CreateSprite()
         {
             if (SelectedTexture != null)
-                SelectedTexture.Sprites.Add(new Sprite(SelectedTexture));
+            {
+                int id = Project.CreateSprite(SelectedTexture);
+                SelectedTexture.Sprites.Add(id);
+            }
         }
 
         public void RemoveSprite()
         {
             if (SelectedTexture != null && SelectedSprite != null)
-                SelectedTexture.Sprites.Remove(SelectedSprite);
+            {
+                if (SelectedTexture.Sprites.Remove(SelectedSprite.ID))
+                {
+                    Project.RemoveSprite(SelectedSprite.ID);
+                    SelectedSprite = null;
+                }
+            }
         }
 
         public void CreateTexture()
@@ -125,6 +82,13 @@ namespace Shuriken.ViewModels
         {
             DisplayName = "Sprites";
             IconCode = "\xf302";
+            
+            CreateSpriteCmd     = new RelayCommand(CreateSprite, () => SelectedTexture != null);
+            RemoveSpriteCmd     = new RelayCommand(RemoveSprite, () => SelectedSprite != null);
+            CreateTextureCmd    = new RelayCommand(CreateTexture, () => SelectedTexList != null);
+            RemoveTextureCmd    = new RelayCommand(RemoveTexture, () => SelectedTexture != null);
+            CreateTexListCmd    = new RelayCommand(CreateTexList, null);
+            RemoveTexListCmd    = new RelayCommand(RemoveTexList, () => SelectedTexList != null);
         }
     }
 }

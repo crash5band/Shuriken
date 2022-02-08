@@ -21,11 +21,8 @@ namespace Shuriken.ViewModels
         public List<string> MissingTextures { get; set; }
         public ObservableCollection<ViewModelBase> Editors { get; set; }
 
-        public static Project Project { get; set; }
-
         public MainViewModel()
         {
-            Project = new Project();
             MissingTextures = new List<string>();
 
             Editors = new ObservableCollection<ViewModelBase>
@@ -86,10 +83,10 @@ namespace Shuriken.ViewModels
                     int textureIndex = (int)subimage.TextureIndex;
                     if (textureIndex >= 0 && textureIndex < texList.Textures.Count)
                     {
-                        Sprite spr = new Sprite(texList.Textures[textureIndex], subimage.TopLeft.Y, subimage.TopLeft.X,
+                        int id = Project.CreateSprite(texList.Textures[textureIndex], subimage.TopLeft.Y, subimage.TopLeft.X,
                             subimage.BottomRight.Y, subimage.BottomRight.X);
-
-                        texList.Textures[textureIndex].Sprites.Add(spr);
+                        
+                        texList.Textures[textureIndex].Sprites.Add(id);
                     }
                 }
             }
@@ -99,7 +96,7 @@ namespace Shuriken.ViewModels
                 UIFont font = new UIFont(entry.Name);
                 foreach (var mapping in xFontList.Fonts[(int)entry.Index].CharacterMappings)
                 {
-                    var sprite = Utilities.FindSpriteFromNCPScene((int)mapping.SubImageIndex, xScenes[0].SubImages, texList.Textures);
+                    var sprite = Utilities.FindSpriteIDFromNCPScene((int)mapping.SubImageIndex, xScenes[0].SubImages, texList.Textures);
                     font.Mappings.Add(new Models.CharacterMapping(mapping.SourceCharacter, sprite));
                 }
 

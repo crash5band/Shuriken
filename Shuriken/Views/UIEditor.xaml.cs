@@ -70,10 +70,10 @@ namespace Shuriken.Views
             if (sv != null)
             {
                 sv.Tick(delta);
-                List<UIScene> sortedScenes = MainViewModel.Project.Scenes.ToList();
+                List<UIScene> sortedScenes = Project.Scenes.ToList();
                 sortedScenes.Sort();
 
-                UpdateScenes(sortedScenes, MainViewModel.Project.Fonts, sv.Time);
+                UpdateScenes(sortedScenes, Project.Fonts, sv.Time);
             }
         }
 
@@ -192,7 +192,7 @@ namespace Shuriken.Views
             return result;
         }
 
-        private Sprite GetSprite(UIScene scn, UICast lyr, float time)
+        private int GetSprite(UIScene scn, UICast lyr, float time)
         {
             int sprIndex = 0;
             foreach (var anim in scn.Animations)
@@ -295,16 +295,17 @@ namespace Shuriken.Views
             float xOffset = 0.0f;
             foreach (var c in lyr.FontCharacters)
             {
-                Sprite spr = null;
+                int sprID = -1;
                 foreach (var mapping in lyr.Font.Mappings)
                 {
                     if (mapping.Character == c)
                     {
-                        spr = mapping.Sprite;
+                        sprID = mapping.Sprite;
                         break;
                     }
                 }
 
+                var spr = Project.TryGetSprite(sprID);
                 if (spr != null)
                 {
                     xOffset += spr.Width / 2.1f * sz.X;
@@ -331,7 +332,7 @@ namespace Shuriken.Views
 
         private void UpdateCast(UIScene scene, UICast lyr, CastTransform transform, float time)
         {
-            Sprite spr = GetSprite(scene, lyr, time);
+            int sprID = GetSprite(scene, lyr, time);
 
             Vec2 position = GetPosition(scene, lyr, time);
             position.X *= renderer.RenderWidth;
@@ -364,9 +365,10 @@ namespace Shuriken.Views
 
             if (lyr.Visible && lyr.IsEnabled)
             {
+                var spr = Project.TryGetSprite(sprID);
                 if (lyr.Type == DrawType.Sprite && spr != null)
                 {
-                    renderer.DrawSprite(position, pivot, rotation, (spr.Dimensions * scale), spr,
+                    renderer.DrawSprite(position, pivot, rotation, (new Vec2(lyr.Width, lyr.Height) * scale), spr,
                         lyr.Flags, color.ToFloats(), gradients[0].ToFloats(), gradients[2].ToFloats(), gradients[3].ToFloats(), gradients[1].ToFloats(), lyr.ZIndex);
                 }
                 else if (lyr.Type == DrawType.Font)
@@ -386,8 +388,6 @@ namespace Shuriken.Views
 
                         posAdjust.X = ((xAdjust * scale.X) - xAdjust) * renderer.RenderWidth;
                         posAdjust.Y = ((yAdjust * scale.Y) - yAdjust) * renderer.RenderHeight;
-                        //posAdjust.X += lyr.Field68 * scale.X;
-                        //posAdjust.Y += lyr.Field6C * scale.Y;
                     }
 
                     CastTransform childTransform = new CastTransform(position + posAdjust, rotation, scale, color);

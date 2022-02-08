@@ -22,20 +22,19 @@ namespace Shuriken.Models
             }
         }
 
-        public Sprite Sprite { get; set; }
+        public int Sprite { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-
-        public CharacterMapping(char c, Sprite spr)
+        public CharacterMapping(char c, int sprID)
         {
             Character = c;
-            Sprite = spr;
+            Sprite = sprID;
         }
 
         public CharacterMapping()
         {
-            Sprite = new Sprite();
+            Sprite = -1;
         }
     }
 }

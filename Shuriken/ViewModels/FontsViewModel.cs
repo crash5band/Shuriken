@@ -13,45 +13,14 @@ namespace Shuriken.ViewModels
     public class FontsViewModel : ViewModelBase
     {
         public UIFont SelectedFont { get; set; }
-
         public CharacterMapping SelectedMapping { get; set; }
+        public ObservableCollection<UIFont> Fonts => Project.Fonts;
 
-        public ObservableCollection<UIFont> Fonts => MainViewModel.Project.Fonts;
-
-        private RelayCommand createFontCmd;
-        public RelayCommand CreateFontCommand
-        {
-            get { return createFontCmd ?? new RelayCommand(CreateFont, null); }
-            set { createFontCmd = value; ; }
-        }
-
-        private RelayCommand removeFontCmd;
-        public RelayCommand RemoveFontCommand
-        {
-            get { return removeFontCmd ?? new RelayCommand(RemoveFont, () => SelectedFont != null); }
-            set { removeFontCmd = value; }
-        }
-
-        private RelayCommand createCharDefCmd;
-        public RelayCommand CreateCharDefCommand
-        {
-            get { return createCharDefCmd ?? new RelayCommand(CreateCharacterDefinition, () => SelectedFont != null); }
-            set { createCharDefCmd = value; }
-        }
-
-        private RelayCommand removeCharDefCmd;
-        public RelayCommand RemoveCharDefCmd
-        {
-            get { return removeCharDefCmd ?? new RelayCommand(RemoveCharacterDefinition, () => SelectedMapping != null); }
-            set { removeCharDefCmd = value; }
-        }
-
-        private RelayCommand<CharacterMapping> changeMappingSpriteCmd;
-        public RelayCommand<CharacterMapping> ChangeMappingSpriteCmd
-        {
-            get { return changeMappingSpriteCmd ?? new RelayCommand<CharacterMapping>(SelectSprite, null); }
-            set { changeMappingSpriteCmd = value; }
-        }
+        public RelayCommand CreateFontCommand { get; }
+        public RelayCommand RemoveFontCommand { get; }
+        public RelayCommand CreateCharDefCommand { get; }
+        public RelayCommand RemoveCharDefCmd { get; }
+        public RelayCommand<CharacterMapping> ChangeMappingSpriteCmd { get; }
 
         public void CreateFont()
         {
@@ -68,7 +37,7 @@ namespace Shuriken.ViewModels
         {
             if (SelectedFont != null)
             {
-                SelectedFont.Mappings.Add(new CharacterMapping() { Character = '.', Sprite = null });
+                SelectedFont.Mappings.Add(new CharacterMapping() { Character = '.', Sprite = -1 });
             }
         }
 
@@ -78,21 +47,23 @@ namespace Shuriken.ViewModels
                 SelectedFont.Mappings.Remove(SelectedMapping);
         }
 
-        public void ChangeMappingSprite(CharacterMapping mapping, Sprite spr)
+        public void ChangeMappingSprite(CharacterMapping mapping, int sprID)
         {
-            mapping.Sprite = spr;
+            mapping.Sprite = sprID;
         }
 
         public void SelectSprite(object mapping)
         {
-            SpritePickerWindow dialog = new SpritePickerWindow(MainViewModel.Project.TextureLists);
+            SpritePickerWindow dialog = new SpritePickerWindow(Project.TextureLists);
             dialog.ShowDialog();
 
             if (dialog.DialogResult == true)
             {
                 CharacterMapping target = mapping as CharacterMapping;
                 if (target != null)
-                    ChangeMappingSprite(target, dialog.SelectedSprite);
+                {
+                    ChangeMappingSprite(target, dialog.SelectedSpriteID);
+                }
             }
         }
 
@@ -100,6 +71,12 @@ namespace Shuriken.ViewModels
         {
             DisplayName = "Fonts";
             IconCode = "\xf031";
+
+            CreateFontCommand       = new RelayCommand(CreateFont, null);
+            RemoveFontCommand       = new RelayCommand(RemoveFont, () => SelectedFont != null);
+            CreateCharDefCommand    = new RelayCommand(CreateCharacterDefinition, () => SelectedFont != null);
+            RemoveCharDefCmd        = new RelayCommand(RemoveCharacterDefinition, () => SelectedMapping != null);
+            ChangeMappingSpriteCmd  = new RelayCommand<CharacterMapping>(SelectSprite, null);
         }
     }
 }

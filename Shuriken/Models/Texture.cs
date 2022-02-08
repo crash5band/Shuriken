@@ -7,75 +7,69 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Shuriken.Converters;
-using OpenTK.Graphics.OpenGL;
+using Shuriken.Rendering;
 using DirectXTexNet;
+using System.ComponentModel;
 
 namespace Shuriken.Models
 {
     public class Texture
     {
-        public uint ID { get; private set; }
         public string Name { get; }
+        public string FullName { get; }
         public int Width { get; private set; }
         public int Height { get; private set; }
-        public BitmapSource ImageSource { get; private set; }
 
-        public ObservableCollection<Sprite> Sprites { get; set; }
+        public BitmapSource ImageSource { get; private set; }
+        internal GLTexture GlTex { get; private set; }
+        public ObservableCollection<int> Sprites { get; set; }
 
         private void CreateTexture(string filename)
         {
             ScratchImage img = TexHelper.Instance.LoadFromDDSFile(filename, DDS_FLAGS.NONE);
-            ScratchImage bimg = img.Decompress(DXGI_FORMAT.B8G8R8A8_UNORM);
+            if (!TexHelper.Instance.IsCompressed(img.GetImage(0).Format))
+            {
+                img = img.Compress(DXGI_FORMAT.BC3_UNORM, TEX_COMPRESS_FLAGS.DEFAULT, 0.5f);
+            }
+
+            CreateBitmap(img.Decompress(DXGI_FORMAT.B8G8R8A8_UNORM));
+
             img = img.Decompress(DXGI_FORMAT.R8G8B8A8_UNORM).FlipRotate(TEX_FR_FLAGS.FLIP_VERTICAL);
 
             Width = img.GetImage(0).Width;
             Height = img.GetImage(0).Height;
 
-            var bmp = BitmapConverter.FromTextureImage(bimg, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            GlTex = new GLTexture(img.GetImage(0).Pixels, Width, Height);
+
+            img.Dispose();
+        }
+
+        private void CreateBitmap(ScratchImage img)
+        {
+            var bmp = BitmapConverter.FromTextureImage(img, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             ImageSource = BitmapConverter.FromBitmap(bmp);
 
-            CreateGLTexture(img);
-            
             img.Dispose();
-            bimg.Dispose();
             bmp.Dispose();
-        }
-
-        private void CreateGLTexture(ScratchImage img)
-        {
-            uint id = 0;
-            GL.GenTextures(1, out id);
-
-            ID = id;
-
-            GL.BindTexture(TextureTarget.Texture2D, ID);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.LinearSharpenAlphaSgis);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Width, Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, img.GetImage(0).Pixels);
-        }
-
-        public void Use()
-        {
-            GL.BindTexture(TextureTarget.Texture2D, ID);
         }
 
         public Texture(string filename)
         {
+            FullName = filename;
             Name = Path.GetFileNameWithoutExtension(filename);
             CreateTexture(filename);
 
-            Sprites = new ObservableCollection<Sprite>();
+            Sprites = new ObservableCollection<int>();
         }
 
         public Texture()
         {
-            Name = "";
-            Width = 0;
-            Height = 0;
+            Name = FullName = "";
+            Width = Height = 0;
             ImageSource = null;
-            Sprites = new ObservableCollection<Sprite>();
+            GlTex = null;
+
+            Sprites = new ObservableCollection<int>();
         }
     }
 }

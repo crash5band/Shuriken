@@ -30,14 +30,19 @@ namespace Shuriken.Views
 
             if (TextureLists.Count > 0)
                 TextureListSelect.SelectedIndex = 0;
+
+            SelectedSpriteID = -1;
         }
 
         private void SelectClicked(object sender, EventArgs e)
         {
-            SelectedSprite = SpriteList.SelectedItem as Sprite;
-            DialogResult = true;
+            if (SpriteList.SelectedItem != null)
+            {
+                SelectedSpriteID = (int)SpriteList.SelectedItem;
+                DialogResult = true;
+            }
         }
-        public Sprite SelectedSprite { get; private set; }
+        public int SelectedSpriteID { get; private set; }
         public ObservableCollection<TextureList> TextureLists { get; }
     }
 }

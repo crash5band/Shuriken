@@ -34,7 +34,7 @@ namespace Shuriken.Rendering
         public int NumQuads { get; private set; }
         public int NumIndices { get; private set; }
         public int BufferPos { get; private set; }
-        public uint TexID { get; set; }
+        public int TexID { get; set; }
         public bool BatchStarted { get; private set; }
         public int RenderWidth { get; set; }
         public int RenderHeight { get; set; }
@@ -279,12 +279,13 @@ namespace Shuriken.Rendering
             quads.Sort();
             foreach (var quad in quads)
             {
-                if (quad.Sprite.Texture.ID != TexID)
+                int id = quad.Sprite.Texture.GlTex.ID;
+                if (id != TexID)
                 {
                     EndBatch();
                     BeginBatch();
-                    quad.Sprite.Texture.Use();
-                    TexID = quad.Sprite.Texture.ID;
+                    quad.Sprite.Texture.GlTex.Bind();
+                    TexID = id;
                 }
 
                 PushQuadBuffer(quad);

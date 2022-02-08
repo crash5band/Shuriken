@@ -10,6 +10,7 @@
         Title="Sprite Select" Height="450" Width="800">
     <Window.Resources>
         <converters:ImageSizeConverter x:Key="ImageSizeConverter"/>
+        <converters:SpriteIDConverter x:Key="SpriteIDConverter"/>
     </Window.Resources>
     <Grid Name="LayoutRoot">
         <Grid.ColumnDefinitions>
@@ -51,11 +52,16 @@
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="5">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border Background="LightGray" Width="{Binding Width, Converter={StaticResource ImageSizeConverter}, Mode=OneWay}" Height="{Binding Height, Converter={StaticResource ImageSizeConverter}, Mode=OneWay}" Margin="2" Padding="2" CornerRadius="2">
+                    <Border Background="LightGray" Width="{Binding ElementName=SpriteImg, Path=Tag.Width, Converter={StaticResource ImageSizeConverter}, Mode=OneWay}"
+                            Height="{Binding ElementName=SpriteImg, Path=Tag.Height, Converter={StaticResource ImageSizeConverter}, Mode=OneWay}" Margin="2" Padding="2" CornerRadius="2">
                         <Border.Effect>
                             <DropShadowEffect BlurRadius="6" ShadowDepth="2" Direction="-45" Color="#333" Opacity="0.3"/>
                         </Border.Effect>
-                        <Image Source="{Binding Crop}" Width="{Binding Width, Converter={StaticResource ImageSizeConverter}, Mode=OneWay}" Height="{Binding Height, Converter={StaticResource ImageSizeConverter}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <Image Name="SpriteImg" Tag="{Binding Converter={StaticResource SpriteIDConverter}}"
+                               Source="{Binding ElementName=SpriteImg, Path=Tag.Crop}"
+                               Width="{Binding ElementName=SpriteImg, Path=Tag.Width, Converter={StaticResource ImageSizeConverter}, Mode=OneWay}"
+                               Height="{Binding ElementName=SpriteImg, Path=Tag.Height, Converter={StaticResource ImageSizeConverter}, Mode=OneWay}"
+                               VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Border>
                 </DataTemplate>
             </ListView.ItemTemplate>

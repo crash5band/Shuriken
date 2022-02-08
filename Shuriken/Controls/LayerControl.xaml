@@ -10,7 +10,7 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              Name="LayerControlPanel"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance Type=models:UILayer}"
+             d:DataContext="{d:DesignInstance Type=models:UICast}"
              d:DesignHeight="1500" d:DesignWidth="300">
     <UserControl.Resources>
         <Style TargetType="Label">
@@ -27,6 +27,7 @@
             <Setter Property="CornerRadius" Value="1"/>
         </Style>
         <converters:EnumToCollectionConverter x:Key="EnumConverter"/>
+        <converters:SpriteIDConverter x:Key="SpriteIDConverter"/>
     </UserControl.Resources>
     <ScrollViewer>
         <StackPanel>
@@ -179,12 +180,13 @@
                     <StackPanel>
                         <ListBox Name="SpriteList" ItemsSource="{Binding Sprites}" Height="100">
                             <ListBox.ItemTemplate>
-                                <DataTemplate DataType="{x:Type models:Sprite}">
+                                <DataTemplate>
                                     <Border Background="LightGray" CornerRadius="2" Padding="2" MinWidth="30">
                                         <Border.Effect>
                                             <DropShadowEffect BlurRadius="6" ShadowDepth="2" Direction="-45" Color="#333" Opacity="0.3"/>
                                         </Border.Effect>
-                                        <Image Source="{Binding Crop}" Width="auto" Height="30"/>
+                                        <Image Name="SprImg" Tag="{Binding Converter={StaticResource SpriteIDConverter}}"
+                                               Source ="{Binding ElementName=SprImg, Path=Tag.Crop}" Width="auto" Height="30"/>
                                     </Border>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

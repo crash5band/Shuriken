@@ -12,6 +12,7 @@ namespace Shuriken.Models
 {
     public class Sprite : INotifyPropertyChanged
     {
+        public readonly int ID;
         public Vector2 Start { get; set; }
         public Vector2 Dimensions { get; set; }
         public Texture Texture { get; set; }
@@ -62,8 +63,9 @@ namespace Shuriken.Models
                 Crop = new CroppedBitmap(Texture.ImageSource, new Int32Rect(X, Y, Width, Height));
         }
 
-        public Sprite(Texture tex, float top = 0.0f, float left = 0.0f, float bottom = 1.0f, float right = 1.0f)
+        public Sprite(int id, Texture tex, float top = 0.0f, float left = 0.0f, float bottom = 1.0f, float right = 1.0f)
         {
+            ID = id;
             Texture = tex;
 
             Start = new Vector2(left * tex.Width, top * tex.Height);

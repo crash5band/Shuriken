@@ -9,24 +9,51 @@ using System.Runtime.CompilerServices;
 
 namespace Shuriken.Models
 {
-    public class Project
+    public static class Project
     {
-        public ObservableCollection<UIScene> Scenes { get; set; }
-        public ObservableCollection<TextureList> TextureLists { get; set; }
-        public ObservableCollection<UIFont> Fonts { get; set; }
+        public static ObservableCollection<UIScene> Scenes { get; set; } = new ObservableCollection<UIScene>();
+        public static ObservableCollection<TextureList> TextureLists { get; set; } = new ObservableCollection<TextureList>();
+        public static ObservableCollection<UIFont> Fonts { get; set; } = new ObservableCollection<UIFont>();
+        public static Dictionary<int, Sprite> Sprites { get; set; } = new Dictionary<int, Sprite>();
 
-        public void Clear()
+        public static int NextSpriteID = 1;
+
+        public static Sprite TryGetSprite(int id)
         {
-            Scenes.Clear();
-            TextureLists.Clear();
-            Fonts.Clear();
+            Sprites.TryGetValue(id, out Sprite sprite);
+            return sprite;
         }
 
-        public Project()
+        public static int AppendSprite(Sprite spr)
         {
-            Scenes = new ObservableCollection<UIScene>();
-            TextureLists = new ObservableCollection<TextureList>();
-            Fonts = new ObservableCollection<UIFont>();
+            Sprites.Add(NextSpriteID, spr);
+            return NextSpriteID++;
+        }
+
+        public static int CreateSprite(Texture tex, float top = 0.0f, float left = 0.0f, float bottom = 1.0f, float right = 1.0f)
+        {
+            Sprite spr = new Sprite(NextSpriteID, tex, top, left, bottom, right);
+            return AppendSprite(spr);
+        }
+
+        public static void RemoveSprite(int id)
+        {
+            Sprites.Remove(id);
+        }
+
+        public static void Clear()
+        {
+            Scenes.Clear();
+            Fonts.Clear();
+
+            foreach (var texlist in TextureLists)
+            {
+                foreach (var tex in texlist.Textures)
+                    tex.GlTex.Dispose();
+            }
+
+            TextureLists.Clear();
+            NextSpriteID = 1;
         }
     }
 }

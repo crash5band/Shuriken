@@ -15,27 +15,9 @@ namespace Shuriken.ViewModels
     {
         public float MinZoom => 0.25f;
         public float MaxZoom => 2.50f;
-
-        private float time;
-        public float Time
-        {
-            get => time;
-            set { time = value; }
-        }
-
-        private bool playing;
-        public bool Playing
-        {
-            get => playing;
-            set { playing = value; }
-        }
-
-        private float playbackSpeed;
-        public float PlaybackSpeed
-        {
-            get => playbackSpeed;
-            set { playbackSpeed = value; }
-        }
+        public float Time { get; set; }
+        public bool Playing { get; set; }
+        public float PlaybackSpeed { get; set; }
 
         private float zoom;
         public float Zoom
@@ -44,118 +26,42 @@ namespace Shuriken.ViewModels
             set { zoom = Math.Clamp(value, MinZoom, MaxZoom); }
         }
 
-        private RelayCommand togglePlayingCmd;
-        public RelayCommand TogglePlayingCmd
-        {
-            get => togglePlayingCmd ?? new RelayCommand(() => Playing ^= true, null);
-            set { togglePlayingCmd = value; }
-        }
+        public RelayCommand TogglePlayingCmd { get; }
+        public RelayCommand StopPlayingCmd { get; }
+        public RelayCommand ReplayCmd { get; }
+        public RelayCommand<float> SeekCmd { get; }
+        public RelayCommand ZoomOutCmd { get; }
+        public RelayCommand ZoomInCmd { get; }
 
-        private RelayCommand stopPlayingCmd;
-        public RelayCommand StopPlayingCmd
-        {
-            get => stopPlayingCmd ?? new RelayCommand(Stop, null);
-            set { stopPlayingCmd = value; }
-        }
-
-        private RelayCommand replayCmd;
-        public RelayCommand ReplayCmd
-        {
-            get => replayCmd ?? new RelayCommand(Replay, null);
-            set { replayCmd = value; }
-        }
-
-        private RelayCommand<float> seekCmd;
-        public RelayCommand<float> SeekCmd
-        {
-            get => seekCmd ?? new RelayCommand<float>(Seek, () => !Playing);
-            set { seekCmd = value; }
-        }
-
-        private RelayCommand zoomOutCmd;
-        public RelayCommand ZoomOutCmd
-        {
-            get => zoomOutCmd ?? new RelayCommand(() => Zoom -= 0.25f, null);
-            set { zoomOutCmd = value; }
-        }
-
-        private RelayCommand zoomInCmd;
-        public RelayCommand ZoomInCmd
-        {
-            get => zoomInCmd ?? new RelayCommand(() => Zoom += 0.25f, null);
-            set { zoomInCmd = value; }
-        }
-
-        private RelayCommand createSceneCmd;
-        public RelayCommand CreateSceneCmd
-        {
-            get => createSceneCmd ?? new RelayCommand(CreateScene, null);
-            set { createSceneCmd = value; }
-        }
-
-        private RelayCommand removeSceneCmd;
-        public RelayCommand RemoveSceneCmd
-        {
-            get => removeSceneCmd ?? new RelayCommand(RemoveSelectedScene, () => SelectedScene != null);
-            set { removeSceneCmd = value; }
-        }
-
-        private RelayCommand createGroupCmd;
-        public RelayCommand CreateGroupCmd
-        {
-            get { return createGroupCmd ?? new RelayCommand(AddGroupToSelection, () => SelectedScene != null); }
-            set { createGroupCmd = value; }
-        }
-
-        private RelayCommand removeGroupCmd;
-        public RelayCommand RemoveGroupCmd
-        {
-            get { return removeGroupCmd ?? new RelayCommand(RemoveSelectedGroup, () => SelectedNode is UICastGroup); }
-            set { removeGroupCmd = value; }
-        }
-
-        private RelayCommand<int> changeCastSpriteCmd;
-        public RelayCommand<int> ChangeCastSpriteCmd
-        {
-            get { return changeCastSpriteCmd ?? new RelayCommand<int>(SelectCastSprite, null); }
-            set { changeCastSpriteCmd = value; }
-        }
-
-        private RelayCommand createCastCmd;
-        public RelayCommand CreateCastCmd
-        {
-            get { return createCastCmd ?? new RelayCommand(AddCastToSelection, () => SelectedNode != null && SelectedNode is ICastContainer); }
-            set { createCastCmd = value; }
-        }
-
-        private RelayCommand removeCastCmd;
-        public RelayCommand RemoveCastCmd
-        {
-            get { return removeCastCmd ?? new RelayCommand(RemoveSelectedCast, () => SelectedNode is UICast); }
-            set { removeCastCmd = value; }
-        }
+        public RelayCommand CreateSceneCmd { get; }
+        public RelayCommand RemoveSceneCmd { get; }
+        public RelayCommand CreateGroupCmd { get; }
+        public RelayCommand RemoveGroupCmd { get; }
+        public RelayCommand<int> ChangeCastSpriteCmd { get; }
+        public RelayCommand CreateCastCmd { get; }
+        public RelayCommand RemoveCastCmd { get; }
 
         public void SelectCastSprite(object index)
         {
-            SpritePickerWindow dialog = new SpritePickerWindow(MainViewModel.Project.TextureLists);
+            SpritePickerWindow dialog = new SpritePickerWindow(Project.TextureLists);
             dialog.ShowDialog();
 
             if (dialog.DialogResult == true)
             {
-                if (dialog.SelectedSprite != null)
+                if (dialog.SelectedSpriteID != -1)
                 {
                     var sprIndex = (int)index;
-                    ChangeCastSprite(sprIndex, dialog.SelectedSprite);
+                    ChangeCastSprite(sprIndex, dialog.SelectedSpriteID);
                 }
             }
         }
 
-        public void ChangeCastSprite(int index, Sprite spr)
+        public void ChangeCastSprite(int index, int sprID)
         {
             if (SelectedNode is UICast)
             {
                 var cast = (UICast)SelectedNode;
-                cast.Sprites[index] = spr;
+                cast.Sprites[index] = sprID;
             }
         }
 
@@ -185,7 +91,7 @@ namespace Shuriken.ViewModels
 
         public void Tick(float d)
         {
-            Time += d * playbackSpeed * (playing ? 1 : 0);
+            Time += d * PlaybackSpeed * (Playing ? 1 : 0);
         }
 
         public void CreateScene()
@@ -221,34 +127,33 @@ namespace Shuriken.ViewModels
                 container.RemoveCast(SelectedNode as UICast);
         }
 
-        private UIScene scene;
-        public UIScene SelectedScene
-        {
-            get { return scene; }
-            set { scene = value; }
-        }
+        public UIScene SelectedScene { get; set; }
+        public object ParentNode { get; set; }
+        public object SelectedNode { get; set; }
+        public ObservableCollection<UIScene> Scenes => Project.Scenes;
 
-        private object parentNode;
-        public object ParentNode
-        {
-            get { return parentNode; }
-            set { parentNode = value; }
-        }
-
-        private object selectedNode;
-        public object SelectedNode
-        {
-            get { return selectedNode; }
-            set { selectedNode = value; }
-        }
-        public ObservableCollection<UIScene> Scenes => MainViewModel.Project.Scenes;
         public ScenesViewModel()
         {
             DisplayName = "Scenes";
             IconCode = "\xf008";
 
             zoom = 0.65f;
-            playbackSpeed = 1.0f;
+            PlaybackSpeed = 1.0f;
+
+            TogglePlayingCmd    = new RelayCommand(() => Playing ^= true, null);
+            StopPlayingCmd      = new RelayCommand(Stop, null);
+            ReplayCmd           = new RelayCommand(Replay, null);
+            SeekCmd             = new RelayCommand<float>(Seek, () => !Playing);
+            ZoomOutCmd          = new RelayCommand(() => Zoom -= 0.25f, null);
+            ZoomInCmd           = new RelayCommand(() => Zoom += 0.25f, null);
+
+            CreateSceneCmd      = new RelayCommand(CreateScene, null);
+            RemoveSceneCmd      = new RelayCommand(RemoveSelectedScene, () => SelectedScene != null);
+            CreateGroupCmd      = new RelayCommand(AddGroupToSelection, () => SelectedScene != null);
+            RemoveGroupCmd      = new RelayCommand(RemoveSelectedGroup, () => SelectedNode is UICastGroup);
+            CreateCastCmd       = new RelayCommand(AddCastToSelection, () => SelectedNode is ICastContainer);
+            RemoveCastCmd       = new RelayCommand(RemoveSelectedCast, () => SelectedNode is UICast);
+            ChangeCastSpriteCmd = new RelayCommand<int>(SelectCastSprite, null);
         }
     }
 }
