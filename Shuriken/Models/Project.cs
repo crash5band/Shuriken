@@ -45,6 +45,7 @@ namespace Shuriken.Models
         {
             Scenes.Clear();
             Fonts.Clear();
+            Sprites.Clear();
 
             foreach (var texlist in TextureLists)
             {
