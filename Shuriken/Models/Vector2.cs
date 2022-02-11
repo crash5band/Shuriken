@@ -15,6 +15,12 @@ namespace Shuriken.Models
             Y = y;
         }
 
+        public Vector2(Vector2 v)
+        {
+            X = v.X;
+            Y = v.Y;
+        }
+
         public Vector2(System.Numerics.Vector2 v)
         {
             X = v.X;

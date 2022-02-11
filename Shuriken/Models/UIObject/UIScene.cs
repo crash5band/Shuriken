@@ -73,6 +73,21 @@ namespace Shuriken.Models
             Visible = false;
         }
 
+        public UIScene(UIScene s)
+        {
+            Name = s.Name;
+            ZIndex = s.ZIndex;
+            AspectRatio = s.AspectRatio;
+            AnimationFramerate = s.AnimationFramerate;
+
+            Groups = new ObservableCollection<UICastGroup>(s.Groups);
+            TextureSizes = new ObservableCollection<Vector2>(s.TextureSizes);
+            Animations = new ObservableCollection<AnimationGroup>(s.Animations);
+
+
+            Visible = false;
+        }
+
         private void ProcessCasts(Scene scene, TextureList texList, IEnumerable<UIFont> fonts)
         {
             // Create groups

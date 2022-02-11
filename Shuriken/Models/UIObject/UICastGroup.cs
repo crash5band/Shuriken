@@ -53,6 +53,15 @@ namespace Shuriken.Models
             Casts = new ObservableCollection<UICast>();
         }
 
+        public UICastGroup(UICastGroup g)
+        {
+            Name = g.name;
+            Field08 = g.Field08;
+            Visible = true;
+
+            Casts = new ObservableCollection<UICast>(g.Casts);
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }

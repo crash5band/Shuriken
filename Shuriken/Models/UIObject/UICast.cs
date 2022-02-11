@@ -195,6 +195,58 @@ namespace Shuriken.Models
                 Sprites.Add(-1);
         }
 
+        public UICast(UICast c)
+        {
+            Name = name;
+            Field00 = c.Field00;
+            Type = c.Type;
+            IsEnabled = c.IsEnabled;
+            Visible = true;
+            ZIndex = ZIndex;
+            Children = new ObservableCollection<UICast>(c.Children);
+
+            TopLeft = new Vector2(c.TopLeft);
+            BottomLeft = new Vector2(c.BottomLeft);
+            TopRight = new Vector2(c.TopRight);
+            BottomRight = new Vector2(c.BottomRight);
+
+            Field2C = c.Field2C;
+            Field34 = c.Field34;
+            Flags = c.Flags;
+            Field3C = c.Field3C;
+
+            Font = null;
+            FontCharacters = c.FontCharacters;
+
+            Field4C = c.Field4C;
+            Width = c.Width;
+            Height = c.Height;
+            Field58 = c.Field58;
+            Field5C = c.Field5C;
+
+            Offset = new Vector2(c.Offset);
+
+            Field68 = c.Field68;
+            Field6C = c.Field6C;
+            Field70 = c.Field70;
+
+            InfoField00 = c.InfoField00;
+            Translation = new Vector2(c.Translation);
+            Rotation = c.Rotation;
+            Scale = new Vector2(c.Scale);
+            InfoField18 = c.InfoField18;
+            Color = new Color(c.Color);
+            GradientTopLeft = new Color(c.GradientTopLeft);
+            GradientBottomLeft = new Color(c.GradientBottomLeft);
+            GradientTopRight = new Color(c.GradientTopRight);
+            GradientBottomRight = new Color(c.GradientBottomRight);
+            InfoField30 = c.InfoField30;
+            InfoField34 = c.InfoField34;
+            InfoField38 = c.InfoField38;
+
+            Sprites = new ObservableCollection<int>(c.Sprites);
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 

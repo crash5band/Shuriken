@@ -65,6 +65,14 @@ namespace Shuriken.Models
             A = bytes[0];
         }
 
+        public Color(Color c)
+        {
+            R = c.R;
+            G = c.G;
+            B = c.B;
+            A = c.A;
+        }
+
         public Vector4 ToFloats()
         {
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);

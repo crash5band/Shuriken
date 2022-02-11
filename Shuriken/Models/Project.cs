@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace Shuriken.Models
 {
@@ -16,7 +14,7 @@ namespace Shuriken.Models
         public static ObservableCollection<UIFont> Fonts { get; set; } = new ObservableCollection<UIFont>();
         public static Dictionary<int, Sprite> Sprites { get; set; } = new Dictionary<int, Sprite>();
 
-        public static int NextSpriteID = 1;
+        private static int NextSpriteID = 1;
 
         public static Sprite TryGetSprite(int id)
         {
