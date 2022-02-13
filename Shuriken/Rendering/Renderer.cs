@@ -31,7 +31,7 @@ namespace Shuriken.Rendering
         public int MaxIndices => MaxQuads * 6;
 
         public int NumVertices { get; private set; }
-        public int NumQuads { get; private set; }
+        public int NumQuads => quads.Count;
         public int NumIndices { get; private set; }
         public int BufferPos { get; private set; }
         public int TexID { get; set; }
@@ -44,7 +44,9 @@ namespace Shuriken.Rendering
             shaderDictionary = new Dictionary<string, ShaderProgram>();
 
             ShaderProgram basicShader = new ShaderProgram("basic", Path.Combine(shadersDir, "basic.vert"), Path.Combine(shadersDir, "basic.frag"));
+            ShaderProgram boxShader = new ShaderProgram("box", Path.Combine(shadersDir, "bb.vert"), Path.Combine(shadersDir, "bb.frag"));
             shaderDictionary.Add(basicShader.Name, basicShader);
+            shaderDictionary.Add(boxShader.Name, boxShader);
 
             // setup vertex indices
             indices = new uint[MaxIndices];
@@ -63,7 +65,7 @@ namespace Shuriken.Rendering
             }
 
             buffer = new Vertex[MaxVertices];
-            quads = new List<Quad>();
+            quads = new List<Quad>(MaxQuads);
             Init();
 
             RenderWidth = width;
@@ -114,7 +116,6 @@ namespace Shuriken.Rendering
         /// </summary>
         private void ResetRenderStats()
         {
-            NumQuads = 0;
             NumIndices = 0;
             NumVertices = 0;
         }
@@ -137,6 +138,7 @@ namespace Shuriken.Rendering
         {
             GL.BindVertexArray(vao);
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
             GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, BufferPos * 4 * 10, buffer);
 
             Flush();
@@ -146,6 +148,7 @@ namespace Shuriken.Rendering
 
         private void Flush()
         {
+            ConfigureShader(shaderDictionary["basic"]);
             GL.DrawElements(PrimitiveType.Triangles, NumIndices, DrawElementsType.UnsignedInt, 0);
         }
 
@@ -257,7 +260,6 @@ namespace Shuriken.Rendering
             Vector2[] uvCoords = GetUVCoords(new Vector2(spr.Start.X, spr.Start.Y), new Vector2(spr.Width, spr.Height), spr.Texture.Width, spr.Texture.Height, mirrorX, mirrorY);
             
             quads.Add(new Quad(mat, uvCoords, col, tl, tr, bl, br, spr, index));
-            ++NumQuads;
         }
 
         /// <summary>
@@ -288,6 +290,11 @@ namespace Shuriken.Rendering
                     TexID = id;
                 }
 
+                if (NumVertices + 4 > MaxVertices)
+                {
+                    EndBatch();
+                    BeginBatch();
+                }
                 PushQuadBuffer(quad);
             }
 
