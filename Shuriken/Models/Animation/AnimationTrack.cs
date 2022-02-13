@@ -9,13 +9,15 @@ using System.Threading.Tasks;
 
 namespace Shuriken.Models.Animation
 {
-    public class AnimationTrack
+    public class AnimationTrack : INotifyPropertyChanged
     {
+        public bool Enabled { get; set; } = true;
         public uint Field00 { get; set; }
         public AnimationType Type { get; }
         public string TypeString => Type.ToString();
         public ObservableCollection<Keyframe> Keyframes { get; set; }
 
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public float GetValue(float frame)
         {
@@ -46,6 +48,12 @@ namespace Shuriken.Models.Animation
         {
             Type = type;
             Keyframes = new ObservableCollection<Keyframe>();
+        }
+
+        public AnimationTrack(AnimationTrack a)
+        {
+            Type = a.Type;
+            Keyframes = new ObservableCollection<Keyframe>(a.Keyframes);
         }
     }
 }

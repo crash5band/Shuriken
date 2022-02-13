@@ -65,7 +65,10 @@
                             <TextBlock Text="{Binding Layer.Name}"/>
                         </HierarchicalDataTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type animation:AnimationTrack}">
-                            <TextBlock Text="{Binding TypeString}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding Enabled}"/>
+                                <TextBlock Text="{Binding TypeString}"/>
+                            </StackPanel>
                         </HierarchicalDataTemplate>
                     </TreeView.Resources>
                 </TreeView>

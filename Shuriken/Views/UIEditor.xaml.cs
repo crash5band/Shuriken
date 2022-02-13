@@ -113,15 +113,21 @@ namespace Shuriken.Views
                     var xPos = anim.GetTrack(lyr, AnimationType.XPosition);
                     if (xPos != null)
                     {
-                        result.X = xPos.GetValue(time);
-                        hasX = true;
+                        if (xPos.Enabled)
+                        {
+                            result.X = xPos.GetValue(time);
+                            hasX = true;
+                        }
                     }
 
                     var yPos = anim.GetTrack(lyr, AnimationType.YPosition);
                     if (yPos != null)
                     {
-                        result.Y = yPos.GetValue(time);
-                        hasY = true;
+                        if (yPos.Enabled)
+                        {
+                            result.Y = yPos.GetValue(time);
+                            hasY = true;
+                        }
                     }
                 }
             }
@@ -148,8 +154,11 @@ namespace Shuriken.Views
                     var rotAnim = anim.GetTrack(lyr, AnimationType.Rotation);
                     if (rotAnim != null)
                     {
-                        result = rotAnim.GetValue(time);
-                        hasRot = true;
+                        if (rotAnim.Enabled)
+                        {
+                            result = rotAnim.GetValue(time);
+                            hasRot = true;
+                        }
                     }
                 }
             }
@@ -170,15 +179,21 @@ namespace Shuriken.Views
                     var sX = anim.GetTrack(lyr, AnimationType.XScale);
                     if (sX != null)
                     {
-                        result.X *= sX.GetValue(time);
-                        hasSx = true;
+                        if (sX.Enabled)
+                        {
+                            result.X *= sX.GetValue(time);
+                            hasSx = true;
+                        }
                     }
 
                     var sy = anim.GetTrack(lyr, AnimationType.YScale);
                     if (sy != null)
                     {
-                        result.Y *= sy.GetValue(time);
-                        hasSy = true;
+                        if (sy.Enabled)
+                        {
+                            result.Y *= sy.GetValue(time);
+                            hasSy = true;
+                        }
                     }
                 }
             }
@@ -202,9 +217,12 @@ namespace Shuriken.Views
                     var sprAnim = anim.GetTrack(lyr, AnimationType.SubImage);
                     if (sprAnim != null)
                     {
-                        int i = (int)sprAnim.GetValue(time);
-                        if (i > 0 && i < lyr.Sprites.Count)
-                            sprIndex = i;
+                        if (sprAnim.Enabled)
+                        {
+                            int i = (int)sprAnim.GetValue(time);
+                            if (i > 0 && i < lyr.Sprites.Count)
+                                sprIndex = i;
+                        }
                     }
                 }
             }
@@ -224,8 +242,11 @@ namespace Shuriken.Views
                     var clrAnim = anim.GetTrack(lyr, AnimationType.Color);
                     if (clrAnim != null)
                     {
-                        result = new Color(clrAnim.GetValue(time));
-                        hasClr = true;
+                        if (clrAnim.Enabled)
+                        {
+                            result = new Color(clrAnim.GetValue(time));
+                            hasClr = true;
+                        }
                     }
                 }
             }
@@ -235,56 +256,42 @@ namespace Shuriken.Views
 
         private Color[] GetGradients(UIScene scn, UICast lyr, float time)
         {
-            bool hasTL = false;
-            bool hasBL = false;
-            bool hasTR = false;
-            bool hasBR = false;
+            // order: tl, bl, tr, br
+            bool[] hasGradient = Enumerable.Repeat(false, 4).ToArray();
             Color[] results = new Color[4];
 
             foreach (var anim in scn.Animations)
             {
                 if (anim.Enabled)
                 {
-                    var clrAnim = anim.GetTrack(lyr, AnimationType.GradientTL);
-                    if (clrAnim != null)
+                    int animValue = 256;
+                    for (int i = 0; i < 4; ++i)
                     {
-                        results[0] = new Color(clrAnim.GetValue(time));
-                        hasTL = true;
-                    }
+                        var clrAnim = anim.GetTrack(lyr, (AnimationType)animValue);
+                        if (clrAnim != null)
+                        {
+                            if (clrAnim.Enabled)
+                            {
+                                hasGradient[i] = true;
+                                results[i] = new Color(clrAnim.GetValue(time));
+                            }
+                        }
 
-                    clrAnim = anim.GetTrack(lyr, AnimationType.GradientBL);
-                    if (clrAnim != null)
-                    {
-                        results[1] = new Color(clrAnim.GetValue(time));
-                        hasBL = true;
-                    }
-
-                    clrAnim = anim.GetTrack(lyr, AnimationType.GradientTR);
-                    if (clrAnim != null)
-                    {
-                        results[2] = new Color(clrAnim.GetValue(time));
-                        hasTR = true;
-                    }
-
-                    clrAnim = anim.GetTrack(lyr, AnimationType.GradientBR);
-                    if (clrAnim != null)
-                    {
-                        results[3] = new Color(clrAnim.GetValue(time));
-                        hasBR = true;
+                        animValue <<= 1;
                     }
                 }
             }
 
-            if (!hasTL)
+            if (!hasGradient[0])
                 results[0] = lyr.GradientTopLeft;
 
-            if (!hasBL)
+            if (!hasGradient[1])
                 results[1] = lyr.GradientBottomLeft;
 
-            if (!hasTR)
+            if (!hasGradient[2])
                 results[2] = lyr.GradientTopRight;
 
-            if (!hasBR)
+            if (!hasGradient[3])
                 results[3] = lyr.GradientBottomRight;
 
             return results;
