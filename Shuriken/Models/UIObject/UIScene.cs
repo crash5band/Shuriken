@@ -211,14 +211,16 @@ namespace Shuriken.Models
                 BuildTree(childIndex, tree, lyrs, lyrs[c]);
             }
 
-            int siblingIndex = tree[c].NextIndex;
-            if (siblingIndex != -1)
+            if (parent != null)
             {
-                UICast sibling = lyrs[siblingIndex];
-                if (parent != null)
+                int siblingIndex = tree[c].NextIndex;
+                if (siblingIndex != -1)
+                {
+                    UICast sibling = lyrs[siblingIndex];
                     parent.Children.Add(sibling);
 
-                BuildTree(siblingIndex, tree, lyrs, parent);
+                    BuildTree(siblingIndex, tree, lyrs, parent);
+                }
             }
         }
 
