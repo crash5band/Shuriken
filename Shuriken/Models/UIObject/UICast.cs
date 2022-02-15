@@ -27,14 +27,8 @@ namespace Shuriken.Models
 
         public uint Field00 { get; set; }
         public DrawType Type { get; set; }
-
         public bool IsEnabled { get; set; }
-
-        public Vector2 TopLeft { get; set; }
-        public Vector2 BottomLeft { get; set; }
-        public Vector2 TopRight { get; set; }
-        public Vector2 BottomRight { get; set; }
-
+        public Vector2 Anchor { get; set; }
         public uint Field2C { get; set; }
         public uint Field34 { get; set; }
         public uint Flags { get; set; }
@@ -73,6 +67,7 @@ namespace Shuriken.Models
 
         public bool Visible { get; set; }
         public int ZIndex { get; set; }
+        public int DefaultSprite { get; set; } = 0;
 
         public ObservableCollection<int> Sprites { get; set; }
         public ObservableCollection<UICast> Children { get; set; }
@@ -97,10 +92,9 @@ namespace Shuriken.Models
             ZIndex = index;
             Children = new ObservableCollection<UICast>();
 
-            TopLeft = new Vector2(cast.TopLeft);
-            BottomLeft = new Vector2(cast.BottomLeft);
-            TopRight = new Vector2(cast.TopRight);
-            BottomRight = new Vector2(cast.BottomRight);
+            float right = Math.Abs(cast.TopRight.X) - Math.Abs(cast.TopLeft.X);
+            float top = Math.Abs(cast.TopRight.Y) - Math.Abs(cast.BottomRight.Y);
+            Anchor = new Vector2(right, top);
 
             Field2C = cast.Field2C;
             Field34 = cast.Field34;
@@ -151,11 +145,6 @@ namespace Shuriken.Models
             ZIndex = 0;
             Children = new ObservableCollection<UICast>();
 
-            TopLeft = new Vector2();
-            BottomLeft = new Vector2();
-            TopRight = new Vector2();
-            BottomRight = new Vector2();
-
             Field2C = 0;
             Field34 = 0;
             Flags = 0;
@@ -165,12 +154,13 @@ namespace Shuriken.Models
             FontCharacters = "";
 
             Field4C = 0;
-            Width = 0;
-            Height = 0;
+            Width = 64;
+            Height = 64;
             Field58 = 0;
             Field5C = 0;
 
-            Offset = new Vector2();
+            Anchor = new Vector2();
+            Offset = new Vector2(0.5f, 0.5f);
 
             Field68 = 0;
             Field6C = 0;
@@ -205,10 +195,7 @@ namespace Shuriken.Models
             ZIndex = ZIndex;
             Children = new ObservableCollection<UICast>(c.Children);
 
-            TopLeft = new Vector2(c.TopLeft);
-            BottomLeft = new Vector2(c.BottomLeft);
-            TopRight = new Vector2(c.TopRight);
-            BottomRight = new Vector2(c.BottomRight);
+            Anchor = new Vector2(Anchor);
 
             Field2C = c.Field2C;
             Field34 = c.Field34;

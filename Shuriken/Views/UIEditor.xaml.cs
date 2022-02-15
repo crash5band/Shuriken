@@ -209,7 +209,7 @@ namespace Shuriken.Views
 
         private int GetSprite(UIScene scn, UICast lyr, float time)
         {
-            int sprIndex = 0;
+            int sprIndex = lyr.DefaultSprite;
             foreach (var anim in scn.Animations)
             {
                 if (anim.Enabled)
@@ -315,26 +315,23 @@ namespace Shuriken.Views
                 var spr = Project.TryGetSprite(sprID);
                 if (spr != null)
                 {
-                    xOffset += spr.Width / 2.1f * sz.X;
-                    Vec2 sprPos = new Vec2(pos.X + xOffset - (lyr.Width / 2.0f * sz.X), pos.Y);
+                    float sprStep = spr.Width / 2.0f * sz.X;
+                    xOffset += sprStep;
+                    Vec2 sprPos = new Vec2(pos.X + xOffset - (lyr.Width * 0.5f * sz.X), pos.Y);
 
                     renderer.DrawSprite(sprPos, pivot, rot, new System.Numerics.Vector2(sz.X * spr.Width, sz.Y * spr.Height), spr, lyr.Flags, lyr.Color.ToFloats(),
                         gradients[0].ToFloats(), gradients[2].ToFloats(), gradients[3].ToFloats(), gradients[1].ToFloats(), lyr.ZIndex);
 
-                    xOffset += spr.Width / 2.25f * sz.X;
+                    xOffset += sprStep / 1.25f;
                 }
             }
         }
 
         private Vec2 GetPivot(UICast lyr, Vec2 scale, int width, int height)
         {
-            float diff = Math.Abs(lyr.TopRight.X) - Math.Abs(lyr.TopLeft.X);
-            float right = diff * renderer.RenderWidth * scale.X;
-
-            diff = Math.Abs(lyr.BottomRight.Y) - Math.Abs(lyr.TopRight.Y);
-            float up = diff * renderer.RenderHeight * scale.Y;
-
-            return new Vec2(right / 2.0f, -up / 2.0f);
+            float x = lyr.Anchor.X * scale.X * width * 0.5f;
+            float y = lyr.Anchor.Y * scale.Y * height * 0.5f;
+            return new Vec2(x, y);
         }
 
         private void UpdateCast(UIScene scene, UICast lyr, CastTransform transform, float time)
@@ -390,11 +387,8 @@ namespace Shuriken.Views
                     // continue from area of parent cast?
                     if ((child.Flags & 1) == 0)
                     {
-                        float xAdjust = Math.Abs(lyr.TopRight.X) - Math.Abs(lyr.TopLeft.X);
-                        float yAdjust = Math.Abs(lyr.BottomRight.Y) - Math.Abs(lyr.TopRight.Y);
-
-                        posAdjust.X = ((xAdjust * scale.X) - xAdjust) * renderer.RenderWidth;
-                        posAdjust.Y = ((yAdjust * scale.Y) - yAdjust) * renderer.RenderHeight;
+                        posAdjust.X = ((lyr.Anchor.X * scale.X) - lyr.Anchor.X) * renderer.RenderWidth;
+                        posAdjust.Y = ((lyr.Anchor.Y * scale.Y) - lyr.Anchor.Y) * renderer.RenderHeight;
                     }
 
                     CastTransform childTransform = new CastTransform(position + posAdjust, rotation, scale, color);
