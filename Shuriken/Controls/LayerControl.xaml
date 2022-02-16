@@ -11,7 +11,7 @@
              Name="LayerControlPanel"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=models:UICast}"
-             d:DesignHeight="1500" d:DesignWidth="300">
+             d:DesignWidth="300">
     <UserControl.Resources>
         <Style TargetType="Label">
             <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -77,6 +77,9 @@
                         <Label>Translation</Label>
                         <local:Vector2Control Value="{Binding Translation}"/>
 
+                        <Label>Z-Translation</Label>
+                        <TextBox Text="{Binding ZTranslation}"/>
+
                         <Label>Offset</Label>
                         <local:Vector2Control Value="{Binding Offset}"/>
 
@@ -84,7 +87,7 @@
                         <TextBox Text="{Binding Rotation}"/>
 
                         <Label>Scale</Label>
-                        <local:Vector2Control Value="{Binding Scale}"/>
+                        <local:Vector3Control Value="{Binding Scale}"/>
                     </StackPanel>
                 </Border>
             </Expander>
@@ -149,8 +152,8 @@
                         <Label>Field6C</Label>
                         <TextBox Text="{Binding Field6C}"/>
 
-                        <Label>Field70</Label>
-                        <TextBox Text="{Binding Field70}"/>
+                        <Label>FontSpacingCorrection</Label>
+                        <TextBox Text="{Binding FontSpacingCorrection}"/>
 
                     </StackPanel>
                 </Border>
@@ -178,8 +181,9 @@
             <Expander Header="Sprites" IsExpanded="True">
                 <Border>
                     <StackPanel>
-                        <ListBox Name="SpriteList" ItemsSource="{Binding Sprites}" Height="100">
-                            <ListBox.ItemTemplate>
+                        <TextBox Text="{Binding DefaultSprite}"/>
+                        <ListView Name="SpriteList" ItemsSource="{Binding Sprites}" Height="100">
+                            <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Border Background="LightGray" CornerRadius="2" Padding="2" MinWidth="30">
                                         <Border.Effect>
@@ -189,8 +193,13 @@
                                                Source ="{Binding ElementName=SprImg, Path=Tag.Crop}" Width="auto" Height="30"/>
                                     </Border>
                                 </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                            </ListView.ItemTemplate>
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                        </ListView>
                         <Button Content="Edit Sprite" HorizontalAlignment="Stretch" Margin="2"
                                 Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl, AncestorLevel=2}, Path=DataContext.ChangeCastSpriteCmd}"
                                 CommandParameter="{Binding ElementName=SpriteList, Path=SelectedIndex}"/>
