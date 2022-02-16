@@ -36,7 +36,7 @@ namespace XNCPLib.XNCP
         public Vector2 Offset { get; set; }
         public float Field68 { get; set; }
         public float Field6C { get; set; }
-        public uint Field70 { get; set; }
+        public uint FontSpacingCorrection { get; set; }
         public CastInfo CastInfoData { get; set; }
         public CastMaterialInfo CastMaterialData { get; set; }
 
@@ -81,7 +81,7 @@ namespace XNCPLib.XNCP
             Offset = new Vector2(reader.ReadSingle(), reader.ReadSingle());
             Field68 = reader.ReadSingle();
             Field6C = reader.ReadSingle();
-            Field70 = reader.ReadUInt32();
+            FontSpacingCorrection = reader.ReadUInt32();
 
             long baseOffset = reader.GetOffsetOrigin();
 

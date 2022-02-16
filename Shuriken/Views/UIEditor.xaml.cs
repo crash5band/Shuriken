@@ -322,7 +322,7 @@ namespace Shuriken.Views
                     renderer.DrawSprite(sprPos, pivot, rot, new System.Numerics.Vector2(sz.X * spr.Width, sz.Y * spr.Height), spr, lyr.Flags, lyr.Color.ToFloats(),
                         gradients[0].ToFloats(), gradients[2].ToFloats(), gradients[3].ToFloats(), gradients[1].ToFloats(), lyr.ZIndex);
 
-                    xOffset += sprStep / 1.25f;
+                    xOffset += sprStep - lyr.FontSpacingCorrection;
                 }
             }
         }

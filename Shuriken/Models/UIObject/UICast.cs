@@ -114,7 +114,7 @@ namespace Shuriken.Models
 
             Field68 = cast.Field68;
             Field6C = cast.Field6C;
-            Field70 = cast.Field70;
+            FontSpacingCorrection = cast.FontSpacingCorrection;
 
             InfoField00 = cast.CastInfoData.Field00;
             Translation = new Vector2(cast.CastInfoData.Translation);
