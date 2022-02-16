@@ -24,7 +24,7 @@ namespace Shuriken.Rendering
         Vector4[] vPos;
         List<Quad> quads;
 
-        Dictionary<uint, string> shaderAttribs;
+        Camera camera;
 
         public readonly int MaxVertices = 10000;
         public int MaxQuads => MaxVertices / 4;
@@ -70,6 +70,10 @@ namespace Shuriken.Rendering
 
             RenderWidth = width;
             RenderHeight = height;
+
+            Models.Vector3 camPos = new Models.Vector3(RenderWidth / 2.0f, -RenderHeight / 2.0f, 990);
+            Models.Vector3 camTgt = new Models.Vector3(RenderWidth / 2.0f, -RenderHeight / 2.0f, -1);
+            camera = new Camera("Default", camPos, camTgt);
         }
         private void Init()
         {
@@ -215,7 +219,8 @@ namespace Shuriken.Rendering
         public void ConfigureShader(ShaderProgram shader)
         {
             shader.Use();
-            shader.SetMatrix4("projection", OpenTK.Mathematics.Matrix4.CreateOrthographicOffCenter(0.0f, RenderWidth, -RenderHeight, 0.0f, -100.0f, 100.0f));
+            shader.SetMatrix4("view", camera.GetViewMatrix());
+            shader.SetMatrix4("projection", camera.GetProjectionMatrix((float)RenderWidth / RenderHeight, 40));
         }
 
         /// <summary>
@@ -226,13 +231,13 @@ namespace Shuriken.Rendering
         /// <param name="rotation">The rotation of the object</param>
         /// <param name="size">The size of the object.</param>
         /// <returns>A model matrix.</returns>
-        public Matrix4x4 CreateModelMatrix(Vector2 position, Vector2 pivot, float rotation, Vector2 size)
+        public Matrix4x4 CreateModelMatrix(Vector3 position, Vector2 pivot, float rotation, Vector3 size)
         {
             Matrix4x4 model = Matrix4x4.Identity;
-            model = Matrix4x4.Multiply(model, Matrix4x4.CreateScale(size.X, size.Y, 1.0f));
+            model = Matrix4x4.Multiply(model, Matrix4x4.CreateScale(size.X, size.Y, size.Z));
             model = Matrix4x4.Multiply(model, Matrix4x4.CreateTranslation(pivot.X, pivot.Y, 0.0f));
             model = Matrix4x4.Multiply(model, Matrix4x4.CreateRotationZ(Utilities.ToRadians(rotation)));
-            model = Matrix4x4.Multiply(model, Matrix4x4.CreateTranslation(position.X, position.Y, 0.0f));
+            model = Matrix4x4.Multiply(model, Matrix4x4.CreateTranslation(position.X, position.Y, position.Z + 0.1f));
 
             return model;
         }
@@ -252,12 +257,13 @@ namespace Shuriken.Rendering
         /// <param name="br">The bottom-right tint gradient</param>
         /// <param name="bl">The bottom-left tint gradient</param>
         /// <param name="index">The draw index of the quad. A higher index indactes the quad is drawn on top of a quad with a lower index.</param>
-        public void DrawSprite(Vector2 pos, Vector2 pivot, float rot, Vector2 sz, Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 tr, Vector4 br, Vector4 bl, int index)
+        public void DrawSprite(Vector3 pos, Vector2 pivot, float rot, Vector3 sz, Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 tr, Vector4 br, Vector4 bl, int index)
         {
             bool mirrorX = (flags & 1024) != 0;
             bool mirrorY = (flags & 2048) != 0;
-            Matrix4x4 mat = CreateModelMatrix(new Vector2(pos.X, pos.Y), new Vector2(pivot.X, pivot.Y), rot, new Vector2(sz.X, sz.Y));
-            Vector2[] uvCoords = GetUVCoords(new Vector2(spr.Start.X, spr.Start.Y), new Vector2(spr.Width, spr.Height), spr.Texture.Width, spr.Texture.Height, mirrorX, mirrorY);
+            Matrix4x4 mat = CreateModelMatrix(pos, pivot, rot, sz);
+            Vector2[] uvCoords = GetUVCoords(new Vector2(spr.Start.X, spr.Start.Y), new Vector2(spr.Width, spr.Height),
+                spr.Texture.Width, spr.Texture.Height, mirrorX, mirrorY);
             
             quads.Add(new Quad(mat, uvCoords, col, tl, tr, bl, br, spr, index));
         }
