@@ -32,11 +32,11 @@ namespace XNCPLib.XNCP
         public uint Width { get; set; }
         public uint Height { get; set; }
         public uint Field58 { get; set; }
-        public uint Field5C { get; set; }
+        public uint ScreenResizeType { get; set; }
         public Vector2 Offset { get; set; }
         public float Field68 { get; set; }
         public float Field6C { get; set; }
-        public uint FontSpacingCorrection { get; set; }
+        public uint ScreenResizeType2 { get; set; }
         public CastInfo CastInfoData { get; set; }
         public CastMaterialInfo CastMaterialData { get; set; }
 
@@ -76,12 +76,12 @@ namespace XNCPLib.XNCP
             Width = reader.ReadUInt32();
             Height = reader.ReadUInt32();
             Field58 = reader.ReadUInt32();
-            Field5C = reader.ReadUInt32();
+            ScreenResizeType = reader.ReadUInt32();
 
             Offset = new Vector2(reader.ReadSingle(), reader.ReadSingle());
             Field68 = reader.ReadSingle();
             Field6C = reader.ReadSingle();
-            FontSpacingCorrection = reader.ReadUInt32();
+            ScreenResizeType2 = reader.ReadUInt32();
 
             long baseOffset = reader.GetOffsetOrigin();
 
