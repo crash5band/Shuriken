@@ -242,7 +242,16 @@ namespace AmicitiaLibrary.IO
         {
             if (SwapBytes)
                 return EndiannessHelper.Swap(base.ReadSingle());
-            return base.ReadSingle();
+            float returnvalue = 0;
+            try
+            {
+                returnvalue = base.ReadSingle();
+            }
+            catch(Exception e)
+            {
+                ///Show error window
+            }
+            return returnvalue;
         }
 
         public float[] ReadSingles(int count)
@@ -260,7 +269,16 @@ namespace AmicitiaLibrary.IO
         {
             if (SwapBytes)
                 return EndiannessHelper.Swap(base.ReadUInt32());
-            return base.ReadUInt32();
+            uint returnvalue = default(uint);
+            try
+            {
+                returnvalue = base.ReadUInt32();
+            }
+            catch(Exception)
+            {
+                //Open an error window
+            }
+            return returnvalue;
         }
 
         public uint[] ReadUInt32s(int count)
