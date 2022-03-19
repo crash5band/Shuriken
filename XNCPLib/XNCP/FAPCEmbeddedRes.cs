@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
 
 namespace XNCPLib.XNCP
 {
@@ -17,7 +17,7 @@ namespace XNCPLib.XNCP
             Content = new ChunkFile();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             Size = reader.ReadUInt32();
             Content.Read(reader);

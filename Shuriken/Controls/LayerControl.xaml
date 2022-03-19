@@ -10,8 +10,8 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              Name="LayerControlPanel"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance Type=models:UILayer}"
-             d:DesignHeight="1500" d:DesignWidth="300">
+             d:DataContext="{d:DesignInstance Type=models:UICast}"
+             d:DesignWidth="300">
     <UserControl.Resources>
         <Style TargetType="Label">
             <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -27,6 +27,7 @@
             <Setter Property="CornerRadius" Value="1"/>
         </Style>
         <converters:EnumToCollectionConverter x:Key="EnumConverter"/>
+        <converters:SpriteIDConverter x:Key="SpriteIDConverter"/>
     </UserControl.Resources>
     <ScrollViewer>
         <StackPanel>
@@ -40,7 +41,7 @@
                         <TextBox Text="{Binding Field00}"/>
 
                         <Label>Type</Label>
-                        <ComboBox ItemsSource="{Binding Type, Converter={StaticResource EnumConverter}}"
+                        <ComboBox ItemsSource="{Binding Type, Converter={StaticResource EnumConverter}, Mode=OneTime}"
                               SelectedValue="{Binding Type}" SelectedValuePath="Value" DisplayMemberPath="Description"/>
 
                         <CheckBox Content="Enabled" IsChecked="{Binding IsEnabled}" HorizontalAlignment="Left" Margin="5 10"/>
@@ -54,19 +55,10 @@
                         <TextBox Text="{Binding Width}"/>
 
                         <Label>Height</Label>
-                        <TextBlock Text="{Binding Height}"/>
+                        <TextBox Text="{Binding Height}"/>
 
-                        <Label>Top Left</Label>
-                        <local:Vector2Control Value="{Binding TopLeft}"/>
-
-                        <Label>Top Right</Label>
-                        <local:Vector2Control Value="{Binding TopRight}"/>
-
-                        <Label>Bottom Right</Label>
-                        <local:Vector2Control Value="{Binding BottomRight}"/>
-
-                        <Label>Bottom Left</Label>
-                        <local:Vector2Control Value="{Binding BottomLeft}"/>
+                        <Label>Anchor</Label>
+                        <local:Vector2Control Value="{Binding Anchor}"/>
                     </StackPanel>
                 </Border>
             </Expander>
@@ -76,14 +68,17 @@
                         <Label>Translation</Label>
                         <local:Vector2Control Value="{Binding Translation}"/>
 
+                        <Label>Z-Translation</Label>
+                        <TextBox Text="{Binding ZTranslation}"/>
+
                         <Label>Offset</Label>
                         <local:Vector2Control Value="{Binding Offset}"/>
 
                         <Label>Rotation</Label>
-                        <TextBlock Text="{Binding Rotation}"/>
+                        <TextBox Text="{Binding Rotation}"/>
 
                         <Label>Scale</Label>
-                        <local:Vector2Control Value="{Binding Scale}"/>
+                        <local:Vector3Control Value="{Binding Scale}"/>
                     </StackPanel>
                 </Border>
             </Expander>
@@ -148,8 +143,8 @@
                         <Label>Field6C</Label>
                         <TextBox Text="{Binding Field6C}"/>
 
-                        <Label>Field70</Label>
-                        <TextBox Text="{Binding Field70}"/>
+                        <Label>FontSpacingCorrection</Label>
+                        <TextBox Text="{Binding FontSpacingCorrection}"/>
 
                     </StackPanel>
                 </Border>
@@ -176,13 +171,30 @@
             </Expander>
             <Expander Header="Sprites" IsExpanded="True">
                 <Border>
-                    <ListBox ItemsSource="{Binding Sprites}" Height="100">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type models:Sprite}">
-                                <Image Source="{Binding Crop}" Width="auto" Height="30"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                    <StackPanel>
+                        <TextBox Text="{Binding DefaultSprite}"/>
+                        <ListView Name="SpriteList" ItemsSource="{Binding Sprites}" Height="100">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="LightGray" CornerRadius="2" Padding="2" MinWidth="30">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="6" ShadowDepth="2" Direction="-45" Color="#333" Opacity="0.3"/>
+                                        </Border.Effect>
+                                        <Image Name="SprImg" Tag="{Binding Converter={StaticResource SpriteIDConverter}}"
+                                               Source ="{Binding ElementName=SprImg, Path=Tag.Crop}" Width="auto" Height="30"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                        </ListView>
+                        <Button Content="Edit Sprite" HorizontalAlignment="Stretch" Margin="2"
+                                Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl, AncestorLevel=2}, Path=DataContext.ChangeCastSpriteCmd}"
+                                CommandParameter="{Binding ElementName=SpriteList, Path=SelectedIndex}"/>
+                    </StackPanel>
                 </Border>
             </Expander>
         </StackPanel>

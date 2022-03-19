@@ -14,5 +14,5 @@ void main()
 {
     uv1         = aUV1;
     color       = aColor;
-    gl_Position = vec4(aPos, 1.0) * projection;
+    gl_Position = vec4(aPos, 1.0) * view * projection;
 }

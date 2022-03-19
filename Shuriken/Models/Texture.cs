@@ -1,97 +1,75 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-using AmicitiaLibrary.Graphics.DDS;
 using Shuriken.Converters;
-using Shuriken.ViewModels;
-using OpenTK.Graphics.OpenGL;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using Shuriken.Rendering;
+using DirectXTexNet;
+using System.ComponentModel;
 
 namespace Shuriken.Models
 {
     public class Texture
     {
-        public uint ID { get; private set; }
         public string Name { get; }
-        public int Width { get; }
-        public int Height { get; }
+        public string FullName { get; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+
         public BitmapSource ImageSource { get; private set; }
-        private System.Drawing.Bitmap bitmap;
+        internal GLTexture GlTex { get; private set; }
+        public ObservableCollection<int> Sprites { get; set; }
 
-        public ObservableCollection<Sprite> Sprites { get; set; }
-        
-        private void CreateGLTexture()
+        private void CreateTexture(string filename)
         {
-            uint id = 0;
-            GL.GenTextures(1, out id);
-
-            ID = id;
-
-            GL.BindTexture(TextureTarget.Texture2D, ID);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.LinearSharpenAlphaSgis);
-
-            //Load the image
-            Image<Rgba32> image = BitmapConverter.ToImageSharpImage<Rgba32>(bitmap);
-
-            //ImageSharp loads from the top-left pixel, whereas OpenGL loads from the bottom-left, causing the texture to be flipped vertically.
-            //This will correct that, making the texture display properly.
-            image.Mutate(x => x.Flip(FlipMode.Vertical));
-
-            //Convert ImageSharp's format into a byte array, so we can use it with OpenGL.
-            var pixels = new List<byte>(4 * image.Width * image.Height);
-
-            for (int y = 0; y < image.Height; y++)
+            ScratchImage img = TexHelper.Instance.LoadFromDDSFile(filename, DDS_FLAGS.NONE);
+            if (!TexHelper.Instance.IsCompressed(img.GetImage(0).Format))
             {
-                var row = image.GetPixelRowSpan(y);
-
-                for (int x = 0; x < image.Width; x++)
-                {
-                    pixels.Add(row[x].R);
-                    pixels.Add(row[x].G);
-                    pixels.Add(row[x].B);
-                    pixels.Add(row[x].A);
-                }
+                img = img.Compress(DXGI_FORMAT.BC3_UNORM, TEX_COMPRESS_FLAGS.DEFAULT, 0.5f);
             }
 
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Width, Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels.ToArray());
+            CreateBitmap(img.Decompress(DXGI_FORMAT.B8G8R8A8_UNORM));
+
+            img = img.Decompress(DXGI_FORMAT.R8G8B8A8_UNORM).FlipRotate(TEX_FR_FLAGS.FLIP_VERTICAL);
+
+            Width = img.GetImage(0).Width;
+            Height = img.GetImage(0).Height;
+
+            GlTex = new GLTexture(img.GetImage(0).Pixels, Width, Height);
+
+            img.Dispose();
         }
 
-        public void Use()
+        private void CreateBitmap(ScratchImage img)
         {
-            GL.BindTexture(TextureTarget.Texture2D, ID);
+            var bmp = BitmapConverter.FromTextureImage(img, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            ImageSource = BitmapConverter.FromBitmap(bmp);
+
+            img.Dispose();
+            bmp.Dispose();
         }
 
         public Texture(string filename)
         {
+            FullName = filename;
             Name = Path.GetFileNameWithoutExtension(filename);
-            bitmap = DDSCodec.DecompressImage(filename);
-            ImageSource = BitmapConverter.Bitmap2BitmapImage(bitmap);
-            Width = ImageSource.PixelWidth;
-            Height = ImageSource.PixelHeight;
-            Sprites = new ObservableCollection<Sprite>();
+            CreateTexture(filename);
 
-            CreateGLTexture();
+            Sprites = new ObservableCollection<int>();
         }
 
         public Texture()
         {
-            Name = "";
-            Width = 0;
-            Height = 0;
+            Name = FullName = "";
+            Width = Height = 0;
             ImageSource = null;
-            Sprites = new ObservableCollection<Sprite>();
+            GlTex = null;
+
+            Sprites = new ObservableCollection<int>();
         }
     }
 }

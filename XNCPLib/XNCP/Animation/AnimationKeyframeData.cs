@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP.Animation
 {
@@ -18,7 +20,7 @@ namespace XNCPLib.XNCP.Animation
             GroupAnimationDataList = new List<GroupAnimationData>();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             GroupCount = reader.ReadUInt32();
             GroupDataOffset = reader.ReadUInt32();
@@ -27,7 +29,7 @@ namespace XNCPLib.XNCP.Animation
 
             for (int i = 0; i < GroupCount; ++i)
             {
-                reader.SeekBegin(reader.PeekBaseOffset() + GroupDataOffset + (8 * i));
+                reader.Seek(reader.GetOffsetOrigin() + GroupDataOffset + (8 * i), SeekOrigin.Begin);
 
                 GroupAnimationData groupData = new GroupAnimationData();
                 groupData.Read(reader);
@@ -53,7 +55,7 @@ namespace XNCPLib.XNCP.Animation
         public uint Field00 { get; set; }
         public float FrameCount { get; set; }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             Field00 = reader.ReadUInt32();
             FrameCount = reader.ReadSingle();

@@ -14,30 +14,40 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="1200">
     <Grid>
+        <!--Main layout [other controls - properties panel]-->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
+        
+        <!-- Main layout -->
         <Grid Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
+
+            <!-- Scenes / Animation divider-->
             <Grid.RowDefinitions>
-                <RowDefinition Height="3*"/>
+                <RowDefinition Height="9*"/>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="1*"/>
+                <RowDefinition Height="4*"/>
             </Grid.RowDefinitions>
+
+            <!-- Scenes tree view-->
             <Grid Grid.Row="0" Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="Scenes" Margin="5"/>
-                <TreeView Grid.Row="1" Name="ScenesTreeView" ItemsSource="{Binding Scenes}" TreeViewItem.Selected="ScenesTreeViewSelected">
+                <TextBlock>
+                    <Run Text="&#xf008;" FontFamily="{StaticResource FontAwesome}"/>
+                    <Run Text="Scenes"/>
+                </TextBlock>
+                <TreeView Grid.Row="1" Name="ScenesTreeView" TreeViewItem.Selected="ScenesTreeViewSelected" TreeView.SelectedItemChanged="SelectedItemChanged" ItemsSource="{Binding Scenes}">
                     <TreeView.Resources>
                         <HierarchicalDataTemplate DataType="{x:Type models:UIScene}" ItemsSource="{Binding Groups}">
                             <StackPanel Orientation="Horizontal">
@@ -46,45 +56,78 @@
                                 <Run Text="&#xf61f; " FontFamily="{StaticResource FontAwesome}"/>
                                 <Run Text="{Binding Name}"/>
                                 </TextBlock>
+                                <StackPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="New Group"/>
+                                        <MenuItem Header="Remove"/>
+                                    </ContextMenu>
+                                </StackPanel.ContextMenu>
                             </StackPanel>
                         </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type models:LayerGroup}" ItemsSource="{Binding Layers}">
+                        <HierarchicalDataTemplate DataType="{x:Type models:UICastGroup}" ItemsSource="{Binding Casts}">
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
                                 <TextBlock>
                                 <Run Text="&#xf5fd; " FontFamily="{StaticResource FontAwesome}"/>
                                 <Run Text="{Binding Name}"/>
                                 </TextBlock>
+                                <StackPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="New Cast"/>
+                                        <MenuItem Header="Remove"/>
+                                    </ContextMenu>
+                                </StackPanel.ContextMenu>
                             </StackPanel>
                         </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type models:UILayer}" ItemsSource="{Binding Children}">
+                        <HierarchicalDataTemplate DataType="{x:Type models:UICast}" ItemsSource="{Binding Children}">
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
                                 <TextBlock>
                                 <Run Text="&#xf111; " FontFamily="{StaticResource FontAwesome}"/>
                                 <Run Text="{Binding Name}"/>
                                 </TextBlock>
+                                <StackPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="New Cast"/>
+                                        <MenuItem Header="Remove"/>
+                                    </ContextMenu>
+                                </StackPanel.ContextMenu>
                             </StackPanel>
                         </HierarchicalDataTemplate>
                     </TreeView.Resources>
                 </TreeView>
+                
+                <!-- creation / deletion buttons -->
                 <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Content="Create Scene" HorizontalAlignment="Stretch" Margin="5"
-                        Command="{Binding CreateSceneCmd}"/>
-                    <Button Grid.Column="1" Content="Remove Scene" HorizontalAlignment="Stretch" Margin="0 5 5 5"
-                        Command="{Binding RemoveSceneCmd}"/>
+                    <Button Grid.Column="0" Content="+C" Command="{Binding CreateCastCmd}"/>
+                    <Button Grid.Column="1" Content="-C" Command="{Binding RemoveCastCmd}"/>
+                    <Button Grid.Column="2" Content="+G" Command="{Binding CreateGroupCmd}"/>
+                    <Button Grid.Column="3" Content="-G" Command="{Binding RemoveGroupCmd}"/>
+                    <Button Grid.Column="4" Content="+S" Command="{Binding CreateSceneCmd}"/>
+                    <Button Grid.Column="5" Content="-S" Command="{Binding RemoveSceneCmd}"/>
                 </Grid>
             </Grid>
+
+            <!-- Horizontal resize splitter [scenes tree view - scene viewer]-->
+            <GridSplitter Grid.Row="0" Grid.Column="1" Width="5" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Margin="2.5 0"/>
+
+            <!-- Scene viewer (opengl control)-->
             <Grid Grid.Row="0" Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                
+                <!-- gl control -->
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                     <Border Width="1280" Height="720" RenderTransformOrigin="0.5, 0.5" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="2">
                         <Border.LayoutTransform>
                             <ScaleTransform ScaleX="{Binding Zoom}" ScaleY="{Binding Zoom}"/>
@@ -96,6 +139,8 @@
                         </gl:GLWpfControl>
                     </Border>
                 </ScrollViewer>
+                
+                <!-- scene viewer toolbar -->
                 <StackPanel Grid.Row="1" Margin="0" Orientation="Horizontal">
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5 0">
                         <Button Style="{StaticResource TransparentButton}" ToolTip="Fit to screen">
@@ -117,7 +162,7 @@
                         </Button>
                     </StackPanel>
                     <TextBlock Text="{Binding Zoom, StringFormat={}{0:P2}, FallbackValue=100%}" VerticalAlignment="Center"/>
-                    <Separator Margin="5 0"/>
+                    <Separator HorizontalAlignment="Center" VerticalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5"/>
                     <Button Style="{StaticResource TransparentButton}" ToolTip="Screenshot">
                         <Button.Content>
                             <TextBlock Text="&#xf030;" FontFamily="{StaticResource FontAwesome}"/>
@@ -179,25 +224,23 @@
                             <TextBlock Text="&#xf2f9;" FontFamily="{StaticResource FontAwesome}"/>
                         </Button.Content>
                     </Button>
+                    <Separator HorizontalAlignment="Center" VerticalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5"/>
                     <TextBlock Margin="5 0" VerticalAlignment="Center" HorizontalAlignment="Right">
                         <Run Text="Frame: "/>
                         <Run Text="{Binding Time, StringFormat={}{0:0.}, FallbackValue=69}"/>
                     </TextBlock>
                 </StackPanel>
             </Grid>
+            
+            <!-- Vertical resize splitter [scenes - animations]-->
             <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Height="5" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Margin="0 2.5" HorizontalAlignment="Stretch"/>
-            <GridSplitter Grid.Row="0" Grid.Column="1" Width="5" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Margin="2.5 0"/>
             <controls:AnimationTimeline Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Animations="{Binding SelectedScene.Animations, Mode=TwoWay}"/>
         </Grid>
 
-        <GridSplitter Grid.Column="1" Width="5" ResizeBehavior="PreviousAndNext" Margin="2.5 0"/>
+        <!-- Horizontal resize splitter [other controls - properties panel]-->
+        <GridSplitter Grid.Row="0" Grid.Column="1" Width="5" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Margin="2.5 0"/>
 
-        <Grid Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="3*"/>
-                <RowDefinition Height="1*"/>
-            </Grid.RowDefinitions>
-        </Grid>
+        <!-- Properties panel -->
         <Grid Grid.Column="4">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>

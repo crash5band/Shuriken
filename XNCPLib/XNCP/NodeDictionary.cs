@@ -8,12 +8,12 @@ namespace XNCPLib.XNCP
 {
     public class NodeDictionary
     {
-        public StringOffset Name { get; set; }
+        public string Name { get; set; }
         public uint Index { get; set; }
 
         public NodeDictionary()
         {
-            Name = new StringOffset();
+
         }
     }
 }

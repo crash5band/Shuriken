@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
 
 namespace XNCPLib.XNCP
 {
@@ -16,7 +16,7 @@ namespace XNCPLib.XNCP
             SubImageIndices = new int[32];
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             for (int i = 0; i < 32; ++i)
                 SubImageIndices[i] = reader.ReadInt32();

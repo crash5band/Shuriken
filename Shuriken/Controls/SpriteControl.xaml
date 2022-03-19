@@ -9,50 +9,48 @@
              mc:Ignorable="d"
              d:DesignHeight="200" d:DesignWidth="400"  BorderBrush="{DynamicResource BorderBrush}" BorderThickness="2">
     <Grid Name="LayoutRoot">
-        <ScrollViewer Margin="5">
-            <ScrollViewer.Resources>
-                <Style TargetType="{x:Type TextBlock}">
-                    <Setter Property="Margin" Value="5 0"/>
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="HorizontalAlignment" Value="Left"/>
-                </Style>
-            </ScrollViewer.Resources>
-            <StackPanel>
-                <Grid>
+        <Grid.Resources>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="Margin" Value="5 0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+            </Style>
+        </Grid.Resources>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="5"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="5"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
                     </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="3*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                        </Grid.RowDefinitions>
 
-                        <TextBlock Text="X" Grid.Row="0" Grid.Column="0"/>
-                        <TextBlock Text="Y" Grid.Row="0" Grid.Column="2"/>
-                        <TextBlock Text="Width" Grid.Row="2" Grid.Column="0"/>
-                        <TextBlock Text="Height" Grid.Row="2" Grid.Column="2"/>
+                    <TextBlock Text="X" Grid.Row="0" Grid.Column="0"/>
+                    <TextBlock Text="Y" Grid.Row="0" Grid.Column="2"/>
+                    <TextBlock Text="Width" Grid.Row="2" Grid.Column="0"/>
+                    <TextBlock Text="Height" Grid.Row="2" Grid.Column="2"/>
 
-                        <TextBlock Text="{Binding Sprite.X}" Grid.Row="0" Grid.Column="1"/>
-                        <TextBlock Text="{Binding Sprite.Y}" Grid.Row="0" Grid.Column="3"/>
-                        <TextBlock Text="{Binding Sprite.Width}" Grid.Row="2" Grid.Column="1"/>
-                        <TextBlock Text="{Binding Sprite.Height}" Grid.Row="2" Grid.Column="3"/>
-                    </Grid>
+                    <TextBox Text="{Binding Sprite.X}" Grid.Row="0" Grid.Column="1"/>
+                    <TextBox Text="{Binding Sprite.Y}" Grid.Row="0" Grid.Column="3"/>
+                    <TextBox Text="{Binding Sprite.Width}" Grid.Row="2" Grid.Column="1"/>
+                    <TextBox Text="{Binding Sprite.Height}" Grid.Row="2" Grid.Column="3"/>
+                </Grid>
 
-                    <Separator Grid.Row="1"/>
-                    <Image Source="{Binding Sprite.Crop}" Grid.Row="2"
+                <Separator Grid.Row="1"/>
+                <Image Source="{Binding Sprite.Crop}" Grid.Row="2"
                            MaxWidth="{Binding Sprite.Width}" MaxHeight="{Binding Sprite.Height}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Grid>
-            </StackPanel>
+            </Grid>
         </ScrollViewer>
     </Grid>
 </UserControl>

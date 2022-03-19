@@ -7,10 +7,10 @@
     <DataTemplate DataType="{x:Type models:UIScene}">
         <controls:SceneControl/>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type models:LayerGroup}">
+    <DataTemplate DataType="{x:Type models:UICastGroup}">
         <controls:GroupControl/>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type models:UILayer}">
+    <DataTemplate DataType="{x:Type models:UICast}">
         <controls:LayerControl/>
     </DataTemplate>
 

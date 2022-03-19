@@ -51,7 +51,7 @@ namespace Shuriken.Misc
             return (int)(v * factor);
         }
 
-        public static Sprite FindSpriteFromNCPScene(int spriteIndex, List<SubImage> spriteList, ObservableCollection<Texture> textures)
+        public static int FindSpriteIDFromNCPScene(int spriteIndex, List<SubImage> spriteList, ObservableCollection<Texture> textures)
         {
             if (spriteIndex >= 0 && spriteIndex < spriteList.Count)
             {
@@ -67,9 +67,10 @@ namespace Shuriken.Misc
                         int w = ToPixels(target.BottomRight.X - target.TopLeft.X, textures[textureIndex].Width);
                         int h = ToPixels(target.BottomRight.Y - target.TopLeft.Y, textures[textureIndex].Height);
 
-                        if (sprites[s].X == x && sprites[s].Y == y
-                            && sprites[s].Width == w
-                            && sprites[s].Height == h)
+                        var spr = Project.TryGetSprite(sprites[s]);
+                        if (spr.X == x && spr.Y == y
+                            && spr.Width == w
+                            && spr.Height == h)
                         {
                             return textures[textureIndex].Sprites[s];
                         }
@@ -77,7 +78,7 @@ namespace Shuriken.Misc
                 }
             }
 
-            return null;
+            return -1;
         }
     }
 }

@@ -21,21 +21,20 @@ namespace Shuriken.Rendering
         public Dictionary<string, ShaderProgram> shaderDictionary;
 
         Vertex[] buffer;
-        Vector2[] uvCoords;
         Vector4[] vPos;
         List<Quad> quads;
 
-        Dictionary<uint, string> shaderAttribs;
+        Camera camera;
 
         public readonly int MaxVertices = 10000;
         public int MaxQuads => MaxVertices / 4;
         public int MaxIndices => MaxQuads * 6;
 
         public int NumVertices { get; private set; }
-        public int NumQuads { get; private set; }
+        public int NumQuads => quads.Count;
         public int NumIndices { get; private set; }
         public int BufferPos { get; private set; }
-        public uint TexID { get; set; }
+        public int TexID { get; set; }
         public bool BatchStarted { get; private set; }
         public int RenderWidth { get; set; }
         public int RenderHeight { get; set; }
@@ -45,8 +44,11 @@ namespace Shuriken.Rendering
             shaderDictionary = new Dictionary<string, ShaderProgram>();
 
             ShaderProgram basicShader = new ShaderProgram("basic", Path.Combine(shadersDir, "basic.vert"), Path.Combine(shadersDir, "basic.frag"));
+            ShaderProgram boxShader = new ShaderProgram("box", Path.Combine(shadersDir, "bb.vert"), Path.Combine(shadersDir, "bb.frag"));
             shaderDictionary.Add(basicShader.Name, basicShader);
+            shaderDictionary.Add(boxShader.Name, boxShader);
 
+            // setup vertex indices
             indices = new uint[MaxIndices];
             uint offset = 0;
             for (uint index = 0; index < MaxIndices; index += 6)
@@ -63,14 +65,19 @@ namespace Shuriken.Rendering
             }
 
             buffer = new Vertex[MaxVertices];
-            quads = new List<Quad>();
+            quads = new List<Quad>(MaxQuads);
             Init();
 
             RenderWidth = width;
             RenderHeight = height;
+
+            Models.Vector3 camPos = new Models.Vector3(RenderWidth / 2.0f, -RenderHeight / 2.0f, 990);
+            Models.Vector3 camTgt = new Models.Vector3(RenderWidth / 2.0f, -RenderHeight / 2.0f, -1);
+            camera = new Camera("Default", camPos, camTgt);
         }
         private void Init()
         {
+            // 3 floats for pos, 4 floats for color, 2 floats for UVs
             const int stride = 10 * sizeof(float);
 
             GL.GenVertexArrays(1, out vao);
@@ -100,29 +107,26 @@ namespace Shuriken.Rendering
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindVertexArray(0);
 
-            uvCoords = new Vector2[4];
-            uvCoords[0] = new Vector2(1.0f, 1.0f);
-            uvCoords[1] = new Vector2(1.0f, 0.0f);
-            uvCoords[2] = new Vector2(0.0f, 0.0f);
-            uvCoords[3] = new Vector2(0.0f, 1.0f);
-
             // top-right, bottom-right, top-left, bottom-left
             vPos = new Vector4[4];
             vPos[0] = new Vector4(0.5f, 0.5f, 0.0f, 1.0f);
             vPos[1] = new Vector4(0.5f, -0.5f, 0.0f, 1.0f);
             vPos[2] = new Vector4(-0.5f, -0.5f, 0.0f, 1.0f);
             vPos[3] = new Vector4(-0.5f, 0.5f, 0.0f, 1.0f);
-
-
         }
 
+        /// <summary>
+        /// Resets the number of quads, vertices, and indices.
+        /// </summary>
         private void ResetRenderStats()
         {
-            NumQuads = 0;
             NumIndices = 0;
             NumVertices = 0;
         }
 
+        /// <summary>
+        /// Starts a new rendering batch.
+        /// </summary>
         public void BeginBatch()
         {
             BufferPos = 0;
@@ -131,10 +135,14 @@ namespace Shuriken.Rendering
             ResetRenderStats();
         }
 
+        /// <summary>
+        /// Ends the current rendering batch and flushes the vertex buffer
+        /// </summary>
         public void EndBatch()
         {
             GL.BindVertexArray(vao);
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
             GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, BufferPos * 4 * 10, buffer);
 
             Flush();
@@ -142,15 +150,25 @@ namespace Shuriken.Rendering
             BatchStarted = false;
         }
 
-        public void Flush()
+        private void Flush()
         {
+            ConfigureShader(shaderDictionary["basic"]);
             GL.DrawElements(PrimitiveType.Triangles, NumIndices, DrawElementsType.UnsignedInt, 0);
         }
 
-        public Vector2[] GetUVCoords(Vector2 sprStart, Vector2 sprSize, float texWidth, float texHeight, bool mirrorX, bool mirrorY)
+        /// <summary>
+        /// Gets the UV coords of the texture from the supplied sprite parameters.
+        /// </summary>
+        /// <param name="sprStart">The start coordinates of the sprite.</param>
+        /// <param name="sprSize">The dimensions of the sprite.</param>
+        /// <param name="texWidth">The width of the texture.</param>
+        /// <param name="texHeight">The height of the texture.</param>
+        /// <param name="flipX">Whether the X coordinates of the sprite are flipped.</param>
+        /// <param name="flipY">Whether the Y coordinates of the sprite are flipped.</param>
+        /// <returns></returns>
+        public Vector2[] GetUVCoords(Vector2 sprStart, Vector2 sprSize, float texWidth, float texHeight, bool flipX, bool flipY)
         {
             // Order: top-right, bottom-right, bottom-left, top-left
-            Vector2[] uvCoords = new Vector2[4];
             Vector2 start = new Vector2(sprStart.X, sprStart.Y);
             Vector2 end = start + new Vector2(sprSize.X, sprSize.Y);
 
@@ -159,17 +177,21 @@ namespace Shuriken.Rendering
             float top = 1 - (start.Y / texHeight);
             float bottom = 1 - (end.Y / texHeight);
 
-            uvCoords[0] = new Vector2(mirrorX ? left : right, mirrorY ? bottom : top);
-            uvCoords[1] = new Vector2(mirrorX ? left : right, mirrorY ? top : bottom);
-            uvCoords[2] = new Vector2(mirrorX ? right : left, mirrorY ? top : bottom);
-            uvCoords[3] = new Vector2(mirrorX ? right : left, mirrorY ? bottom : top);
-
-            return uvCoords;
+            return new Vector2[4]
+            {
+                new Vector2(flipX ? left : right, flipY ? bottom : top),
+                new Vector2(flipX ? left : right, flipY ? top : bottom),
+                new Vector2(flipX ? right : left, flipY ? top : bottom),
+                new Vector2(flipX ? right : left, flipY ? bottom : top)
+            };
         }
 
+        /// <summary>
+        /// Pushes the quad parameters onto the vertex buffer.
+        /// </summary>
+        /// <param name="q">The quad to push to the buffer.</param>
         public void PushQuadBuffer(Quad q)
         {
-
             int offset = 0;
             buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], q.M);
             buffer[BufferPos + offset].Color = q.Color * q.TopRight;
@@ -191,37 +213,64 @@ namespace Shuriken.Rendering
             buffer[BufferPos + offset].UV = q.UVCoords[offset];
 
             BufferPos += 4;
-            ++NumQuads;
             NumIndices += 6;
         }
 
         public void ConfigureShader(ShaderProgram shader)
         {
             shader.Use();
-            shader.SetMatrix4("projection", OpenTK.Mathematics.Matrix4.CreateOrthographicOffCenter(0.0f, RenderWidth, -RenderHeight, 0.0f, -100.0f, 100.0f));
+            shader.SetMatrix4("view", camera.GetViewMatrix());
+            shader.SetMatrix4("projection", camera.GetProjectionMatrix((float)RenderWidth / RenderHeight, 40));
         }
 
-        public Matrix4x4 CreateModelMatrix(Vector2 position, int drawIndex, Vector2 pivot, float rotation, Vector2 size)
+        /// <summary>
+        /// Creates a model matrix from the given parameters.
+        /// </summary>
+        /// <param name="position">The position of the object.</param>
+        /// <param name="pivot">The pivot around which the object rotates.</param>
+        /// <param name="rotation">The rotation of the object</param>
+        /// <param name="size">The size of the object.</param>
+        /// <returns>A model matrix.</returns>
+        public Matrix4x4 CreateModelMatrix(Vector3 position, Vector2 pivot, float rotation, Vector3 size)
         {
             Matrix4x4 model = Matrix4x4.Identity;
-            model = Matrix4x4.Multiply(model, Matrix4x4.CreateScale(size.X, size.Y, 1.0f));
+            model = Matrix4x4.Multiply(model, Matrix4x4.CreateScale(size.X, size.Y, size.Z));
             model = Matrix4x4.Multiply(model, Matrix4x4.CreateTranslation(pivot.X, pivot.Y, 0.0f));
             model = Matrix4x4.Multiply(model, Matrix4x4.CreateRotationZ(Utilities.ToRadians(rotation)));
-            model = Matrix4x4.Multiply(model, Matrix4x4.CreateTranslation(position.X, position.Y, 0.0f));
+            model = Matrix4x4.Multiply(model, Matrix4x4.CreateTranslation(position.X, position.Y, position.Z + 0.1f));
 
             return model;
         }
 
-        public void DrawSprite(Vector2 pos, Vector2 pivot, float rot, Vector2 sz, Shuriken.Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 tr, Vector4 br, Vector4 bl, int index)
+        /// <summary>
+        /// Adds a quad given its sprite and world transform to the quad buffer.
+        /// </summary>
+        /// <param name="pos">The position of the quad.</param>
+        /// <param name="pivot">The pivot around which the quad rotates.</param>
+        /// <param name="rot">The rotation of the quad.</param>
+        /// <param name="sz">The size of the quad.</param>
+        /// <param name="spr">The sprite used to draw the quad.</param>
+        /// <param name="flags"></param>
+        /// <param name="col">The tint color/</param>
+        /// <param name="tl">The top-left tint gradient</param>
+        /// <param name="tr">The top-right tint gradient</param>
+        /// <param name="br">The bottom-right tint gradient</param>
+        /// <param name="bl">The bottom-left tint gradient</param>
+        /// <param name="index">The draw index of the quad. A higher index indactes the quad is drawn on top of a quad with a lower index.</param>
+        public void DrawSprite(Vector3 pos, Vector2 pivot, float rot, Vector3 sz, Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 tr, Vector4 br, Vector4 bl, int index)
         {
             bool mirrorX = (flags & 1024) != 0;
             bool mirrorY = (flags & 2048) != 0;
-            Matrix4x4 mat = CreateModelMatrix(new Vector2(pos.X, pos.Y), index, new Vector2(pivot.X, pivot.Y), rot, new Vector2(sz.X, sz.Y));
-            Vector2[] uvCoords = GetUVCoords(new Vector2(spr.Start.X, spr.Start.Y), new Vector2(spr.Width, spr.Height), spr.Texture.Width, spr.Texture.Height, mirrorX, mirrorY);
+            Matrix4x4 mat = CreateModelMatrix(pos, pivot, rot, sz);
+            Vector2[] uvCoords = GetUVCoords(new Vector2(spr.Start.X, spr.Start.Y), new Vector2(spr.Width, spr.Height),
+                spr.Texture.Width, spr.Texture.Height, mirrorX, mirrorY);
+            
             quads.Add(new Quad(mat, uvCoords, col, tl, tr, bl, br, spr, index));
-            //PushQuadBuffer(mat, GetUVCoords(new Vector2(spr.Start.X, spr.Start.Y), new Vector2(spr.Dimensions.X, spr.Dimensions.Y), spr.Texture.Width, spr.Texture.Height, mirrorX, mirrorY), col, tr, br, bl, tl);
         }
 
+        /// <summary>
+        /// Clears the quad buffer and starts a new rendering batch.
+        /// </summary>
         public void Start()
         {
             quads.Clear();
@@ -230,28 +279,33 @@ namespace Shuriken.Rendering
             BeginBatch();
         }
 
+        /// <summary>
+        /// Draws the quads in the quad buffer.
+        /// </summary>
         public void End()
         {
             quads.Sort();
             foreach (var quad in quads)
             {
-                if (quad.Sprite.Texture.ID != TexID)
+                int id = quad.Sprite.Texture.GlTex.ID;
+                if (id != TexID)
                 {
                     EndBatch();
                     BeginBatch();
-                    quad.Sprite.Texture.Use();
-                    TexID = quad.Sprite.Texture.ID;
+                    quad.Sprite.Texture.GlTex.Bind();
+                    TexID = id;
                 }
 
+                if (NumVertices + 4 > MaxVertices)
+                {
+                    EndBatch();
+                    BeginBatch();
+                }
                 PushQuadBuffer(quad);
             }
 
-            EndBatch();
-        }
-
-        public void DrawBoundingBox(BoundingBox box)
-        {
-
+            if (BatchStarted)
+                EndBatch();
         }
     }
 }

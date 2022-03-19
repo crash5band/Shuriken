@@ -42,7 +42,7 @@ namespace Shuriken.Controls
             set
             {
                 mousePos = value;
-                NotifyPropertyChanged();
+                ;
             }
         }
 
@@ -54,7 +54,7 @@ namespace Shuriken.Controls
             {
                 zoom = value;
                 SelectionBorder.LayoutTransform = new ScaleTransform(zoom, zoom);
-                NotifyPropertyChanged();
+                ;
             }
         }
 

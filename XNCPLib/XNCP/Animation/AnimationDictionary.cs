@@ -3,23 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP.Animation
 {
     public class AnimationDictionary
     {
-        public StringOffset Name { get; set; }
+        public string Name { get; set; }
         public uint Index { get; set; }
 
         public AnimationDictionary()
         {
-            Name = new StringOffset();
+
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
-            Name.Read(reader);
+            uint nameOffset = reader.ReadUInt32();
+            Name = reader.ReadStringOffset(nameOffset);
             Index = reader.ReadUInt32();
         }
     }

@@ -11,39 +11,13 @@ namespace Shuriken.Models.Animation
 {
     public class AnimationGroup : INotifyPropertyChanged
     {
-        private float time;
-        public float Time
-        {
-            get => time;
-            set
-            {
-                time = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private bool enabled;
-        public bool Enabled
-        {
-            get => enabled;
-            set
-            {
-                enabled = value;
-                NotifyPropertyChanged();
-            }
-        }
+        public float Time { get; set; }
+        public bool Enabled { get; set; }
 
         public string Name { get; set; }
         public uint Field00 { get; set; }
         public float Duration { get; set; }
         public ObservableCollection<AnimationList> LayerAnimations { get; set; }
-
-        public AnimationGroup(string name)
-        {
-            Name = name;
-            Enabled = true;
-            LayerAnimations = new ObservableCollection<AnimationList>();
-        }
 
         public void AddTime(float delta)
         {
@@ -55,7 +29,7 @@ namespace Shuriken.Models.Animation
             Time = 0.0f;
         }
 
-        public bool LayerHasAnimation(UILayer layer, AnimationType type)
+        public bool LayerHasAnimation(UICast layer, AnimationType type)
         {
             foreach (var animation in LayerAnimations)
             {
@@ -72,7 +46,7 @@ namespace Shuriken.Models.Animation
             return false;
         }
 
-        public AnimationTrack GetTrack(UILayer layer, AnimationType type)
+        public AnimationTrack GetTrack(UICast layer, AnimationType type)
         {
             foreach (var animation in LayerAnimations)
             {
@@ -86,10 +60,11 @@ namespace Shuriken.Models.Animation
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        public AnimationGroup(string name)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            Name = name;
+            Enabled = true;
+            LayerAnimations = new ObservableCollection<AnimationList>();
         }
     }
 }

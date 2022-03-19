@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
 
 namespace XNCPLib.XNCP
 {
@@ -13,12 +13,12 @@ namespace XNCPLib.XNCP
         public uint Size { get; set; }
         public uint EndPosition { get; set; }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
-            bool bigEndian = reader.Endianness == Endianness.BigEndian;
+            bool bigEndian = reader.Endianness == Endianness.Big;
 
             // Header is always little endian
-            reader.Endianness = Endianness.LittleEndian;
+            reader.Endianness = Endianness.Little;
 
             long startPosition = reader.Position;
             Signature = reader.ReadUInt32();
@@ -27,7 +27,7 @@ namespace XNCPLib.XNCP
 
             if (bigEndian)
             {
-                reader.Endianness = Endianness.BigEndian;
+                reader.Endianness = Endianness.Big;
             }
         }
     }

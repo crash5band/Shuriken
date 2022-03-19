@@ -18,12 +18,20 @@ namespace Shuriken.ViewModels
     {
         public static string AppVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-        public ObservableCollection<string> MissingTextures { get; set; }
+        public List<string> MissingTextures { get; set; }
         public ObservableCollection<ViewModelBase> Editors { get; set; }
 
         public MainViewModel()
         {
-            MissingTextures = new ObservableCollection<string>();
+            MissingTextures = new List<string>();
+
+            Editors = new ObservableCollection<ViewModelBase>
+            {
+                new ScenesViewModel(),
+                new SpritesViewModel(),
+                new FontsViewModel(),
+                new AboutViewModel()
+            };
 #if DEBUG
             //LoadTestXNCP();
 #endif
@@ -55,11 +63,11 @@ namespace Shuriken.ViewModels
             TextureList texList = new TextureList("textures");
             foreach (XTexture texture in xTextures)
             {
-                string texPath = Path.Combine(root, texture.Name.Value);
+                string texPath = Path.Combine(root, texture.Name);
                 if (File.Exists(texPath))
                     texList.Textures.Add(new Texture(texPath));
                 else
-                    MissingTextures.Add(texture.Name.Value);
+                    MissingTextures.Add(texture.Name);
             }
 
             if (MissingTextures.Count > 0)
@@ -75,20 +83,20 @@ namespace Shuriken.ViewModels
                     int textureIndex = (int)subimage.TextureIndex;
                     if (textureIndex >= 0 && textureIndex < texList.Textures.Count)
                     {
-                        Sprite spr = new Sprite(texList.Textures[textureIndex], subimage.TopLeft.Y, subimage.TopLeft.X,
+                        int id = Project.CreateSprite(texList.Textures[textureIndex], subimage.TopLeft.Y, subimage.TopLeft.X,
                             subimage.BottomRight.Y, subimage.BottomRight.X);
-
-                        texList.Textures[textureIndex].Sprites.Add(spr);
+                        
+                        texList.Textures[textureIndex].Sprites.Add(id);
                     }
                 }
             }
 
             foreach (var entry in xFontList.FontIDTable)
             {
-                UIFont font = new UIFont(entry.Name.Value);
+                UIFont font = new UIFont(entry.Name);
                 foreach (var mapping in xFontList.Fonts[(int)entry.Index].CharacterMappings)
                 {
-                    var sprite = Utilities.FindSpriteFromNCPScene((int)mapping.SubImageIndex, xScenes[0].SubImages, texList.Textures);
+                    var sprite = Utilities.FindSpriteIDFromNCPScene((int)mapping.SubImageIndex, xScenes[0].SubImages, texList.Textures);
                     font.Mappings.Add(new Models.CharacterMapping(mapping.SourceCharacter, sprite));
                 }
 
@@ -96,7 +104,7 @@ namespace Shuriken.ViewModels
             }
 
             foreach (SceneID sceneID in xIDs)
-                Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name.Value, texList, Project.Fonts));
+                Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name, texList, Project.Fonts));
 
             Project.TextureLists.Add(texList);
         }
@@ -113,6 +121,8 @@ namespace Shuriken.ViewModels
             builder.AppendLine("The loaded UI file uses textures that were not found.\n");
             foreach (var texture in MissingTextures)
                 builder.AppendLine(texture);
+
+            MessageBox.Show(builder.ToString(), "Missing Textures", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 }

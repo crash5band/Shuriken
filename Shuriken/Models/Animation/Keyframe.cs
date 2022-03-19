@@ -14,20 +14,20 @@ namespace Shuriken.Models.Animation
         public int Frame
         {
             get => frame;
-            set { frame = value; NotifyPropertyChanged(); }
+            set
+            {
+                if (value >= 0)
+                    frame = value;
+            }
         }
 
-        private float kValue;
-        public float KValue
-        {
-            get => kValue;
-            set { kValue = value; NotifyPropertyChanged(); }
-        }
+        public float KValue { get; set; }
         public int Field08 { get; set; }
         public float Offset1 { get; set; }
         public float Offset2 { get; set; }
         public int Field14 { get; set; }
 
+        public event PropertyChangedEventHandler PropertyChanged;
         public Keyframe()
         {
             Frame = 0;
@@ -46,12 +46,6 @@ namespace Shuriken.Models.Animation
             Offset1 = k.Offset1;
             Offset2 = k.Offset2;
             Field14 = (int)k.Field14;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

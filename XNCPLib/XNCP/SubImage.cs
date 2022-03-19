@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
 
 namespace XNCPLib.XNCP
 {
@@ -21,7 +21,7 @@ namespace XNCPLib.XNCP
             BottomRight = new Vector2(1.0f, 1.0f);
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             TextureIndex = reader.ReadUInt32();
             TopLeft     = new Vector2(reader.ReadSingle(), reader.ReadSingle());

@@ -1,10 +1,13 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
-using AmicitiaLibrary.IO;
+using Amicitia.IO.Binary;
+using XNCPLib.Extensions;
+using XNCPLib.Misc;
 
 namespace XNCPLib.XNCP.Animation
 {
@@ -19,21 +22,21 @@ namespace XNCPLib.XNCP.Animation
             SubDataList = new List<CastAnimationSubData>();
         }
 
-        public void Read(EndianBinaryReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             Flags = reader.ReadUInt32();
             DataOffset = reader.ReadUInt32();
 
             if (DataOffset > 0)
             {
-                reader.SeekBegin(reader.PeekBaseOffset() + DataOffset);
-                uint count = Utilities.Utilities.CountSetBits(Flags);
+                reader.Seek(reader.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
+                uint count = Utilities.CountSetBits(Flags);
                 SubDataList.Capacity = (int)count;
 
 
                 for (int i = 0; i < count; ++i)
                 {
-                    reader.SeekBegin(reader.PeekBaseOffset() + DataOffset + (12 * i));
+                    reader.Seek(reader.GetOffsetOrigin() + DataOffset + (12 * i), SeekOrigin.Begin);
                     CastAnimationSubData subData = new CastAnimationSubData();
                     subData.Read(reader);
                     SubDataList.Add(subData);
@@ -54,7 +57,7 @@ namespace XNCPLib.XNCP.Animation
             Keyframes = new List<Keyframe>();
         }
 
-        public  void Read(EndianBinaryReader reader)
+        public  void Read(BinaryObjectReader reader)
         {
             Field00 = reader.ReadUInt32();
             KeyframeCount = reader.ReadUInt32();
@@ -62,7 +65,7 @@ namespace XNCPLib.XNCP.Animation
 
             Keyframes.Capacity = (int)KeyframeCount;
 
-            reader.SeekBegin(reader.PeekBaseOffset() + DataOffset);
+            reader.Seek(reader.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
             for (int i = 0; i < KeyframeCount; ++i)
             {
                 Keyframe key = new Keyframe();
