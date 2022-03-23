@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Shuriken.ViewModels;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace Shuriken
 {
@@ -24,6 +25,7 @@ namespace Shuriken
     public partial class MainWindow : Window
     {
         private MainViewModel vm;
+        public string titleAtLaunch;
 
         public MainWindow()
         {
@@ -33,6 +35,8 @@ namespace Shuriken
             DataContext = vm;
 
             editorSelect.SelectedIndex = 0;
+
+            titleAtLaunch = Title;
         }
         private void NewClick(object sender, RoutedEventArgs e)
         {
@@ -50,11 +54,15 @@ namespace Shuriken
             if (fileDialog.ShowDialog() == true)
             {
                 vm.Load(fileDialog.FileName);
+                Title = $"{titleAtLaunch} - {fileDialog.FileName}";
             }
         }
 
         private void HelpClick(object sender, RoutedEventArgs e)
         {
+            string url = "https://hedgedocs.github.io/";
+            url = url.Replace("&", "^&");
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
 
         private void ViewClick(object sender, RoutedEventArgs e)

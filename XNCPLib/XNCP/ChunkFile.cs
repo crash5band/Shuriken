@@ -34,7 +34,7 @@ namespace XNCPLib.XNCP
             Info = new InfoChunk();
             Info.Read(reader);
 
-            reader.Seek(reader.GetOffsetOrigin() + Info.NextChunkOffset, SeekOrigin.Begin);
+            reader.SeekL(reader.GetOffsetOrigin() + Info.NextChunkOffset, SeekOrigin.Begin);
 
             // check whether the next chunk is a NCPJChunk or XTextureListChunk.
             // signature check is always little endian.
@@ -45,7 +45,7 @@ namespace XNCPLib.XNCP
             if (bigEndian)
                 reader.Endianness = Endianness.Big;
 
-            reader.Seek(reader.GetOffsetOrigin() + Info.NextChunkOffset, SeekOrigin.Begin);
+            reader.SeekL(reader.GetOffsetOrigin() + Info.NextChunkOffset, SeekOrigin.Begin);
             if (nextSignature != Utilities.Make4CCLE("NXTL"))
             {
                 CsdmProject.Read(reader);
@@ -55,7 +55,7 @@ namespace XNCPLib.XNCP
                 TextureList.Read(reader);
             }
 
-            reader.Seek(reader.GetOffsetOrigin() + Info.NextChunkOffset + Info.ChunkListSize, SeekOrigin.Begin);
+            reader.SeekL(reader.GetOffsetOrigin() + Info.NextChunkOffset + Info.ChunkListSize, SeekOrigin.Begin);
             Offset.Read(reader);
             End.Read(reader);
 

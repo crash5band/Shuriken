@@ -9,14 +9,17 @@
         xmlns:vm ="clr-namespace:Shuriken.ViewModels"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}" 
         mc:Ignorable="d"
-    Title="Shuriken" d:DesignWidth="960" d:DesignHeight="450">
+    Title="Shuriken | DEV BUILD - UNSTABLE" d:DesignWidth="960" d:DesignHeight="450">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0">
+        <Menu Grid.Row="0" Margin="0,0,0,108">
             <MenuItem Header="File">
                 <MenuItem Header="Open" Click="OpenMenu_Click"/>
                 <MenuItem Header="Exit"/>
@@ -26,13 +29,13 @@
                 <MenuItem Header="Paste"/>
             </MenuItem>
             <MenuItem Header="View">
-                <MenuItem Header="IDK" Click="ViewClick"/>
+                <MenuItem Header="How about you view these nuts" Click="ViewClick"/>
             </MenuItem>
             <MenuItem Header="Help">
-                <MenuItem Header="Send help" Click="HelpClick"/>
+                <MenuItem Header="HedgeDocs" Click="HelpClick"/>
             </MenuItem>
         </Menu>
-        <TabControl TabStripPlacement="Left" ItemsSource="{Binding Editors}" Grid.Row="2" Name="editorSelect">
+        <TabControl TabStripPlacement="Left" ItemsSource="{Binding Editors}" Name="editorSelect" Margin="0,18,0,0" Grid.RowSpan="3">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel HorizontalAlignment="Center">

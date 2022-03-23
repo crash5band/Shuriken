@@ -33,7 +33,7 @@ namespace XNCPLib.XNCP
             CharacterMappingTableOffset = reader.ReadUInt32();
             
             CharacterMappings.Capacity = (int)CharacterCount;
-            reader.Seek(reader.GetOffsetOrigin() + CharacterMappingTableOffset, SeekOrigin.Begin);
+            reader.SeekL(reader.GetOffsetOrigin() + CharacterMappingTableOffset, SeekOrigin.Begin);
 
             for (int m = 0; m < CharacterCount; ++m)
             {

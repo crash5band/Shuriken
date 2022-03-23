@@ -16,6 +16,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\..\..\.nuget\packages\nlog.config\4.7.14\contentFiles\any\any\NLog.config" TargetPath="NLog.config" Link="NLog.config">
+      <Private>True</Private>
+      <NuGetPackageVersion>4.7.14</NuGetPackageVersion>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <NuGetItemType>None</NuGetItemType>
+      <NuGetPackageId>NLog.Config</NuGetPackageId>
+      <Pack>false</Pack>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLog" Version="4.7.14" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
 

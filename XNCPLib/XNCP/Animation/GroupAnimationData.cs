@@ -29,7 +29,7 @@ namespace XNCPLib.XNCP.Animation
 
             for (int i = 0; i < CastCount; ++i)
             {
-                reader.Seek(reader.GetOffsetOrigin() + CastDataOffset + (8 * i), SeekOrigin.Begin);
+                reader.SeekL(reader.GetOffsetOrigin() + CastDataOffset + (8 * i), SeekOrigin.Begin);
 
                 CastAnimationData animationData = new CastAnimationData();
                 animationData.Read(reader);

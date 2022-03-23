@@ -8,6 +8,7 @@
     <Version>0.2.0</Version>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
+    <ApplicationIcon>shuriken.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -15,11 +16,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="C:\Users\windo\.nuget\packages\nlog.config\4.7.14\contentFiles\any\any\NLog.config" />
     <None Remove="Fonts\fa-solid-900.ttf" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="shuriken.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DirectXTexNet" Version="1.0.3" />
+    <PackageReference Include="NLog.Config" Version="4.7.14" />
     <PackageReference Include="OpenTK" Version="4.6.7" />
     <PackageReference Include="OpenTK.GLWpfControl" Version="4.1.0" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" />

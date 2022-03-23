@@ -47,7 +47,7 @@ namespace Shuriken.ViewModels
         /// </summary>
         /// <param name="filename">The path of the file to load</param>
         public void Load(string filename)
-        {
+        {            
             FAPCFile file = new FAPCFile();
             file.Load(filename);
 
@@ -96,8 +96,16 @@ namespace Shuriken.ViewModels
                 UIFont font = new UIFont(entry.Name);
                 foreach (var mapping in xFontList.Fonts[(int)entry.Index].CharacterMappings)
                 {
-                    var sprite = Utilities.FindSpriteIDFromNCPScene((int)mapping.SubImageIndex, xScenes[0].SubImages, texList.Textures);
-                    font.Mappings.Add(new Models.CharacterMapping(mapping.SourceCharacter, sprite));
+                    try
+                    {
+                        var sprite = Utilities.FindSpriteIDFromNCPScene((int)mapping.SubImageIndex, xScenes[0].SubImages, texList.Textures);
+                        font.Mappings.Add(new Models.CharacterMapping(mapping.SourceCharacter, sprite));
+                    }
+                    catch(Exception ex)
+                    {
+                        MessageBox.Show($"Could not load font correctly! The UI file may not load.\n{ex.ToString()}", "Font Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    
                 }
 
                 Project.Fonts.Add(font);
@@ -118,7 +126,7 @@ namespace Shuriken.ViewModels
         private void WarnMissingTextures()
         {
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine("The loaded UI file uses textures that were not found.\n");
+            builder.AppendLine("This UI project uses textures that were not found, and thus coulnd't be loaded.\n");
             foreach (var texture in MissingTextures)
                 builder.AppendLine(texture);
 

@@ -21,12 +21,24 @@ namespace XNCPLib.Extensions
                 return "";
 
             long savedPosition = reader.Position;
-            reader.Seek(reader.GetOffsetOrigin() + offset, SeekOrigin.Begin);
+            reader.SeekL(reader.GetOffsetOrigin() + offset, SeekOrigin.Begin);
 
             string result = reader.ReadString(StringBinaryFormat.NullTerminated);
-            reader.Seek(savedPosition, SeekOrigin.Begin);
+            reader.SeekL(savedPosition, SeekOrigin.Begin);
             
             return result;
+        }
+        public static void SeekL(this BinaryObjectReader reader, long offset, SeekOrigin origin)
+        {
+            try
+            {
+                reader.Seek(offset, origin);
+            }
+            catch (Exception ex)
+            {
+                Log.Exception(ex.ToString(), "IOExtensions");
+            }
+            
         }
     }
 }

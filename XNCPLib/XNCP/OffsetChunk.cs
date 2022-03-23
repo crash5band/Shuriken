@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Amicitia.IO.Binary;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP
 {
@@ -34,7 +35,7 @@ namespace XNCPLib.XNCP
                 OffsetLocations.Add(reader.ReadUInt32());
             }
 
-            reader.Seek(Header.EndPosition, SeekOrigin.Begin);
+            reader.SeekL(Header.EndPosition, SeekOrigin.Begin);
         }
     }
 }

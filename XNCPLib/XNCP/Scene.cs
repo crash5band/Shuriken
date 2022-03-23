@@ -93,7 +93,7 @@ namespace XNCPLib.XNCP
             AnimationCastTableOffset = reader.ReadUInt32();
 
             long baseOffset = reader.GetOffsetOrigin();
-            reader.Seek(baseOffset + Data1Offset, SeekOrigin.Begin);
+            reader.SeekL(baseOffset + Data1Offset, SeekOrigin.Begin);
 
             for (int i = 0; i < Data1Count; ++i)
             {
@@ -110,14 +110,14 @@ namespace XNCPLib.XNCP
 
             for (int i = 0; i < GroupCount; ++i)
             {
-                reader.Seek(baseOffset + CastGroupTableOffset + (16 * i), SeekOrigin.Begin);
+                reader.SeekL(baseOffset + CastGroupTableOffset + (16 * i), SeekOrigin.Begin);
                 CastGroup group = new CastGroup();
                 group.Read(reader);
 
                 UICastGroups.Add(group);
             }
 
-            reader.Seek(baseOffset + CastDictionaryOffset, SeekOrigin.Begin);
+            reader.SeekL(baseOffset + CastDictionaryOffset, SeekOrigin.Begin);
             for (int i = 0; i < CastCount; ++i)
             {
                 CastDictionary dictionary = new CastDictionary();
@@ -128,7 +128,7 @@ namespace XNCPLib.XNCP
 
             for (int i = 0; i < AnimationCount; ++i)
             {
-                reader.Seek(baseOffset + AnimationKeyframeDataListOffset + (8 * i), SeekOrigin.Begin);
+                reader.SeekL(baseOffset + AnimationKeyframeDataListOffset + (8 * i), SeekOrigin.Begin);
 
                 AnimationKeyframeData keyframeData = new AnimationKeyframeData();
                 keyframeData.Read(reader);
@@ -136,7 +136,7 @@ namespace XNCPLib.XNCP
                 AnimationKeyframeDataList.Add(keyframeData);
             }
 
-            reader.Seek(baseOffset + AnimationDictionaryOffset, SeekOrigin.Begin);
+            reader.SeekL(baseOffset + AnimationDictionaryOffset, SeekOrigin.Begin);
             for (int i = 0; i < AnimationCount; ++i)
             {
                 AnimationDictionary dictionary = new AnimationDictionary();
@@ -145,7 +145,7 @@ namespace XNCPLib.XNCP
                 AnimationDictionaries.Add(dictionary);
             }
 
-            reader.Seek(baseOffset + AnimationFrameDataListOffset, SeekOrigin.Begin);
+            reader.SeekL(baseOffset + AnimationFrameDataListOffset, SeekOrigin.Begin);
             for (int i = 0; i < AnimationCount; ++i)
             {
                 AnimationFrameData frameData = new AnimationFrameData();

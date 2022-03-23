@@ -29,14 +29,14 @@ namespace XNCPLib.XNCP.Animation
 
             if (DataOffset > 0)
             {
-                reader.Seek(reader.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
+                reader.SeekL(reader.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
                 uint count = Utilities.CountSetBits(Flags);
                 SubDataList.Capacity = (int)count;
 
 
                 for (int i = 0; i < count; ++i)
                 {
-                    reader.Seek(reader.GetOffsetOrigin() + DataOffset + (12 * i), SeekOrigin.Begin);
+                    reader.SeekL(reader.GetOffsetOrigin() + DataOffset + (12 * i), SeekOrigin.Begin);
                     CastAnimationSubData subData = new CastAnimationSubData();
                     subData.Read(reader);
                     SubDataList.Add(subData);
@@ -65,7 +65,7 @@ namespace XNCPLib.XNCP.Animation
 
             Keyframes.Capacity = (int)KeyframeCount;
 
-            reader.Seek(reader.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
+            reader.SeekL(reader.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
             for (int i = 0; i < KeyframeCount; ++i)
             {
                 Keyframe key = new Keyframe();

@@ -87,13 +87,13 @@ namespace XNCPLib.XNCP
 
             if (CastInfoOffset != 0)
             {
-                reader.Seek(baseOffset + CastInfoOffset, SeekOrigin.Begin);
+                reader.SeekL(baseOffset + CastInfoOffset, SeekOrigin.Begin);
                 CastInfoData.Read(reader);
             }
 
             if (CastMaterialInfoOffset != 0)
             {
-                reader.Seek(baseOffset + CastMaterialInfoOffset, SeekOrigin.Begin);
+                reader.SeekL(baseOffset + CastMaterialInfoOffset, SeekOrigin.Begin);
                 CastMaterialData.Read(reader);
             }
         }

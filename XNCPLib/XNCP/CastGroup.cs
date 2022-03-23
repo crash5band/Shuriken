@@ -37,7 +37,7 @@ namespace XNCPLib.XNCP
             CastHierarchyTreeOffset = reader.ReadUInt32();
 
             long baseOffset = reader.GetOffsetOrigin();
-            reader.Seek(baseOffset + CastTableOffset, SeekOrigin.Begin);
+            reader.SeekL(baseOffset + CastTableOffset, SeekOrigin.Begin);
 
             for (int i = 0; i < CastCount; ++i)
             {
@@ -46,7 +46,7 @@ namespace XNCPLib.XNCP
 
             for (int i = 0; i < CastCount; ++i)
             {
-                reader.Seek(baseOffset + CastOffsets[i], SeekOrigin.Begin);
+                reader.SeekL(baseOffset + CastOffsets[i], SeekOrigin.Begin);
 
                 Cast cast = new Cast();
                 cast.Read(reader);
@@ -54,7 +54,7 @@ namespace XNCPLib.XNCP
                 Casts.Add(cast);
             }
 
-            reader.Seek(baseOffset + CastHierarchyTreeOffset, SeekOrigin.Begin);
+            reader.SeekL(baseOffset + CastHierarchyTreeOffset, SeekOrigin.Begin);
             for (int i = 0; i < CastCount; ++i)
             {
                 CastHierarchyTree.Add(new CastHierarchyTreeNode(reader.ReadInt32(), reader.ReadInt32()));

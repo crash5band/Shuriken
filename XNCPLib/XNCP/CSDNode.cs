@@ -45,7 +45,7 @@ namespace XNCPLib.XNCP
             NodeListOffset = reader.ReadUInt32();
             NodeDictionaryOffset = reader.ReadUInt32();
 
-            reader.Seek(reader.GetOffsetOrigin() + SceneTableOffset, SeekOrigin.Begin);
+            reader.SeekL(reader.GetOffsetOrigin() + SceneTableOffset, SeekOrigin.Begin);
             for (int i = 0; i < SceneCount; ++i)
             {
                 SceneOffsets.Add(reader.ReadUInt32());
@@ -53,7 +53,7 @@ namespace XNCPLib.XNCP
 
             for (int i = 0; i < SceneCount; ++i)
             {
-                reader.Seek(reader.GetOffsetOrigin() + SceneOffsets[i], SeekOrigin.Begin);
+                reader.SeekL(reader.GetOffsetOrigin() + SceneOffsets[i], SeekOrigin.Begin);
 
                 Scene scene = new Scene();
                 scene.Read(reader);
@@ -61,7 +61,7 @@ namespace XNCPLib.XNCP
                 Scenes.Add(scene);
             }
 
-            reader.Seek(reader.GetOffsetOrigin() + SceneIDTableOffset, SeekOrigin.Begin);
+            reader.SeekL(reader.GetOffsetOrigin() + SceneIDTableOffset, SeekOrigin.Begin);
             for (int i = 0; i < SceneCount; ++i)
             {
                 SceneID id = new SceneID();

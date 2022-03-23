@@ -29,7 +29,7 @@ namespace XNCPLib.XNCP.Animation
 
             for (int i = 0; i < GroupCount; ++i)
             {
-                reader.Seek(reader.GetOffsetOrigin() + GroupDataOffset + (8 * i), SeekOrigin.Begin);
+                reader.SeekL(reader.GetOffsetOrigin() + GroupDataOffset + (8 * i), SeekOrigin.Begin);
 
                 GroupAnimationData groupData = new GroupAnimationData();
                 groupData.Read(reader);

@@ -35,7 +35,7 @@ namespace XNCPLib.XNCP
             TextureCount = reader.ReadUInt32();
             DataOffset = reader.ReadUInt32();
 
-            reader.Seek(reader.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
+            reader.SeekL(reader.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
             for (int i = 0; i < TextureCount; ++i)
             {
                 XTexture texture = new XTexture();

@@ -53,14 +53,10 @@ namespace Amicitia.IO.Binary
 
         public void Seek( long offset, SeekOrigin origin )
         {
-            try
-            {
+           
                 mBaseStream.Seek(offset, origin);
-            }
-            catch ( Exception e)
-            {
-                //Show error
-            }
+            
+            
             
             InvalidateBits();
         }

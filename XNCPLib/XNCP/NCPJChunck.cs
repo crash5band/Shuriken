@@ -41,10 +41,10 @@ namespace XNCPLib.XNCP
             DXLSignature = reader.ReadUInt32();
             FontListOffset = reader.ReadUInt32();
 
-            reader.Seek(reader.GetOffsetOrigin() + RootNodeOffset, SeekOrigin.Begin);
+            reader.SeekL(reader.GetOffsetOrigin() + RootNodeOffset, SeekOrigin.Begin);
             Root.Read(reader);
 
-            reader.Seek(reader.GetOffsetOrigin() + FontListOffset, SeekOrigin.Begin);
+            reader.SeekL(reader.GetOffsetOrigin() + FontListOffset, SeekOrigin.Begin);
             Fonts.Read(reader);
 
             reader.PopOffsetOrigin();

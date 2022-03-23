@@ -46,7 +46,7 @@ namespace XNCPLib.XNCP
             long pos = reader.Position;
             for (int f = 0; f < FontCount; ++f)
             {
-                reader.Seek(reader.GetOffsetOrigin() + FontTableOffset + (8 * f), SeekOrigin.Begin);
+                reader.SeekL(reader.GetOffsetOrigin() + FontTableOffset + (8 * f), SeekOrigin.Begin);
 
                 Font font = new Font();
                 font.Read(reader);
@@ -55,7 +55,7 @@ namespace XNCPLib.XNCP
 
             for (int i = 0; i < FontCount; ++i)
             {
-                reader.Seek(reader.GetOffsetOrigin() + FontIDTableOffset + (8 * i), SeekOrigin.Begin);
+                reader.SeekL(reader.GetOffsetOrigin() + FontIDTableOffset + (8 * i), SeekOrigin.Begin);
                 
                 FontID id = new FontID();
                 
