@@ -68,5 +68,13 @@ namespace Shuriken
         private void ViewClick(object sender, RoutedEventArgs e)
         {
         }
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to exit?", "Quit", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if(result == MessageBoxResult.Yes)
+            {
+                App.Current.Shutdown();
+            }
+        }
     }
 }
