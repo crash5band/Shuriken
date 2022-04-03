@@ -37,6 +37,19 @@ namespace XNCPLib.XNCP.Animation
                 GroupAnimationDataList.Add(groupData);
             }
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(GroupCount);
+            writer.WriteUInt32(GroupDataOffset);
+
+            for (int i = 0; i < GroupCount; ++i)
+            {
+                writer.Seek(writer.GetOffsetOrigin() + GroupDataOffset + (8 * i), SeekOrigin.Begin);
+
+                GroupAnimationDataList[i].Write(writer);
+            }
+        }
     }
 
     public class AnimationData2
@@ -59,6 +72,12 @@ namespace XNCPLib.XNCP.Animation
         {
             Field00 = reader.ReadUInt32();
             FrameCount = reader.ReadSingle();
+        }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(Field00);
+            writer.WriteSingle(FrameCount);
         }
     }
 }

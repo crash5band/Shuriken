@@ -33,5 +33,17 @@ namespace XNCPLib.XNCP
             OffsetChunkSize = reader.ReadUInt32();
             Field1C = reader.ReadUInt32();
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            Header.Write(writer);
+
+            writer.WriteUInt32(ChunkCount);
+            writer.WriteUInt32(NextChunkOffset);
+            writer.WriteUInt32(ChunkListSize);
+            writer.WriteUInt32(OffsetChunkOffset);
+            writer.WriteUInt32(OffsetChunkSize);
+            writer.WriteUInt32(Field1C);
+        }
     }
 }

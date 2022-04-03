@@ -52,6 +52,10 @@ namespace Shuriken
                 vm.Load(fileDialog.FileName);
             }
         }
+        private void SaveMenu_Click(object sender, RoutedEventArgs e)
+        {
+            vm.Save();
+        }
 
         private void HelpClick(object sender, RoutedEventArgs e)
         {

@@ -37,6 +37,19 @@ namespace XNCPLib.XNCP.Animation
                 CastAnimationDataList.Add(animationData);
             }
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(CastCount);
+            writer.WriteUInt32(CastDataOffset);
+
+            for (int i = 0; i < CastCount; ++i)
+            {
+                writer.Seek(writer.GetOffsetOrigin() + CastDataOffset + (8 * i), SeekOrigin.Begin);
+
+                CastAnimationDataList[i].Write(writer);
+            }
+        }
     }
 
     public class GroupAnimationData2

@@ -80,5 +80,32 @@ namespace Shuriken.Misc
 
             return -1;
         }
+
+        public static uint FindSubImageIndexFromSprite(Sprite sprite, List<SubImage> subImages, ObservableCollection<Texture> textures)
+        {
+            int textureIndex = textures.IndexOf(sprite.Texture);
+
+            Vector2 TopLeft = new Vector2(
+                sprite.Start.X == 0 ? 0 : sprite.Texture.Width / sprite.Start.X,
+                sprite.Start.Y == 0 ? 0 : sprite.Texture.Height / sprite.Start.Y);
+            Vector2 BottomRight = new Vector2((sprite.Dimensions.X / sprite.Texture.Width) + TopLeft.X, (sprite.Dimensions.Y / sprite.Texture.Height) + TopLeft.Y);
+
+            for (int s = 0; s < subImages.Count; ++s)
+            {
+                var subImage = subImages[s];
+                if (subImage.TextureIndex != textureIndex) continue;
+
+                Sprite target = new Sprite(0, textures[textureIndex], subImage.TopLeft.Y, subImage.TopLeft.X,
+                            subImage.BottomRight.Y, subImage.BottomRight.X);
+
+                if (target.X == sprite.X && target.Y == sprite.Y && 
+                    target.Width == sprite.Width && target.Height == sprite.Height)
+                {
+                    return (uint) s;
+                }
+            }
+
+            return 0;
+        }
     }
 }

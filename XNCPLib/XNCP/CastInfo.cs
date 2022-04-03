@@ -47,5 +47,26 @@ namespace XNCPLib.XNCP
             Field34 = reader.ReadUInt32();
             Field38 = reader.ReadUInt32();
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteInt32(Field00);
+            writer.WriteSingle(Translation.X);
+            writer.WriteSingle(Translation.Y);
+            writer.WriteSingle(Rotation);
+            writer.WriteSingle(Scale.X);
+            writer.WriteSingle(Scale.Y);
+            writer.WriteSingle(Field18);
+
+            writer.WriteUInt32(Color);
+            writer.WriteUInt32(GradientTopLeft);
+            writer.WriteUInt32(GradientBottomLeft);
+            writer.WriteUInt32(GradientTopRight);
+            writer.WriteUInt32(GradientBottomRight);
+
+            writer.WriteUInt32(Field30);
+            writer.WriteUInt32(Field34);
+            writer.WriteUInt32(Field38);
+        }
     }
 }

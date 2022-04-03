@@ -36,5 +36,20 @@ namespace XNCPLib.XNCP
 
             reader.Seek(Header.EndPosition, SeekOrigin.Begin);
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            Header.Write(writer);
+
+            writer.WriteUInt32(OffsetLocationCount);
+            writer.WriteUInt32(Field0C);
+
+            for (int loc = 0; loc < OffsetLocations.Count; ++loc)
+            {
+                writer.WriteUInt32(OffsetLocations[loc]);
+            }
+
+            writer.Seek(Header.EndPosition, SeekOrigin.Begin);
+        }
     }
 }

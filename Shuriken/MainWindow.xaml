@@ -19,6 +19,7 @@
         <Menu Grid.Row="0">
             <MenuItem Header="File">
                 <MenuItem Header="Open" Click="OpenMenu_Click"/>
+                <MenuItem Header="Save" Click="SaveMenu_Click"/>
                 <MenuItem Header="Exit"/>
             </MenuItem>
             <MenuItem Header="Edit">

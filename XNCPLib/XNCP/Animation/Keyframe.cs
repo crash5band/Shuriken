@@ -25,5 +25,15 @@ namespace XNCPLib.XNCP.Animation
             Offset2 = reader.ReadSingle();
             Field14 = reader.ReadUInt32();
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(Frame);
+            writer.WriteSingle(Value);
+            writer.WriteUInt32(Field08);
+            writer.WriteSingle(Offset1);
+            writer.WriteSingle(Offset2);
+            writer.WriteUInt32(Field14);
+        }
     }
 }

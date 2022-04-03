@@ -43,6 +43,24 @@ namespace XNCPLib.XNCP.Animation
                 }
             }
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(Flags);
+            writer.WriteUInt32(DataOffset);
+
+            if (DataOffset > 0)
+            {
+                writer.Seek(writer.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
+                uint count = Utilities.CountSetBits(Flags);
+
+                for (int i = 0; i < count; ++i)
+                {
+                    writer.Seek(writer.GetOffsetOrigin() + DataOffset + (12 * i), SeekOrigin.Begin);
+                    SubDataList[i].Write(writer);
+                }
+            }
+        }
     }
 
     public class CastAnimationSubData
@@ -57,7 +75,7 @@ namespace XNCPLib.XNCP.Animation
             Keyframes = new List<Keyframe>();
         }
 
-        public  void Read(BinaryObjectReader reader)
+        public void Read(BinaryObjectReader reader)
         {
             Field00 = reader.ReadUInt32();
             KeyframeCount = reader.ReadUInt32();
@@ -72,6 +90,19 @@ namespace XNCPLib.XNCP.Animation
                 key.Read(reader);
 
                 Keyframes.Add(key);
+            }
+        }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(Field00);
+            writer.WriteUInt32(KeyframeCount);
+            writer.WriteUInt32(DataOffset);
+
+            writer.Seek(writer.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
+            for (int i = 0; i < KeyframeCount; ++i)
+            {
+                Keyframes[i].Write(writer);
             }
         }
     }

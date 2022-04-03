@@ -70,5 +70,33 @@ namespace XNCPLib.XNCP
                 SceneIDTable.Add(id);
             }
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(SceneCount);
+            writer.WriteUInt32(SceneTableOffset);
+            writer.WriteUInt32(SceneIDTableOffset);
+            writer.WriteUInt32(NodeCount);
+            writer.WriteUInt32(NodeListOffset);
+            writer.WriteUInt32(NodeDictionaryOffset);
+
+            writer.Seek(writer.GetOffsetOrigin() + SceneTableOffset, SeekOrigin.Begin);
+            for (int i = 0; i < SceneCount; ++i)
+            {
+                writer.WriteUInt32(SceneOffsets[i]);
+            }
+
+            for (int i = 0; i < SceneCount; ++i)
+            {
+                writer.Seek(writer.GetOffsetOrigin() + SceneOffsets[i], SeekOrigin.Begin);
+                Scenes[i].Write(writer);
+            }
+
+            writer.Seek(writer.GetOffsetOrigin() + SceneIDTableOffset, SeekOrigin.Begin);
+            for (int i = 0; i < SceneCount; ++i)
+            {
+                SceneIDTable[i].Write(writer);
+            }
+        }
     }
 }
