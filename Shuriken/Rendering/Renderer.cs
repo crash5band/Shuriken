@@ -44,9 +44,7 @@ namespace Shuriken.Rendering
             shaderDictionary = new Dictionary<string, ShaderProgram>();
 
             ShaderProgram basicShader = new ShaderProgram("basic", Path.Combine(shadersDir, "basic.vert"), Path.Combine(shadersDir, "basic.frag"));
-            ShaderProgram boxShader = new ShaderProgram("box", Path.Combine(shadersDir, "bb.vert"), Path.Combine(shadersDir, "bb.frag"));
             shaderDictionary.Add(basicShader.Name, basicShader);
-            shaderDictionary.Add(boxShader.Name, boxShader);
 
             // setup vertex indices
             indices = new uint[MaxIndices];
