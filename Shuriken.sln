@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shuriken", "Shuriken\Shurik
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Amicitia.IO", "Amicitia.IO\Amicitia.IO.csproj", "{9E0EA82B-C709-4152-AD28-5074DB1AFD0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XNCPLibTests", "XNCPLibTests\XNCPLibTests.csproj", "{A6866EAE-DD2D-4543-9E43-E69F3340C254}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{9E0EA82B-C709-4152-AD28-5074DB1AFD0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E0EA82B-C709-4152-AD28-5074DB1AFD0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E0EA82B-C709-4152-AD28-5074DB1AFD0C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A6866EAE-DD2D-4543-9E43-E69F3340C254}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A6866EAE-DD2D-4543-9E43-E69F3340C254}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A6866EAE-DD2D-4543-9E43-E69F3340C254}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A6866EAE-DD2D-4543-9E43-E69F3340C254}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
