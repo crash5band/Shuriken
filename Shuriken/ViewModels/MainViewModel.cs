@@ -159,13 +159,12 @@ namespace Shuriken.ViewModels
                     mapping.SourceCharacter = map.Character;
                     Sprite sp = Project.TryGetSprite(map.Sprite);
 
-                    // Disabled due to saving wrong values sometimes...
-                    //mapping.SubImageIndex = Utilities.FindSubImageIndexFromSprite(sp, xScenes[0].SubImages, texList.Textures); // TODO: This may be wrong...
+                    // This seems to work fine, but causes different values to be saved in ui_gameplay.xncp. Duplicate subimage entry?
+                    mapping.SubImageIndex = Utilities.FindSubImageIndexFromSprite(sp, xScenes[0].SubImages, texList.Textures);
                 }
             }
 
-            // Sprite Saving: Disabled for now due to conversion issues
-            /*
+            // Sprite Saving: Has conversion issues
             int nextSpriteId = 1;
             if (xScenes.Count > 0)
             {
@@ -174,20 +173,24 @@ namespace Shuriken.ViewModels
                     int textureIndex = (int)subimage.TextureIndex;
                     if (textureIndex >= 0 && textureIndex < texList.Textures.Count)
                     {
-                        if (nextSpriteId == 303)
-                        {
-                            int abc = 123;
-                        }
                         Sprite sprite = Project.TryGetSprite(nextSpriteId++);
                         int newTextureIndex = texList.Textures.IndexOf(sprite.Texture);
 
                         subimage.TextureIndex = (uint) newTextureIndex;
-                        subimage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, sprite.Y / sprite.Texture.Height);
-                        subimage.BottomRight = new Vector2(((float)sprite.Width / sprite.Texture.Width) + subimage.TopLeft.X, ((float)sprite.Height / sprite.Texture.Height) + subimage.TopLeft.Y);
+                        if (sprite.HasChanged)
+                        {
+                            subimage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, sprite.Y / sprite.Texture.Height);
+                            subimage.BottomRight = new Vector2(((float)sprite.Width / sprite.Texture.Width) + subimage.TopLeft.X, ((float)sprite.Height / sprite.Texture.Height) + subimage.TopLeft.Y);
+                        }
+                        else
+                        {
+                            subimage.TopLeft = new Vector2(sprite.OriginalLeft, sprite.OriginalTop);
+                            subimage.BottomRight = new Vector2(sprite.OriginalRight, sprite.OriginalBottom);
+                        }
                     }
                 }
             }
-            */
+            
 
             int sceneIndex = 0;
             foreach (SceneID sceneID in xIDs)
@@ -287,25 +290,30 @@ namespace Shuriken.ViewModels
                     cast.CastInfoData.Field34 = uiCast.InfoField34;
                     cast.CastInfoData.Field38 = uiCast.InfoField38;
 
-                    /*
-                    // TODO: Sprites
+                    
+                    
                     if (uiCast.Type == DrawType.Sprite)
                     {
-                        int[] castSprites = scene.UICastGroups[g].Casts[c].CastMaterialData.SubImageIndices;
-                        for (int index = 0; index < cast.Sprites.Count; ++index)
+                        int[] castSprites = cast.CastMaterialData.SubImageIndices;
+                        for (int index = 0; index < uiCast.Sprites.Count; ++index)
                         {
-                            cast.Sprites[index] = Utilities.FindSpriteIDFromNCPScene(castSprites[index], scene.SubImages, texList.Textures);
+                            if (uiCast.Sprites[index] == -1)
+                            {
+                                castSprites[index] = -1;
+                                continue;
+                            }
+                            castSprites[index] = (int)Utilities.FindSubImageIndexFromSprite(Project.TryGetSprite(uiCast.Sprites[index]), scene.SubImages, Project.TextureLists[0].Textures);
                         }
+                        
                     }
                     else if (uiCast.Type == DrawType.Font)
                     {
-                        foreach (var font in fonts)
+                        foreach (var font in Project.Fonts)
                         {
-                            if (font.Name == scene.UICastGroups[g].Casts[c].FontName)
-                                cast.Font = font;
+                            cast.FontName = uiCast.Font.Name.Substring(0, cast.FontName.Length); // TODO: Will break with longer names
                         }
                     }
-                    */
+                    
                 }
 
                 foreach (var entry in entryIndexMap)
