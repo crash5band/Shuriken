@@ -75,5 +75,11 @@ namespace Shuriken
         private void ViewClick(object sender, RoutedEventArgs e)
         {
         }
+
+        private void ExitMenu_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: Check for differences in the loaded file and prompt the user to save
+            Application.Current.Shutdown();
+        }
     }
 }

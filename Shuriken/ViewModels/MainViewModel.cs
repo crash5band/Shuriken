@@ -11,6 +11,7 @@ using Shuriken.Commands;
 using System.Windows;
 using Shuriken.Misc;
 using System.Reflection;
+using Shuriken.Models.Animation;
 
 namespace Shuriken.ViewModels
 {
@@ -21,8 +22,10 @@ namespace Shuriken.ViewModels
         public List<string> MissingTextures { get; set; }
         public ObservableCollection<ViewModelBase> Editors { get; set; }
 
+        // File Info
         public FAPCFile WorkFile { get; set; }
         public string WorkFilePath { get; set; }
+        public bool IsLoaded { get; set; }
         public MainViewModel()
         {
             MissingTextures = new List<string>();
@@ -35,7 +38,7 @@ namespace Shuriken.ViewModels
                 new AboutViewModel()
             };
 
-            WorkFile = new FAPCFile();
+            IsLoaded = false;
 #if DEBUG
             //LoadTestXNCP();
 #endif
@@ -115,6 +118,7 @@ namespace Shuriken.ViewModels
             Project.TextureLists.Add(texList);
 
             WorkFilePath = filename;
+            IsLoaded = true;
         }
 
         // Very barebones save method which doesn't add anything into the original NCP file, and only changes what's already there
@@ -154,7 +158,9 @@ namespace Shuriken.ViewModels
                     Models.CharacterMapping map = font.Mappings[nextMappingIndex++];
                     mapping.SourceCharacter = map.Character;
                     Sprite sp = Project.TryGetSprite(map.Sprite);
-                    mapping.SubImageIndex = Utilities.FindSubImageIndexFromSprite(sp, xScenes[0].SubImages, texList.Textures); // TODO: This may be wrong...
+
+                    // Disabled due to saving wrong values sometimes...
+                    //mapping.SubImageIndex = Utilities.FindSubImageIndexFromSprite(sp, xScenes[0].SubImages, texList.Textures); // TODO: This may be wrong...
                 }
             }
 
@@ -282,7 +288,7 @@ namespace Shuriken.ViewModels
                     cast.CastInfoData.Field38 = uiCast.InfoField38;
 
                     /*
-                    // Sprites (not correct)
+                    // TODO: Sprites
                     if (uiCast.Type == DrawType.Sprite)
                     {
                         int[] castSprites = scene.UICastGroups[g].Casts[c].CastMaterialData.SubImageIndices;
@@ -302,45 +308,54 @@ namespace Shuriken.ViewModels
                     */
                 }
 
-                /* Animations
                 foreach (var entry in entryIndexMap)
                 {
+                    int trackIndex = 0;
+                    int trackAnimIndex = 0;
                     XNCPLib.XNCP.Animation.AnimationKeyframeData keyframeData = scene.AnimationKeyframeDataList[entry.Value];
                     for (int c = 0; c < keyframeData.GroupAnimationDataList[g].CastCount; ++c)
                     {
                         XNCPLib.XNCP.Animation.CastAnimationData castAnimData = keyframeData.GroupAnimationDataList[g].CastAnimationDataList[c];
-                        List<AnimationTrack> tracks = new List<AnimationTrack>((int)XNCPLib.Misc.Utilities.CountSetBits(castAnimData.Flags));
 
                         int castAnimDataIndex = 0;
+                        List<AnimationTrack> tracks = null;
                         for (int i = 0; i < 12; ++i)
                         {
                             // check each animation type if it exists in Flags
+
+                            // TODO: Save new anim flags
                             if ((castAnimData.Flags & (1 << i)) != 0)
                             {
-                                AnimationType type = (AnimationType)(1 << i);
-                                AnimationTrack anim = new AnimationTrack(type)
-                                {
-                                    Field00 = castAnimData.SubDataList[castAnimDataIndex].Field00,
-                                };
 
+                                if (tracks == null)
+                                {
+                                    tracks = uiScene.Animations[entry.Key].LayerAnimations[trackIndex++].Tracks.ToList();
+                                    trackAnimIndex = 0;
+                                }
+                                AnimationTrack anim = tracks[trackAnimIndex++];
+
+                                castAnimData.SubDataList[castAnimDataIndex].Field00 = anim.Field00;
+
+                                int keyframeIndex = 0;
                                 foreach (var key in castAnimData.SubDataList[castAnimDataIndex].Keyframes)
                                 {
-                                    anim.Keyframes.Add(new Keyframe(key));
+                                    var uiKey = anim.Keyframes[keyframeIndex++];
+
+                                    key.Frame = uiKey.HasNoFrame ? 0xFFFFFFFF : (uint)uiKey.Frame;
+                                    key.Value = uiKey.KValue;
+                                    key.Field08 = (uint)uiKey.Field08;
+                                    key.Offset1 = uiKey.Offset1;
+                                    key.Offset2 = uiKey.Offset2;
+                                    key.Field14 = (uint)uiKey.Field14;
                                 }
 
-                                tracks.Add(anim);
                                 ++castAnimDataIndex;
                             }
                         }
-
-                        if (tracks.Count > 0)
-                        {
-                            AnimationList layerAnimationList = new AnimationList(tempCasts[c], tracks);
-                            Animations[entry.Key].LayerAnimations.Add(layerAnimationList);
-                        }
                     }
                 }
-                */
+
+                // TODO: Save Cast Hierarchy tree
             }
         }
 
