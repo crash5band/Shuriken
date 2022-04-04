@@ -118,7 +118,7 @@ namespace Shuriken.ViewModels
             Project.TextureLists.Add(texList);
 
             WorkFilePath = filename;
-            IsLoaded = true;
+            IsLoaded = !MissingTextures.Any();
         }
 
         // Very barebones save method which doesn't add anything into the original NCP file, and only changes what's already there
@@ -145,7 +145,6 @@ namespace Shuriken.ViewModels
                     Texture t = texList.Textures[nextTextureIndex++];
                     texture.Name = Path.GetFileName(t.FullName).Substring(0, texture.Name.Length); // TODO: This will break with names larger than the original one
                 }
-                
             }
 
             int nextFontIndex = 0;
@@ -376,7 +375,7 @@ namespace Shuriken.ViewModels
         private void WarnMissingTextures()
         {
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine("The loaded UI file uses textures that were not found.\n");
+            builder.AppendLine("The loaded UI file uses textures that were not found. Saving has been disabled. In order to save, please copy the files listed below into the UI file's directory, and re-open it.\n");
             foreach (var texture in MissingTextures)
                 builder.AppendLine(texture);
 
