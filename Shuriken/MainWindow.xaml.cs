@@ -54,7 +54,18 @@ namespace Shuriken
         }
         private void SaveMenu_Click(object sender, RoutedEventArgs e)
         {
-            vm.Save();
+            vm.Save(null);
+        }
+
+        private void SaveAsMenu_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog fileDialog = new SaveFileDialog();
+            fileDialog.Filter = "Ninja Chao Project Files|*.xncp;*.yncp";
+
+            if (fileDialog.ShowDialog() == true)
+            {
+                vm.Save(fileDialog.FileName);
+            }
         }
 
         private void HelpClick(object sender, RoutedEventArgs e)

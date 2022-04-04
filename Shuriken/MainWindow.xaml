@@ -20,6 +20,7 @@
             <MenuItem Header="File">
                 <MenuItem Header="Open" Click="OpenMenu_Click"/>
                 <MenuItem Header="Save" Click="SaveMenu_Click"/>
+                <MenuItem Header="Save As" Click="SaveAsMenu_Click"/>
                 <MenuItem Header="Exit"/>
             </MenuItem>
             <MenuItem Header="Edit">

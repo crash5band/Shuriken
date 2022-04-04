@@ -21,7 +21,8 @@ namespace Shuriken.ViewModels
         public List<string> MissingTextures { get; set; }
         public ObservableCollection<ViewModelBase> Editors { get; set; }
 
-        public string LoadedFile { get; set; }
+        public FAPCFile WorkFile { get; set; }
+        public string WorkFilePath { get; set; }
         public MainViewModel()
         {
             MissingTextures = new List<string>();
@@ -33,6 +34,8 @@ namespace Shuriken.ViewModels
                 new FontsViewModel(),
                 new AboutViewModel()
             };
+
+            WorkFile = new FAPCFile();
 #if DEBUG
             //LoadTestXNCP();
 #endif
@@ -49,15 +52,14 @@ namespace Shuriken.ViewModels
         /// <param name="filename">The path of the file to load</param>
         public void Load(string filename)
         {
-            FAPCFile file = new FAPCFile();
-            file.Load(filename);
+            WorkFile.Load(filename);
 
             string root = Path.GetDirectoryName(Path.GetFullPath(filename));
 
-            List<Scene> xScenes = file.Resources[0].Content.CsdmProject.Root.Scenes;
-            List<SceneID> xIDs = file.Resources[0].Content.CsdmProject.Root.SceneIDTable;
-            List<XTexture> xTextures = file.Resources[1].Content.TextureList.Textures;
-            FontList xFontList = file.Resources[0].Content.CsdmProject.Fonts;
+            List<Scene> xScenes = WorkFile.Resources[0].Content.CsdmProject.Root.Scenes;
+            List<SceneID> xIDs = WorkFile.Resources[0].Content.CsdmProject.Root.SceneIDTable;
+            List<XTexture> xTextures = WorkFile.Resources[1].Content.TextureList.Textures;
+            FontList xFontList = WorkFile.Resources[0].Content.CsdmProject.Fonts;
 
             Clear();
 
@@ -110,22 +112,22 @@ namespace Shuriken.ViewModels
                 Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name, texList, Project.Fonts));
 
             Project.TextureLists.Add(texList);
-            LoadedFile = filename;
+
+            WorkFilePath = filename;
         }
 
         // Very barebones save method which doesn't add anything into the original NCP file, and only changes what's already there
         // It also *may* not save anything, but it's progress...
-        public void Save()
+        public void Save(string path)
         {
-            FAPCFile file = new FAPCFile();
-            file.Load(LoadedFile);
+            if (path == null) path = WorkFilePath;
 
-            string root = Path.GetDirectoryName(Path.GetFullPath(LoadedFile));
+            string root = Path.GetDirectoryName(Path.GetFullPath(WorkFilePath));
 
-            List<Scene> xScenes = file.Resources[0].Content.CsdmProject.Root.Scenes;
-            List<SceneID> xIDs = file.Resources[0].Content.CsdmProject.Root.SceneIDTable;
-            List<XTexture> xTextures = file.Resources[1].Content.TextureList.Textures;
-            FontList xFontList = file.Resources[0].Content.CsdmProject.Fonts;
+            List<Scene> xScenes = WorkFile.Resources[0].Content.CsdmProject.Root.Scenes;
+            List<SceneID> xIDs = WorkFile.Resources[0].Content.CsdmProject.Root.SceneIDTable;
+            List<XTexture> xTextures = WorkFile.Resources[1].Content.TextureList.Textures;
+            FontList xFontList = WorkFile.Resources[0].Content.CsdmProject.Fonts;
 
             TextureList texList = Project.TextureLists[0];
             int nextTextureIndex = 0;
@@ -154,7 +156,7 @@ namespace Shuriken.ViewModels
                 }
             }
 
-            // Disabled for now due to conversion issues
+            // Sprite Saving: Disabled for now due to conversion issues
             /*
             int nextSpriteId = 1;
             if (xScenes.Count > 0)
@@ -203,7 +205,7 @@ namespace Shuriken.ViewModels
                 SaveCasts(uiScene, scene);
             }
 
-            file.Save(LoadedFile);
+            WorkFile.Save(path);
         }
 
         private void SaveCasts(UIScene uiScene, Scene scene)
