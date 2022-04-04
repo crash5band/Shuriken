@@ -52,6 +52,7 @@ namespace Shuriken.ViewModels
         /// <param name="filename">The path of the file to load</param>
         public void Load(string filename)
         {
+            WorkFile = new FAPCFile();
             WorkFile.Load(filename);
 
             string root = Path.GetDirectoryName(Path.GetFullPath(filename));
@@ -117,10 +118,11 @@ namespace Shuriken.ViewModels
         }
 
         // Very barebones save method which doesn't add anything into the original NCP file, and only changes what's already there
-        // It also *may* not save anything, but it's progress...
+        // It also *may* not save everything, but it's progress...
         public void Save(string path)
         {
             if (path == null) path = WorkFilePath;
+            else WorkFilePath = path;
 
             string root = Path.GetDirectoryName(Path.GetFullPath(WorkFilePath));
 
