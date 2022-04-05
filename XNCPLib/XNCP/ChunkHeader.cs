@@ -30,5 +30,21 @@ namespace XNCPLib.XNCP
                 reader.Endianness = Endianness.Big;
             }
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            bool bigEndian = writer.Endianness == Endianness.Big;
+
+            // Header is always little endian
+            writer.Endianness = Endianness.Little;
+
+            writer.WriteUInt32(Signature);
+            writer.WriteUInt32(Size);
+
+            if (bigEndian)
+            {
+                writer.Endianness = Endianness.Big;
+            }
+        }
     }
 }

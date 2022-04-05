@@ -13,11 +13,26 @@ namespace XNCPLib.XNCP
     public class FontID
     {
         public string Name { get; set; }
+        public uint NameOffset { get; set; }
         public uint Index { get; set; }
 
         public FontID()
         {
 
+        }
+
+        public void Read(BinaryObjectReader reader)
+        {
+            NameOffset = reader.ReadUInt32();
+            Name = reader.ReadStringOffset(NameOffset);
+            Index = reader.ReadUInt32();
+        }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(NameOffset);
+            writer.WriteStringOffset(NameOffset, Name);
+            writer.WriteUInt32(Index);
         }
     }
 
@@ -58,11 +73,27 @@ namespace XNCPLib.XNCP
                 reader.Seek(reader.GetOffsetOrigin() + FontIDTableOffset + (8 * i), SeekOrigin.Begin);
                 
                 FontID id = new FontID();
-                
-                uint nameOffset = reader.ReadUInt32();
-                id.Name = reader.ReadStringOffset(nameOffset);
-                id.Index = reader.ReadUInt32();
+                id.Read(reader);
                 FontIDTable.Add(id);
+            }
+        }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(FontCount);
+            writer.WriteUInt32(FontTableOffset);
+            writer.WriteUInt32(FontIDTableOffset);
+
+            for (int f = 0; f < FontCount; ++f)
+            {
+                writer.Seek(writer.GetOffsetOrigin() + FontTableOffset + (8 * f), SeekOrigin.Begin);
+                Fonts[f].Write(writer);
+            }
+
+            for (int i = 0; i < FontCount; ++i)
+            {
+                writer.Seek(writer.GetOffsetOrigin() + FontIDTableOffset + (8 * i), SeekOrigin.Begin);
+                FontIDTable[i].Write(writer);
             }
         }
     }

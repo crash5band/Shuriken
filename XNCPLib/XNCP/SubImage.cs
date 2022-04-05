@@ -27,5 +27,16 @@ namespace XNCPLib.XNCP
             TopLeft     = new Vector2(reader.ReadSingle(), reader.ReadSingle());
             BottomRight = new Vector2(reader.ReadSingle(), reader.ReadSingle());
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(TextureIndex);
+
+            writer.WriteSingle(TopLeft.X);
+            writer.WriteSingle(TopLeft.Y);
+
+            writer.WriteSingle(BottomRight.X);
+            writer.WriteSingle(BottomRight.Y);
+        }
     }
 }

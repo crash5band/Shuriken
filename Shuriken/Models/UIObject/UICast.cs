@@ -28,7 +28,20 @@ namespace Shuriken.Models
         public uint Field00 { get; set; }
         public DrawType Type { get; set; }
         public bool IsEnabled { get; set; }
-        public Vector2 Anchor { get; set; }
+        public Vector2 TopLeft { get; set; }
+        public Vector2 BottomLeft { get; set; }
+        public Vector2 TopRight { get; set; }
+        public Vector2 BottomRight { get; set; }
+
+        public Vector2 Anchor 
+        { 
+            get {
+                float right = Math.Abs(TopRight.X) - Math.Abs(TopLeft.X);
+                float top = Math.Abs(TopRight.Y) - Math.Abs(BottomRight.Y);
+                return new Vector2(right, top);
+            }
+        }
+
         public uint Field2C { get; set; }
         public uint Field34 { get; set; }
         public uint Flags { get; set; }
@@ -92,9 +105,10 @@ namespace Shuriken.Models
             ZIndex = index;
             Children = new ObservableCollection<UICast>();
 
-            float right = Math.Abs(cast.TopRight.X) - Math.Abs(cast.TopLeft.X);
-            float top = Math.Abs(cast.TopRight.Y) - Math.Abs(cast.BottomRight.Y);
-            Anchor = new Vector2(right, top);
+            TopLeft = new Vector2(cast.TopLeft);
+            TopRight = new Vector2(cast.TopRight);
+            BottomLeft = new Vector2(cast.BottomLeft);
+            BottomRight = new Vector2(cast.BottomRight);
 
             Field2C = cast.Field2C;
             Field34 = cast.Field34;
@@ -159,7 +173,11 @@ namespace Shuriken.Models
             Field58 = 0;
             Field5C = 0;
 
-            Anchor = new Vector2();
+            TopLeft = new Vector2();
+            TopRight = new Vector2();
+            BottomLeft = new Vector2();
+            BottomRight = new Vector2();
+
             Offset = new Vector2(0.5f, 0.5f);
 
             Field68 = 0;
@@ -195,7 +213,10 @@ namespace Shuriken.Models
             ZIndex = ZIndex;
             Children = new ObservableCollection<UICast>(c.Children);
 
-            Anchor = new Vector2(Anchor);
+            TopLeft = new Vector2(c.TopLeft);
+            TopRight = new Vector2(c.TopRight);
+            BottomLeft = new Vector2(c.BottomLeft);
+            BottomRight = new Vector2(c.BottomRight);
 
             Field2C = c.Field2C;
             Field34 = c.Field34;

@@ -60,17 +60,15 @@ namespace Shuriken.Misc
                 {
                     var sprites = textures[textureIndex].Sprites;
                     var target = spriteList[spriteIndex];
+                    Sprite targetToCompare = new Sprite(0, textures[textureIndex], target.TopLeft.Y, target.TopLeft.X,
+                        target.BottomRight.Y, target.BottomRight.X);
                     for (int s = 0; s < sprites.Count; ++s)
                     {
-                        int x = ToPixels(target.TopLeft.X, textures[textureIndex].Width);
-                        int y = ToPixels(target.TopLeft.Y, textures[textureIndex].Height);
-                        int w = ToPixels(target.BottomRight.X - target.TopLeft.X, textures[textureIndex].Width);
-                        int h = ToPixels(target.BottomRight.Y - target.TopLeft.Y, textures[textureIndex].Height);
-
                         var spr = Project.TryGetSprite(sprites[s]);
-                        if (spr.X == x && spr.Y == y
-                            && spr.Width == w
-                            && spr.Height == h)
+
+                        if (spr.X == targetToCompare.X && spr.Y == targetToCompare.Y
+                            && spr.Width == targetToCompare.Width
+                            && spr.Height == targetToCompare.Height)
                         {
                             return textures[textureIndex].Sprites[s];
                         }
@@ -79,6 +77,33 @@ namespace Shuriken.Misc
             }
 
             return -1;
+        }
+
+        public static uint FindSubImageIndexFromSprite(Sprite sprite, List<SubImage> subImages, ObservableCollection<Texture> textures)
+        {
+            // TODO: May not always be correct
+            return (uint)(sprite.ID - 1);
+
+            /*
+            int textureIndex = textures.IndexOf(sprite.Texture)
+
+            for (int s = 0; s < subImages.Count; ++s)
+            {
+                var subImage = subImages[s];
+                if (subImage.TextureIndex != textureIndex) continue;
+
+                Sprite target = new Sprite(0, textures[textureIndex], subImage.TopLeft.Y, subImage.TopLeft.X,
+                            subImage.BottomRight.Y, subImage.BottomRight.X);
+
+                if (target.X == sprite.X && target.Y == sprite.Y && 
+                    target.Width == sprite.Width && target.Height == sprite.Height)
+                {
+                    return (uint) s;
+                }
+            }
+
+            return 0;
+            */
         }
     }
 }

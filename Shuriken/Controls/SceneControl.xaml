@@ -29,25 +29,25 @@
                 <Border>
                     <StackPanel>
                         <Label>Name</Label>
-                        <TextBox Text="{Binding Name}"/>
+                        <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Field00</Label>
-                        <TextBox Text="{Binding Field00}"/>
+                        <TextBox Text="{Binding Field00, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>ZIndex</Label>
-                        <TextBox Text="{Binding ZIndex}"/>
+                        <TextBox Text="{Binding ZIndex, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Field0C</Label>
-                        <TextBox Text="{Binding Field0C}"/>
+                        <TextBox Text="{Binding Field0C, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Field10</Label>
-                        <TextBox Text="{Binding Field10}"/>
+                        <TextBox Text="{Binding Field10, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Aspect Ratio</Label>
-                        <TextBox Text="{Binding AspectRatio}"/>
+                        <TextBox Text="{Binding AspectRatio, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Animation Framerate</Label>
-                        <TextBox Text="{Binding AnimationFramerate}"/>
+                        <TextBox Text="{Binding AnimationFramerate, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </Border>
             </Expander>

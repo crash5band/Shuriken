@@ -60,5 +60,34 @@ namespace XNCPLib.XNCP
                 CastHierarchyTree.Add(new CastHierarchyTreeNode(reader.ReadInt32(), reader.ReadInt32()));
             }
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(CastCount);
+            writer.WriteUInt32(CastTableOffset);
+            writer.WriteUInt32(Field08);
+            writer.WriteUInt32(CastHierarchyTreeOffset);
+
+            long baseOffset = writer.GetOffsetOrigin();
+            writer.Seek(baseOffset + CastTableOffset, SeekOrigin.Begin);
+
+            for (int i = 0; i < CastCount; ++i)
+            {
+                writer.WriteUInt32(CastOffsets[i]);
+            }
+
+            for (int i = 0; i < CastCount; ++i)
+            {
+                writer.Seek(baseOffset + CastOffsets[i], SeekOrigin.Begin);
+                Casts[i].Write(writer);
+            }
+
+            writer.Seek(baseOffset + CastHierarchyTreeOffset, SeekOrigin.Begin);
+            for (int i = 0; i < CastCount; ++i)
+            {
+                writer.WriteInt32(CastHierarchyTree[i].ChildIndex);
+                writer.WriteInt32(CastHierarchyTree[i].NextIndex);
+            }
+        }
     }
 }

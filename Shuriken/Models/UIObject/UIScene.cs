@@ -198,6 +198,8 @@ namespace Shuriken.Models
 
                 next = tree[next].NextIndex;
             }
+
+            Groups[group].CastsOrderedByIndex = new List<UICast>(lyrs);
         }
 
         private void BuildTree(int c, List<CastHierarchyTreeNode> tree, List<UICast> lyrs, UICast parent)

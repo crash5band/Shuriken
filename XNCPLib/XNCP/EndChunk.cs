@@ -24,5 +24,12 @@ namespace XNCPLib.XNCP
             Padding[0] = reader.ReadUInt32();
             Padding[1] = reader.ReadUInt32();
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            Header.Write(writer);
+            writer.WriteUInt32(Padding[0]);
+            writer.WriteUInt32(Padding[1]);
+        }
     }
 }

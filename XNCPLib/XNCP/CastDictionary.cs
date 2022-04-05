@@ -11,6 +11,7 @@ namespace XNCPLib.XNCP
     public class CastDictionary
     {
         public string Name { get; set; }
+        public uint NameOffset { get; set; }
         public uint GroupIndex { get; set; }
         public uint CastIndex { get; set; }
 
@@ -21,11 +22,20 @@ namespace XNCPLib.XNCP
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.ReadUInt32();
-            Name = reader.ReadStringOffset(nameOffset);
+            NameOffset = reader.ReadUInt32();
+            Name = reader.ReadStringOffset(NameOffset);
 
             GroupIndex = reader.ReadUInt32();
             CastIndex = reader.ReadUInt32();
+        }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(NameOffset);
+            writer.WriteStringOffset(NameOffset, Name);
+
+            writer.WriteUInt32(GroupIndex);
+            writer.WriteUInt32(CastIndex);
         }
     }
 }

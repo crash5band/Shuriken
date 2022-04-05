@@ -52,13 +52,19 @@
                 <Border>
                     <StackPanel>
                         <Label>Width</Label>
-                        <TextBox Text="{Binding Width}"/>
+                        <TextBox Text="{Binding Width, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Height</Label>
-                        <TextBox Text="{Binding Height}"/>
+                        <TextBox Text="{Binding Height, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <Label>Anchor</Label>
-                        <local:Vector2Control Value="{Binding Anchor}"/>
+                        <Label>Top Left</Label>
+                        <local:Vector2Control Value="{Binding TopLeft}"/>
+                        <Label>Top Right</Label>
+                        <local:Vector2Control Value="{Binding TopRight}"/>
+                        <Label>Bottom Left</Label>
+                        <local:Vector2Control Value="{Binding BottomLeft}"/>
+                        <Label>Bottom Right</Label>
+                        <local:Vector2Control Value="{Binding BottomRight}"/>
                     </StackPanel>
                 </Border>
             </Expander>
@@ -69,13 +75,13 @@
                         <local:Vector2Control Value="{Binding Translation}"/>
 
                         <Label>Z-Translation</Label>
-                        <TextBox Text="{Binding ZTranslation}"/>
+                        <TextBox Text="{Binding ZTranslation, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Offset</Label>
                         <local:Vector2Control Value="{Binding Offset}"/>
 
                         <Label>Rotation</Label>
-                        <TextBox Text="{Binding Rotation}"/>
+                        <TextBox Text="{Binding Rotation, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Scale</Label>
                         <local:Vector3Control Value="{Binding Scale}"/>
@@ -106,10 +112,10 @@
                 <Border>
                     <StackPanel>
                         <Label>Font</Label>
-                        <TextBox Text="{Binding Font.Name}"/>
+                        <TextBox Text="{Binding Font.Name, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Font Characters</Label>
-                        <TextBox Text="{Binding FontCharacters}"/>
+                        <TextBox Text="{Binding FontCharacters, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </Border>
             </Expander>
@@ -117,34 +123,34 @@
                 <Border>
                     <StackPanel>
                         <Label>Field2C</Label>
-                        <TextBox Text="{Binding Field2C}"/>
+                        <TextBox Text="{Binding Field2C, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Inheritance</Label>
-                        <TextBox Text="{Binding Field34}"/>
+                        <TextBox Text="{Binding Field34, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Flags</Label>
-                        <TextBox Text="{Binding Flags}"/>
+                        <TextBox Text="{Binding Flags, UpdateSourceTrigger=PropertyChanged}"/>
                         
                         <Label>Field3C</Label>
-                        <TextBox Text="{Binding Field3C}"/>
+                        <TextBox Text="{Binding Field3C, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Field4C</Label>
-                        <TextBox Text="{Binding Field4C}"/>
+                        <TextBox Text="{Binding Field4C, UpdateSourceTrigger=PropertyChanged}"/>
                         
                         <Label>Field58</Label>
-                        <TextBox Text="{Binding Field58}"/>
+                        <TextBox Text="{Binding Field58, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Field5C</Label>
-                        <TextBox Text="{Binding Field5C}"/>
+                        <TextBox Text="{Binding Field5C, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Field68</Label>
-                        <TextBox Text="{Binding Field68}"/>
+                        <TextBox Text="{Binding Field68, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Field6C</Label>
-                        <TextBox Text="{Binding Field6C}"/>
+                        <TextBox Text="{Binding Field6C, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>FontSpacingCorrection</Label>
-                        <TextBox Text="{Binding FontSpacingCorrection}"/>
+                        <TextBox Text="{Binding FontSpacingCorrection, UpdateSourceTrigger=PropertyChanged}"/>
 
                     </StackPanel>
                 </Border>
@@ -153,26 +159,26 @@
                 <Border>
                     <StackPanel>
                         <Label>InfoField00</Label>
-                        <TextBox Text="{Binding InfoField00}"/>
+                        <TextBox Text="{Binding InfoField00, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>InfoField18</Label>
-                        <TextBox Text="{Binding InfoField18}"/>
+                        <TextBox Text="{Binding InfoField18, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>InfoField30</Label>
-                        <TextBox Text="{Binding InfoField30}"/>
+                        <TextBox Text="{Binding InfoField30, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>InfoField34</Label>
-                        <TextBox Text="{Binding InfoField34}"/>
+                        <TextBox Text="{Binding InfoField34, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>InfoField38</Label>
-                        <TextBox Text="{Binding InfoField38}"/>
+                        <TextBox Text="{Binding InfoField38, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </Border>
             </Expander>
             <Expander Header="Sprites" IsExpanded="True">
                 <Border>
                     <StackPanel>
-                        <TextBox Text="{Binding DefaultSprite}"/>
+                        <TextBox Text="{Binding DefaultSprite, UpdateSourceTrigger=PropertyChanged}"/>
                         <ListView Name="SpriteList" ItemsSource="{Binding Sprites}" Height="100">
                             <ListView.ItemTemplate>
                                 <DataTemplate>

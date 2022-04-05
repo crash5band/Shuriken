@@ -17,16 +17,23 @@ namespace Shuriken.Models
         public Vector2 Dimensions { get; set; }
         public Texture Texture { get; set; }
 
+        // Used for saving to avoid corruption in un-edited values
+        public float OriginalTop { get; set; }
+        public float OriginalBottom { get; set; }
+        public float OriginalLeft { get; set; }
+        public float OriginalRight { get; set; }
+        public bool HasChanged { get; set; }
+
         public int X
         {
             get { return (int)Start.X; }
-            set { Start.X = value;CreateCrop(); }
+            set { Start.X = value;CreateCrop(); HasChanged = true; }
         }
 
         public int Y
         {
             get { return (int)Start.Y; }
-            set { Start.Y = value; CreateCrop(); }
+            set { Start.Y = value; CreateCrop(); HasChanged = true; }
         }
 
         public int Width
@@ -38,6 +45,7 @@ namespace Shuriken.Models
                 {
                     Dimensions.X = value;
                     CreateCrop();
+                    HasChanged = true;
                 }
             }
         }
@@ -51,6 +59,7 @@ namespace Shuriken.Models
                 {
                     Dimensions.Y = value;
                     CreateCrop();
+                    HasChanged = true;
                 }
             }
         }
@@ -74,6 +83,12 @@ namespace Shuriken.Models
 
             Dimensions = new Vector2((right - left) * tex.Width, (bottom - top) * tex.Height);
             CreateCrop();
+
+            OriginalTop = top;
+            OriginalLeft = left;
+            OriginalBottom = bottom;
+            OriginalRight = right;
+            HasChanged = false;
         }
 
         public Sprite()
@@ -82,6 +97,7 @@ namespace Shuriken.Models
             Dimensions = new Vector2();
 
             Texture = new Texture();
+            HasChanged = false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

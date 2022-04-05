@@ -27,8 +27,8 @@
         <TextBlock Grid.Column="2" Text="Y"/>
         <TextBlock Grid.Column="4" Text="Z"/>
 
-        <TextBox Name="XTextBox" Grid.Column="1" Text="{Binding Value.X}"/>
-        <TextBox Name="YTextBox" Grid.Column="3" Text="{Binding Value.Y}"/>
-        <TextBox Name="ZTextBox" Grid.Column="5" Text="{Binding Value.Z}"/>
+        <TextBox Name="XTextBox" Grid.Column="1" Text="{Binding Value.X, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Name="YTextBox" Grid.Column="3" Text="{Binding Value.Y, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Name="ZTextBox" Grid.Column="5" Text="{Binding Value.Z, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </UserControl>

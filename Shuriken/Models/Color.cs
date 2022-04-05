@@ -78,6 +78,11 @@ namespace Shuriken.Models
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
         }
 
+        public uint ToUint()
+        {
+            return BitConverter.ToUInt32(new byte[] { A, B, G, R });
+        }
+
         public override string ToString()
         {
             return $"<{R}, {G}, {B}, {A}>";

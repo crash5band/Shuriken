@@ -58,16 +58,16 @@
                         <HierarchicalDataTemplate DataType="{x:Type animation:AnimationGroup}" ItemsSource="{Binding LayerAnimations}">
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox IsChecked="{Binding Enabled}" Margin="0 0 5 0"/>
-                                <TextBlock Text="{Binding Name}"/>
+                                <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
                         </HierarchicalDataTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type animation:AnimationList}" ItemsSource="{Binding Tracks}">
-                            <TextBlock Text="{Binding Layer.Name}"/>
+                            <TextBlock Text="{Binding Layer.Name, UpdateSourceTrigger=PropertyChanged}"/>
                         </HierarchicalDataTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type animation:AnimationTrack}">
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox IsChecked="{Binding Enabled}"/>
-                                <TextBlock Text="{Binding TypeString}"/>
+                                <TextBlock Text="{Binding TypeString, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
                         </HierarchicalDataTemplate>
                     </TreeView.Resources>
@@ -91,7 +91,7 @@
                                 <TextBlock Text="&#xf010;" FontFamily="{StaticResource FontAwesome}"/>
                             </Button.Content>
                         </Button>
-                        <Slider Value="{Binding Zoom}" Minimum="{Binding MinZoom}" Maximum="{Binding MaxZoom}" MinWidth="50" Width="100" VerticalAlignment="Center"/>
+                        <Slider Value="{Binding Zoom}" Minimum="{Binding MinZoom}" Maximum="{Binding MaxZoom, UpdateSourceTrigger=PropertyChanged}" MinWidth="50" Width="100" VerticalAlignment="Center"/>
                         <Button Style="{StaticResource TransparentButton}">
                             <Button.Content>
                                 <TextBlock Text="&#xf00e;" FontFamily="{StaticResource FontAwesome}"/>
@@ -99,12 +99,12 @@
                         </Button>
                         
                         <!-- Min/Max value adjustment -->
-                        <TextBlock Text="{Binding Zoom, StringFormat={}{0:P2}, FallbackValue=100%}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Zoom, StringFormat={}{0:P2}, FallbackValue=100%, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
                         <Separator HorizontalAlignment="Center" VerticalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5"/>
                         <TextBlock Text="Min" VerticalAlignment="Center"/>
-                        <TextBox Text="{Binding MinValue}" MinWidth="30" Width="50" VerticalAlignment="Center" Margin="5 0"/>
+                        <TextBox Text="{Binding MinValue, UpdateSourceTrigger=PropertyChanged}" MinWidth="30" Width="50" VerticalAlignment="Center" Margin="5 0"/>
                         <TextBlock Text="Max" VerticalAlignment="Center"/>
-                        <TextBox Text="{Binding MaxValue}" MinWidth="30" Width="50" VerticalAlignment="Center" Margin="5 0"/>
+                        <TextBox Text="{Binding MaxValue, UpdateSourceTrigger=PropertyChanged}" MinWidth="30" Width="50" VerticalAlignment="Center" Margin="5 0"/>
                         <Separator HorizontalAlignment="Center" VerticalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5"/>
                         
                         <!-- Timeline controls -->
@@ -154,9 +154,9 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <Label>Frame</Label>
-                        <TextBox Text="{Binding SelectedKey.Frame}" IsEnabled="{Binding KeySelected}"/>
+                        <TextBox Text="{Binding SelectedKey.Frame}" IsEnabled="{Binding KeySelected, UpdateSourceTrigger=PropertyChanged}"/>
                         <Label>Value</Label>
-                        <TextBox Text="{Binding SelectedKey.KValue}" IsEnabled="{Binding KeySelected}"/>
+                        <TextBox Text="{Binding SelectedKey.KValue}" IsEnabled="{Binding KeySelected, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </ScrollViewer>
             </GroupBox>

@@ -21,5 +21,13 @@ namespace XNCPLib.XNCP
             for (int i = 0; i < 32; ++i)
                 SubImageIndices[i] = reader.ReadInt32();
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            for (int i = 0; i < 32; ++i)
+            {
+                writer.WriteInt32(SubImageIndices[i]);
+            }
+        }
     }
 }

@@ -27,6 +27,7 @@ namespace Shuriken.Models
         public bool Visible { get; set; }
 
         public ObservableCollection<UICast> Casts { get; set; }
+        public List<UICast> CastsOrderedByIndex { get; set; }
 
         public void AddCast(UICast cast)
         {

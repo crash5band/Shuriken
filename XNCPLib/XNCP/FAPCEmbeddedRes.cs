@@ -22,5 +22,11 @@ namespace XNCPLib.XNCP
             Size = reader.ReadUInt32();
             Content.Read(reader);
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(Size);
+            Content.Write(writer);
+        }
     }
 }

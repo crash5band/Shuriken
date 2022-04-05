@@ -31,5 +31,21 @@ namespace XNCPLib.XNCP
 
             reader.Dispose();
         }
+
+        public void Save(string filename)
+        {
+            BinaryObjectWriter writer = new BinaryObjectWriter(filename, Endianness.Little, Encoding.UTF8);
+
+            writer.WriteUInt32(Signature);
+            if (Signature == Utilities.Make4CCLE("CPAF"))
+            {
+                writer.Endianness = Endianness.Big;
+            }
+
+            Resources[0].Write(writer);
+            Resources[1].Write(writer);
+
+            writer.Dispose();
+        }
     }
 }

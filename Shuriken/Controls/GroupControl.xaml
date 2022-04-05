@@ -28,10 +28,10 @@
             <Border>
                 <StackPanel>
                     <Label>Name</Label>
-                    <TextBox Text="{Binding Name}"/>
+                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
 
                     <Label>Field08</Label>
-                    <TextBox Text="{Binding Field08}"/>
+                    <TextBox Text="{Binding Field08, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
             </Border>
         </Expander>

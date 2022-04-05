@@ -27,7 +27,9 @@ namespace XNCPLib.XNCP
         public uint Field3C { get; set; }
         public uint CastMaterialInfoOffset { get; set; }
         public string FontCharacters{ get; set; }
+        public uint FontCharactersOffset { get; set; }
         public string FontName { get; set; }
+        public uint FontNameOffset { get; set; }
         public uint Field4C { get; set; }
         public uint Width { get; set; }
         public uint Height { get; set; }
@@ -66,11 +68,11 @@ namespace XNCPLib.XNCP
             Field3C = reader.ReadUInt32();
             CastMaterialInfoOffset = reader.ReadUInt32();
 
-            uint fontCharactersOffset = reader.ReadUInt32();
-            FontCharacters = reader.ReadStringOffset(fontCharactersOffset);
+            FontCharactersOffset = reader.ReadUInt32();
+            FontCharacters = reader.ReadStringOffset(FontCharactersOffset);
 
-            uint fontNameOffset = reader.ReadUInt32();
-            FontName = reader.ReadStringOffset(fontNameOffset);
+            FontNameOffset = reader.ReadUInt32();
+            FontName = reader.ReadStringOffset(FontNameOffset);
 
             Field4C = reader.ReadUInt32();
             Width = reader.ReadUInt32();
@@ -95,6 +97,62 @@ namespace XNCPLib.XNCP
             {
                 reader.Seek(baseOffset + CastMaterialInfoOffset, SeekOrigin.Begin);
                 CastMaterialData.Read(reader);
+            }
+        }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(Field00);
+            writer.WriteUInt32(Field04);
+            writer.WriteUInt32(IsEnabled);
+
+            writer.WriteSingle(TopLeft.X);
+            writer.WriteSingle(TopLeft.Y);
+            writer.WriteSingle(BottomLeft.X);
+            writer.WriteSingle(BottomLeft.Y);
+
+            writer.WriteSingle(TopRight.X);
+            writer.WriteSingle(TopRight.Y);
+            writer.WriteSingle(BottomRight.X);
+            writer.WriteSingle(BottomRight.Y);
+
+            writer.WriteUInt32(Field2C);
+            writer.WriteUInt32(CastInfoOffset);
+            writer.WriteUInt32(Field34);
+            writer.WriteUInt32(Field38);
+            writer.WriteUInt32(Field3C);
+            writer.WriteUInt32(CastMaterialInfoOffset);
+
+            writer.WriteUInt32(FontCharactersOffset);
+            writer.WriteStringOffset(FontCharactersOffset, FontCharacters);
+
+            writer.WriteUInt32(FontNameOffset);
+            writer.WriteStringOffset(FontNameOffset, FontName);
+
+            writer.WriteUInt32(Field4C);
+            writer.WriteUInt32(Width);
+            writer.WriteUInt32(Height);
+            writer.WriteUInt32(Field58);
+            writer.WriteUInt32(Field5C);
+
+            writer.WriteSingle(Offset.X);
+            writer.WriteSingle(Offset.Y);
+            writer.WriteSingle(Field68);
+            writer.WriteSingle(Field6C);
+            writer.WriteUInt32(FontSpacingCorrection);
+
+            long baseOffset = writer.GetOffsetOrigin();
+
+            if (CastInfoOffset != 0)
+            {
+                writer.Seek(baseOffset + CastInfoOffset, SeekOrigin.Begin);
+                CastInfoData.Write(writer);
+            }
+
+            if (CastMaterialInfoOffset != 0)
+            {
+                writer.Seek(baseOffset + CastMaterialInfoOffset, SeekOrigin.Begin);
+                CastMaterialData.Write(writer);
             }
         }
     }

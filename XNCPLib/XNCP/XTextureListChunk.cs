@@ -46,5 +46,24 @@ namespace XNCPLib.XNCP
 
             reader.PopOffsetOrigin();
         }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.PushOffsetOrigin();
+            Header.Write(writer);
+
+            writer.WriteUInt32(ListOffset);
+            writer.WriteUInt32(Field0C);
+            writer.WriteUInt32(TextureCount);
+            writer.WriteUInt32(DataOffset);
+
+            writer.Seek(writer.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
+            for (int i = 0; i < TextureCount; ++i)
+            {
+                Textures[i].Write(writer);
+            }
+
+            writer.PopOffsetOrigin();
+        }
     }
 }
