@@ -91,11 +91,6 @@ namespace Shuriken.ViewModels
                     int textureIndex = (int)subimage.TextureIndex;
                     if (textureIndex >= 0 && textureIndex < texList.Textures.Count)
                     {
-                        if (subImageIndex == 247)
-                        {
-                            int a = 123;
-                        }
-
                         int id = Project.CreateSprite(texList.Textures[textureIndex], subimage.TopLeft.Y, subimage.TopLeft.X,
                             subimage.BottomRight.Y, subimage.BottomRight.X);
                         

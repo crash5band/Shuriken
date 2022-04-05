@@ -40,10 +40,10 @@
                     <TextBlock Text="Width" Grid.Row="2" Grid.Column="0"/>
                     <TextBlock Text="Height" Grid.Row="2" Grid.Column="2"/>
 
-                    <TextBox Text="{Binding Sprite.X}" Grid.Row="0" Grid.Column="1"/>
-                    <TextBox Text="{Binding Sprite.Y}" Grid.Row="0" Grid.Column="3"/>
-                    <TextBox Text="{Binding Sprite.Width}" Grid.Row="2" Grid.Column="1"/>
-                    <TextBox Text="{Binding Sprite.Height}" Grid.Row="2" Grid.Column="3"/>
+                    <TextBox Text="{Binding Sprite.X, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1"/>
+                    <TextBox Text="{Binding Sprite.Y, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="3"/>
+                    <TextBox Text="{Binding Sprite.Width, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.Column="1"/>
+                    <TextBox Text="{Binding Sprite.Height, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.Column="3"/>
                 </Grid>
 
                 <Separator Grid.Row="1"/>

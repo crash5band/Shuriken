@@ -36,13 +36,13 @@
             </Style>
         </Grid.Resources>
         <TextBlock Grid.Column="0" Text="R"/>
-        <TextBox Grid.Column="1" Text="{Binding Value.R}"/>
+        <TextBox Grid.Column="1" Text="{Binding Value.R, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Grid.Column="2" Text="G"/>
-        <TextBox Grid.Column="3" Text="{Binding Value.G}"/>
+        <TextBox Grid.Column="3" Text="{Binding Value.G, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Grid.Column="4" Text="B"/>
-        <TextBox Grid.Column="5" Text="{Binding Value.B}"/>
+        <TextBox Grid.Column="5" Text="{Binding Value.B, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Grid.Column="6" Text="A"/>
-        <TextBox Grid.Column="7" Text="{Binding Value.A}"/>
+        <TextBox Grid.Column="7" Text="{Binding Value.A, UpdateSourceTrigger=PropertyChanged}"/>
         <Button Name="ColorBtn" Grid.Column="8" Width="30" Height="30" Background="{Binding Value, Converter={StaticResource ColorToBrushConverter}}" Click="ColorBtnClick"/>
     </Grid>
 </UserControl>

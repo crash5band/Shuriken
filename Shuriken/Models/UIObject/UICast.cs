@@ -38,7 +38,10 @@ namespace Shuriken.Models
         public string FontCharacters { get; set; }
 
         public uint Field4C { get; set; }
-        public uint Width { get; set; }
+        public uint Width { 
+            get; 
+            set; 
+        }
         public uint Height { get; set; }
         public uint Field58 { get; set; }
         public uint Field5C { get; set; }
