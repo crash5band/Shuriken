@@ -250,11 +250,16 @@ namespace Shuriken.ViewModels
                     cast.Field04 = (uint)uiCast.Type;
                     cast.IsEnabled = uiCast.IsEnabled ? (uint)1 : 0;
 
-                    /* TODO: Process these
+                    /*
                     float right = Math.Abs(cast.TopRight.X) - Math.Abs(cast.TopLeft.X);
                     float top = Math.Abs(cast.TopRight.Y) - Math.Abs(cast.BottomRight.Y);
                     Anchor = new Vector2(right, top);
                     */
+
+                    cast.TopLeft = new Vector2(uiCast.TopLeft);
+                    cast.TopRight = new Vector2(uiCast.TopRight);
+                    cast.BottomLeft = new Vector2(uiCast.BottomLeft);
+                    cast.BottomRight = new Vector2(uiCast.BottomRight);
 
                     cast.Field2C = uiCast.Field2C;
                     cast.Field34 = uiCast.Field34;

@@ -57,8 +57,14 @@
                         <Label>Height</Label>
                         <TextBox Text="{Binding Height, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <Label>Anchor</Label>
-                        <local:Vector2Control Value="{Binding Anchor}"/>
+                        <Label>Top Left</Label>
+                        <local:Vector2Control Value="{Binding TopLeft}"/>
+                        <Label>Top Right</Label>
+                        <local:Vector2Control Value="{Binding TopRight}"/>
+                        <Label>Bottom Left</Label>
+                        <local:Vector2Control Value="{Binding BottomLeft}"/>
+                        <Label>Bottom Right</Label>
+                        <local:Vector2Control Value="{Binding BottomRight}"/>
                     </StackPanel>
                 </Border>
             </Expander>

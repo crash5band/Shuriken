@@ -27,6 +27,7 @@ namespace Shuriken
 
         public MainWindow()
         {
+            FrameworkCompatibilityPreferences.KeepTextBoxDisplaySynchronizedWithTextProperty = false;
             InitializeComponent();
 
             vm = new MainViewModel();
