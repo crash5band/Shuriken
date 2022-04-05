@@ -60,17 +60,15 @@ namespace Shuriken.Misc
                 {
                     var sprites = textures[textureIndex].Sprites;
                     var target = spriteList[spriteIndex];
+                    Sprite targetToCompare = new Sprite(0, textures[textureIndex], target.TopLeft.Y, target.TopLeft.X,
+                        target.BottomRight.Y, target.BottomRight.X);
                     for (int s = 0; s < sprites.Count; ++s)
                     {
-                        int x = ToPixels(target.TopLeft.X, textures[textureIndex].Width);
-                        int y = ToPixels(target.TopLeft.Y, textures[textureIndex].Height);
-                        int w = ToPixels(target.BottomRight.X - target.TopLeft.X, textures[textureIndex].Width);
-                        int h = ToPixels(target.BottomRight.Y - target.TopLeft.Y, textures[textureIndex].Height);
-
                         var spr = Project.TryGetSprite(sprites[s]);
-                        if (spr.X == x && spr.Y == y
-                            && spr.Width == w
-                            && spr.Height == h)
+
+                        if (spr.X == targetToCompare.X && spr.Y == targetToCompare.Y
+                            && spr.Width == targetToCompare.Width
+                            && spr.Height == targetToCompare.Height)
                         {
                             return textures[textureIndex].Sprites[s];
                         }

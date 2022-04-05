@@ -91,6 +91,11 @@ namespace Shuriken.ViewModels
                     int textureIndex = (int)subimage.TextureIndex;
                     if (textureIndex >= 0 && textureIndex < texList.Textures.Count)
                     {
+                        if (subImageIndex == 247)
+                        {
+                            int a = 123;
+                        }
+
                         int id = Project.CreateSprite(texList.Textures[textureIndex], subimage.TopLeft.Y, subimage.TopLeft.X,
                             subimage.BottomRight.Y, subimage.BottomRight.X);
                         
@@ -163,33 +168,35 @@ namespace Shuriken.ViewModels
                 }
             }
 
-            // Sprite Saving: Has conversion issues
-            int nextSpriteId = 1;
+            // Sprite Saving: Has some conversion issues
             if (xScenes.Count > 0)
             {
-                foreach (SubImage subimage in xScenes[0].SubImages)
+                foreach (Scene scene in xScenes)
                 {
-                    int textureIndex = (int)subimage.TextureIndex;
-                    if (textureIndex >= 0 && textureIndex < texList.Textures.Count)
+                    int nextSpriteId = 1;
+                    foreach (SubImage subimage in scene.SubImages)
                     {
-                        Sprite sprite = Project.TryGetSprite(nextSpriteId++);
-                        int newTextureIndex = texList.Textures.IndexOf(sprite.Texture);
+                        int textureIndex = (int)subimage.TextureIndex;
+                        if (textureIndex >= 0 && textureIndex < texList.Textures.Count)
+                        {
+                            Sprite sprite = Project.TryGetSprite(nextSpriteId++);
+                            int newTextureIndex = texList.Textures.IndexOf(sprite.Texture);
 
-                        subimage.TextureIndex = (uint) newTextureIndex;
-                        if (sprite.HasChanged)
-                        {
-                            subimage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, sprite.Y / sprite.Texture.Height);
-                            subimage.BottomRight = new Vector2(((float)sprite.Width / sprite.Texture.Width) + subimage.TopLeft.X, ((float)sprite.Height / sprite.Texture.Height) + subimage.TopLeft.Y);
-                        }
-                        else
-                        {
-                            subimage.TopLeft = new Vector2(sprite.OriginalLeft, sprite.OriginalTop);
-                            subimage.BottomRight = new Vector2(sprite.OriginalRight, sprite.OriginalBottom);
+                            subimage.TextureIndex = (uint)newTextureIndex;
+                            if (sprite.HasChanged)
+                            {
+                                subimage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, (float)sprite.Y / sprite.Texture.Height);
+                                subimage.BottomRight = new Vector2(((float)sprite.Width / sprite.Texture.Width) + subimage.TopLeft.X, ((float)sprite.Height / sprite.Texture.Height) + subimage.TopLeft.Y);
+                            }
+                            else
+                            {
+                                subimage.TopLeft = new Vector2(sprite.OriginalLeft, sprite.OriginalTop);
+                                subimage.BottomRight = new Vector2(sprite.OriginalRight, sprite.OriginalBottom);
+                            }
                         }
                     }
                 }
             }
-            
 
             int sceneIndex = 0;
             foreach (SceneID sceneID in xIDs)
@@ -301,7 +308,11 @@ namespace Shuriken.ViewModels
                                 castSprites[index] = -1;
                                 continue;
                             }
-                            castSprites[index] = (int)Utilities.FindSubImageIndexFromSprite(Project.TryGetSprite(uiCast.Sprites[index]), scene.SubImages, Project.TextureLists[0].Textures);
+
+                            Sprite uiSprite = Project.TryGetSprite(uiCast.Sprites[index]);
+
+                            // TODO: Doesn't support newly sprites
+                            castSprites[index] = (int)Utilities.FindSubImageIndexFromSprite(uiSprite, scene.SubImages, Project.TextureLists[0].Textures);
                         }
                         
                     }
