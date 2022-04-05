@@ -168,6 +168,30 @@ namespace Shuriken.ViewModels
                 }
             }
 
+            int sceneIndex = 0;
+            foreach (SceneID sceneID in xIDs)
+            {
+                Scene scene = xScenes[(int)sceneID.Index];
+                UIScene uiScene = Project.Scenes[sceneIndex++];
+
+                sceneID.Name = uiScene.Name.Substring(0, sceneID.Name.Length); // TODO: This will break with names larger than the original one
+
+                scene.Field00 = uiScene.Field00;
+                scene.ZIndex = uiScene.ZIndex;
+                scene.Field0C = uiScene.Field0C;
+                scene.Field10 = uiScene.Field10;
+                scene.AspectRatio = uiScene.AspectRatio;
+                scene.AnimationFramerate = uiScene.AnimationFramerate;
+
+                int textureSizeIndex = 0;
+                for (int i = 0; i < scene.Data1.Count; ++i)
+                {
+                    scene.Data1[i] = uiScene.TextureSizes[textureSizeIndex++];
+                }
+
+                SaveCasts(uiScene, scene);
+            }
+
             // Sprite Saving: Has some conversion issues
             if (xScenes.Count > 0)
             {
@@ -196,30 +220,6 @@ namespace Shuriken.ViewModels
                         }
                     }
                 }
-            }
-
-            int sceneIndex = 0;
-            foreach (SceneID sceneID in xIDs)
-            {
-                Scene scene = xScenes[(int)sceneID.Index];
-                UIScene uiScene = Project.Scenes[sceneIndex++];
-
-                sceneID.Name = uiScene.Name.Substring(0, sceneID.Name.Length); // TODO: This will break with names larger than the original one
-
-                scene.Field00 = uiScene.Field00;
-                scene.ZIndex = uiScene.ZIndex;
-                scene.Field0C = uiScene.Field0C;
-                scene.Field10 = uiScene.Field10;
-                scene.AspectRatio = uiScene.AspectRatio;
-                scene.AnimationFramerate = uiScene.AnimationFramerate;
-
-                int textureSizeIndex = 0;
-                for (int i = 0; i < scene.Data1.Count; ++i)
-                {
-                    scene.Data1[i] = uiScene.TextureSizes[textureSizeIndex++];
-                }
-
-                SaveCasts(uiScene, scene);
             }
 
             WorkFile.Save(path);
