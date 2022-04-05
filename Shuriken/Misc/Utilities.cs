@@ -81,7 +81,11 @@ namespace Shuriken.Misc
 
         public static uint FindSubImageIndexFromSprite(Sprite sprite, List<SubImage> subImages, ObservableCollection<Texture> textures)
         {
-            int textureIndex = textures.IndexOf(sprite.Texture);
+            // TODO: May not always be correct
+            return (uint)(sprite.ID - 1);
+
+            /*
+            int textureIndex = textures.IndexOf(sprite.Texture)
 
             for (int s = 0; s < subImages.Count; ++s)
             {
@@ -99,6 +103,7 @@ namespace Shuriken.Misc
             }
 
             return 0;
+            */
         }
     }
 }
