@@ -295,8 +295,6 @@ namespace Shuriken.ViewModels
                     cast.CastInfoData.Field30 = uiCast.InfoField30;
                     cast.CastInfoData.Field34 = uiCast.InfoField34;
                     cast.CastInfoData.Field38 = uiCast.InfoField38;
-
-                    
                     
                     if (uiCast.Type == DrawType.Sprite)
                     {
@@ -311,7 +309,7 @@ namespace Shuriken.ViewModels
 
                             Sprite uiSprite = Project.TryGetSprite(uiCast.Sprites[index]);
 
-                            // TODO: Doesn't support newly sprites
+                            // TODO: Doesn't support new sprites
                             castSprites[index] = (int)Utilities.FindSubImageIndexFromSprite(uiSprite, scene.SubImages, Project.TextureLists[0].Textures);
                         }
                         

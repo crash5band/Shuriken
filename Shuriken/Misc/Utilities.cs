@@ -83,11 +83,6 @@ namespace Shuriken.Misc
         {
             int textureIndex = textures.IndexOf(sprite.Texture);
 
-            Vector2 TopLeft = new Vector2(
-                sprite.Start.X == 0 ? 0 : sprite.Texture.Width / sprite.Start.X,
-                sprite.Start.Y == 0 ? 0 : sprite.Texture.Height / sprite.Start.Y);
-            Vector2 BottomRight = new Vector2((sprite.Dimensions.X / sprite.Texture.Width) + TopLeft.X, (sprite.Dimensions.Y / sprite.Texture.Height) + TopLeft.Y);
-
             for (int s = 0; s < subImages.Count; ++s)
             {
                 var subImage = subImages[s];
