@@ -13,7 +13,7 @@ namespace XNCPLib.XNCP
 {
     public class Cast
     {
-        public uint Field00 { get; set; }
+        public uint PositionScaleLinkage { get; set; }
         public uint Field04 { get; set; }
         public uint IsEnabled { get; set; }
         public Vector2 TopLeft { get; set; }
@@ -33,12 +33,12 @@ namespace XNCPLib.XNCP
         public uint Field4C { get; set; }
         public uint Width { get; set; }
         public uint Height { get; set; }
-        public uint Field58 { get; set; }
-        public uint Field5C { get; set; }
+        public uint ScreenCanvasFlags { get; set; }
+        public uint ScreenResizeTypePosition { get; set; }
         public Vector2 Offset { get; set; }
         public float Field68 { get; set; }
         public float Field6C { get; set; }
-        public uint FontSpacingCorrection { get; set; }
+        public uint ScreenResizeTypeScale { get; set; }
         public CastInfo CastInfoData { get; set; }
         public CastMaterialInfo CastMaterialData { get; set; }
 
@@ -52,7 +52,7 @@ namespace XNCPLib.XNCP
 
         public void Read(BinaryObjectReader reader)
         {
-            Field00 = reader.ReadUInt32();
+            PositionScaleLinkage = reader.ReadUInt32();
             Field04 = reader.ReadUInt32();
             IsEnabled = reader.ReadUInt32();
 
@@ -77,13 +77,13 @@ namespace XNCPLib.XNCP
             Field4C = reader.ReadUInt32();
             Width = reader.ReadUInt32();
             Height = reader.ReadUInt32();
-            Field58 = reader.ReadUInt32();
-            Field5C = reader.ReadUInt32();
+            ScreenCanvasFlags = reader.ReadUInt32();
+            ScreenResizeTypePosition = reader.ReadUInt32();
 
             Offset = new Vector2(reader.ReadSingle(), reader.ReadSingle());
             Field68 = reader.ReadSingle();
             Field6C = reader.ReadSingle();
-            FontSpacingCorrection = reader.ReadUInt32();
+            ScreenResizeTypeScale = reader.ReadUInt32();
 
             long baseOffset = reader.GetOffsetOrigin();
 
