@@ -156,7 +156,8 @@
                         <Label>Frame</Label>
                         <TextBox Text="{Binding SelectedKey.Frame}" IsEnabled="{Binding KeySelected, UpdateSourceTrigger=PropertyChanged}"/>
                         <Label>Value</Label>
-                        <TextBox Text="{Binding SelectedKey.KValue}" IsEnabled="{Binding KeySelected, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Name="FrameValueText" Text="{Binding SelectedKey.KValue}" IsEnabled="{Binding KeySelected, UpdateSourceTrigger=PropertyChanged}" />
+                        <local:ColorControl x:Name="FrameValueColor" Value="{Binding SelectedKey.KValueColor, Mode=TwoWay}" IsEnabled="{Binding KeySelected, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </ScrollViewer>
             </GroupBox>

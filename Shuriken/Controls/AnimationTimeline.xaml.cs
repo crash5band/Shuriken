@@ -106,7 +106,22 @@ namespace Shuriken.Controls
             MaxValue = 100;
             holdingKey = false;
 
+            UpdateValueEditor();
             DrawTimeline();
+        }
+
+        private void UpdateValueEditor()
+        {
+            if (track != null && track.Type.IsColor())
+            {
+                FrameValueColor.Visibility = Visibility.Visible;
+                FrameValueText.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                FrameValueColor.Visibility = Visibility.Collapsed;
+                FrameValueText.Visibility = Visibility.Visible;
+            }
         }
 
         private Line GetFrameLine(int frame)
@@ -330,6 +345,7 @@ namespace Shuriken.Controls
             }
 
             ScanKeyframe();
+            UpdateValueEditor();
             DrawTimeline();
         }
 
