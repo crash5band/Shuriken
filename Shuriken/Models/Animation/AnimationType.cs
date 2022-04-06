@@ -22,4 +22,18 @@ namespace Shuriken.Models.Animation
         GradientTR  = 1024,
         GradientBR  = 2048
     }
+
+    public static class AnimationTypeMethods
+    {
+        public static bool IsColor(this AnimationType type)
+        {
+            return new AnimationType[] { 
+                AnimationType.Color,
+                AnimationType.GradientTL,
+                AnimationType.GradientBL,
+                AnimationType.GradientTR,
+                AnimationType.GradientBR
+            }.Contains(type);
+        }
+    }
 }
