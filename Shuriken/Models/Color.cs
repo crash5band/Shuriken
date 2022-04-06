@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace Shuriken.Models
 {
-    public class Color
+    public class Color : INotifyPropertyChanged
     {
         public byte R { get; set; }
         public byte G { get; set; }
@@ -73,6 +73,8 @@ namespace Shuriken.Models
             A = c.A;
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public Vector4 ToFloats()
         {
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
@@ -81,6 +83,11 @@ namespace Shuriken.Models
         public uint ToUint()
         {
             return BitConverter.ToUInt32(new byte[] { A, B, G, R });
+        }
+
+        public float ToFloat()
+        {
+            return BitConverter.ToSingle(new byte[] { A, B, G, R });
         }
 
         public override string ToString()

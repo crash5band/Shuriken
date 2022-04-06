@@ -56,7 +56,16 @@ namespace Shuriken.Controls
         public Keyframe SelectedKey
         {
             get { return keyframe; }
-            set { keyframe = value;NotifyPropertyChanged("KeySelected"); }
+            set 
+            {
+                keyframe = value; 
+                NotifyPropertyChanged("KeySelected");
+                if (value != null)
+                {
+                    // Regiser for changes in order to update original keyframe value from color
+                    value.KValueColor.PropertyChanged += UpdateKeyframeValueFromColor;
+                }
+            }
         }
 
         public bool KeySelected
@@ -122,6 +131,11 @@ namespace Shuriken.Controls
                 FrameValueColor.Visibility = Visibility.Collapsed;
                 FrameValueText.Visibility = Visibility.Visible;
             }
+        }
+
+        private void UpdateKeyframeValueFromColor(object sender, PropertyChangedEventArgs e)
+        {
+            SelectedKey.KValue = SelectedKey.KValueColor.ToFloat();
         }
 
         private Line GetFrameLine(int frame)

@@ -29,11 +29,9 @@ namespace Shuriken.Models.Animation
         }
         public bool HasNoFrame { get; set; }
         public float KValue { get; set; }
-        public Color KValueColor
-        {
-            get => new Color(KValue);
-            set => KValue = value.ToUint();
-        }
+
+        public Color KValueColor { get; set; }
+
         public int Field08 { get; set; }
         public float Offset1 { get; set; }
         public float Offset2 { get; set; }
@@ -44,6 +42,7 @@ namespace Shuriken.Models.Animation
         {
             Frame = 0;
             KValue = 0.0f;
+            KValueColor = new Color();
             Field08 = 0;
             Offset1 = 0.0f;
             Offset2 = 0.0f;
@@ -54,6 +53,7 @@ namespace Shuriken.Models.Animation
         {
             Frame = (int)k.Frame;
             KValue = k.Value;
+            KValueColor = new Color(k.Value);
             Field08 = (int)k.Field08;
             Offset1 = k.Offset1;
             Offset2 = k.Offset2;
