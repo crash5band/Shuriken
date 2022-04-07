@@ -250,11 +250,11 @@ namespace Shuriken.Controls
 
                     if (k < track.Keyframes.Count - 1)
                     {
-                        Line line = GetCurve(track.Keyframes[k], track.Keyframes[k + 1]);
-                        line.X1 -= c.Width / 2;
-                        line.X2 -= c.Width / 2;
-                        line.Y1 += c.Height / 2;
-                        line.Y2 += c.Height / 2;
+                        //Line line = GetCurve(track.Keyframes[k], track.Keyframes[k + 1]);
+                        //line.X1 -= c.Width / 2;
+                        //line.X2 -= c.Width / 2;
+                        //line.Y1 += c.Height / 2;
+                        //line.Y2 += c.Height / 2;
                         //Timeline.Children.Add(line);
                     }
 
