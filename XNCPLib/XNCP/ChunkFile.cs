@@ -147,13 +147,14 @@ namespace XNCPLib.XNCP
             // NCPJChunk/XTextureListChunk
             //----------------------------------------------------------------
             Debug.Assert(CsdmProject.IsUsed ^ TextureList.IsUsed);
+            List<uint> offsetList = new();
             if (CsdmProject.IsUsed)
             {
                 CsdmProject.Write(writer);
             }
             else
             {
-                TextureList.Write(writer);
+                TextureList.Write(writer, ref offsetList);
             }
 
             // It looks like it always tries to align ChunkListSize to 32-bit
