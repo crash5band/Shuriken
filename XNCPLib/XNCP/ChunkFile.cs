@@ -15,7 +15,6 @@ namespace XNCPLib.XNCP
     public class ChunkFile
     {
         public uint Signature { get; set; }
-        public uint ChunkListSize { get; set; }
         public uint OffsetChunkOffset { get; set; }
         public uint OffsetChunkSize { get; set; }
         public uint Field1C { get; set; }
@@ -52,11 +51,12 @@ namespace XNCPLib.XNCP
 
             uint chunkCount;
             uint nextChunkOffset;
+            uint chunkListSize;
             uint headerStart = (uint)reader.Position;
             {
                 chunkCount = reader.ReadUInt32(); // TODO: multiple chunk count
                 nextChunkOffset = reader.ReadUInt32();
-                ChunkListSize = reader.ReadUInt32();
+                chunkListSize = reader.ReadUInt32();
                 OffsetChunkOffset = reader.ReadUInt32();
                 OffsetChunkSize = reader.ReadUInt32();
                 Field1C = reader.ReadUInt32();
@@ -85,9 +85,10 @@ namespace XNCPLib.XNCP
             {
                 TextureList.Read(reader);
             }
+            // TODO: can we verify chunkListSize matches the current largest offset?
 
             // TODO:
-            reader.Seek(reader.GetOffsetOrigin() + nextChunkOffset + ChunkListSize, SeekOrigin.Begin);
+            reader.Seek(reader.GetOffsetOrigin() + nextChunkOffset + chunkListSize, SeekOrigin.Begin);
             Offset.Read(reader);
             End.Read(reader);
 
@@ -119,7 +120,9 @@ namespace XNCPLib.XNCP
                 // Skipped: NextChunkOffset
                 writer.Skip(4);
 
-                writer.WriteUInt32(ChunkListSize);
+                // Skipped: ChunkListSize
+                writer.Skip(4);
+
                 writer.WriteUInt32(OffsetChunkOffset);
                 writer.WriteUInt32(OffsetChunkSize);
                 writer.WriteUInt32(Field1C);
@@ -152,8 +155,20 @@ namespace XNCPLib.XNCP
                 TextureList.Write(writer);
             }
 
+            // It looks like it always tries to align ChunkListSize to 32-bit
+            uint chunkListEnd = (uint)writer.Length;
+            uint unalignedBytes = (chunkListEnd - headerInfoEnd) % 0x10;
+            if (unalignedBytes != 0)
+            {
+                chunkListEnd += 0x10 - unalignedBytes;
+            }
+
+            // Go back and write ChunkListSize
+            writer.Seek(headerInfoStart + 8, SeekOrigin.Begin);
+            writer.WriteUInt32(chunkListEnd - headerInfoEnd);
+            writer.Seek(chunkListEnd, SeekOrigin.Begin);
+
             // TODO:
-            writer.Seek(headerInfoEnd + ChunkListSize, SeekOrigin.Begin);
             // We're still not writing some stuff here...
             Offset.Write(writer);
             End.Write(writer);
