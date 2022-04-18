@@ -30,7 +30,6 @@ namespace XNCPLib.XNCP
 
         public void Write(BinaryObjectWriter writer)
         {
-
             // Skipped: size
             writer.Skip(4);
 
