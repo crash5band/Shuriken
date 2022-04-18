@@ -18,7 +18,6 @@ namespace XNCPLib.XNCP
         public uint OffsetChunkOffset { get; set; }
         public uint OffsetChunkSize { get; set; }
         public uint Field1C { get; set; }
-        public uint NextSignature { get; set; }
         public NCPJChunck CsdmProject { get; set; }
         public XTextureListChunk TextureList { get; set; }
         public OffsetChunk Offset { get; set; }
@@ -70,14 +69,15 @@ namespace XNCPLib.XNCP
 
             // check whether the next chunk is a NCPJChunk or XTextureListChunk.
             // signature check is always little endian.
+            uint nextSignature;
             reader.Endianness = Endianness.Little;
             {
-                NextSignature = reader.ReadUInt32();
+                nextSignature = reader.ReadUInt32();
             }
             reader.Endianness = endianPrev;
 
             reader.Seek(reader.GetOffsetOrigin() + nextChunkOffset, SeekOrigin.Begin);
-            if (NextSignature != Utilities.Make4CCLE("NXTL"))
+            if (nextSignature != Utilities.Make4CCLE("NXTL"))
             {
                 CsdmProject.Read(reader);
             }
@@ -146,7 +146,8 @@ namespace XNCPLib.XNCP
             //----------------------------------------------------------------
             // NCPJChunk/XTextureListChunk
             //----------------------------------------------------------------
-            if (NextSignature != Utilities.Make4CCLE("NXTL"))
+            Debug.Assert(CsdmProject.IsUsed ^ TextureList.IsUsed);
+            if (CsdmProject.IsUsed)
             {
                 CsdmProject.Write(writer);
             }

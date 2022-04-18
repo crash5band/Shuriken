@@ -12,6 +12,7 @@ namespace XNCPLib.XNCP
 {
     public class XTextureListChunk
     {
+        public bool IsUsed { get; set; }
         public ChunkHeader Header { get; set; }
         public uint ListOffset { get; set; }
         public uint Field0C { get; set; }
@@ -27,6 +28,8 @@ namespace XNCPLib.XNCP
 
         public void Read(BinaryObjectReader reader)
         {
+            IsUsed = true;
+
             reader.PushOffsetOrigin();
             Header.Read(reader);
 

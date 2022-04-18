@@ -8,6 +8,7 @@ namespace XNCPLib.XNCP
 {
     public class NCPJChunck
     {
+        public bool IsUsed { get; set; }
         public ChunkHeader Header { get; set; }
         public uint Field08 { get; set; }
         public uint Field0C { get; set; }
@@ -28,6 +29,8 @@ namespace XNCPLib.XNCP
 
         public void Read(BinaryObjectReader reader)
         {
+            IsUsed = true;
+
             reader.PushOffsetOrigin();
             Header = new ChunkHeader();
             Header.Read(reader);
