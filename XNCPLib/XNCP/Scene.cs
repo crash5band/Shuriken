@@ -15,7 +15,6 @@ namespace XNCPLib.XNCP
     public class SceneID
     {
         public string Name { get; set; }
-        private uint NameOffset { get; set; }
         public uint Index { get; set; }
         public SceneID()
         {
@@ -23,15 +22,15 @@ namespace XNCPLib.XNCP
 
         public void Read(BinaryObjectReader reader)
         {
-            NameOffset = reader.ReadUInt32();
-            Name = reader.ReadStringOffset(NameOffset);
+            uint nameOffset = reader.ReadUInt32();
+            Name = reader.ReadStringOffset(nameOffset);
             Index = reader.ReadUInt32();
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public void Write(BinaryObjectWriter writer, uint nameOffset)
         {
-            writer.WriteUInt32(NameOffset);
-            writer.WriteStringOffset(NameOffset, Name);
+            writer.WriteUInt32(nameOffset);
+            writer.WriteStringOffset(nameOffset, Name);
             writer.WriteUInt32(Index);
         }
     }

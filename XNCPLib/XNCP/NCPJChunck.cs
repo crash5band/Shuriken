@@ -137,7 +137,7 @@ namespace XNCPLib.XNCP
             }
 
             writer.Seek(writer.GetOffsetOrigin() + rootNodeOffset, SeekOrigin.Begin);
-            Root.Write(writer); // TODO: finish
+            Root.Write(writer, rootSceneListOffset, rootSceneDataOffset);
 
             writer.Seek(writer.GetOffsetOrigin() + fontListOffset, SeekOrigin.Begin);
             Fonts.Write(writer, fontDataOffset, characterMappingOffset, fontNamesOffset);
