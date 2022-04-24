@@ -47,8 +47,6 @@ namespace XNCPLib.XNCP
 
     public class Font
     {
-        public uint CharacterCount { get; set; }
-        public uint CharacterMappingTableOffset { get; set; }
         public List<CharacterMapping> CharacterMappings { get; set; }
 
         public Font()
@@ -58,13 +56,13 @@ namespace XNCPLib.XNCP
 
         public void Read(BinaryObjectReader reader)
         {
-            CharacterCount = reader.ReadUInt32();
-            CharacterMappingTableOffset = reader.ReadUInt32();
+            uint characterCount = reader.ReadUInt32();
+            uint characterMappingTableOffset = reader.ReadUInt32();
             
-            CharacterMappings.Capacity = (int)CharacterCount;
-            reader.Seek(reader.GetOffsetOrigin() + CharacterMappingTableOffset, SeekOrigin.Begin);
+            CharacterMappings.Capacity = (int)characterCount;
+            reader.Seek(reader.GetOffsetOrigin() + characterMappingTableOffset, SeekOrigin.Begin);
 
-            for (int m = 0; m < CharacterCount; ++m)
+            for (int m = 0; m < characterCount; ++m)
             {
                 CharacterMapping mapping = new CharacterMapping();
                 mapping.Read(reader);
@@ -72,13 +70,13 @@ namespace XNCPLib.XNCP
             }
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public void Write(BinaryObjectWriter writer, uint characterMappingOffset)
         {
-            writer.WriteUInt32(CharacterCount);
-            writer.WriteUInt32(CharacterMappingTableOffset);
+            writer.WriteUInt32((uint)CharacterMappings.Count);
+            writer.WriteUInt32(characterMappingOffset);
 
-            writer.Seek(writer.GetOffsetOrigin() + CharacterMappingTableOffset, SeekOrigin.Begin);
-            for (int m = 0; m < CharacterCount; ++m)
+            writer.Seek(writer.GetOffsetOrigin() + characterMappingOffset, SeekOrigin.Begin);
+            for (int m = 0; m < CharacterMappings.Count; ++m)
             {
                 CharacterMappings[m].Write(writer);
             }

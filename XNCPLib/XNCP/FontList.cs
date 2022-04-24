@@ -87,7 +87,10 @@ namespace XNCPLib.XNCP
             for (int f = 0; f < Fonts.Count; ++f)
             {
                 writer.Seek(writer.GetOffsetOrigin() + fontDataOffset + (8 * f), SeekOrigin.Begin);
-                Fonts[f].Write(writer);
+                Fonts[f].Write(writer, characterMappingOffset);
+
+                // Get the next mapping offset
+                characterMappingOffset += (uint)Fonts[f].CharacterMappings.Count * 0x8;
             }
 
             for (int i = 0; i < Fonts.Count; ++i)
