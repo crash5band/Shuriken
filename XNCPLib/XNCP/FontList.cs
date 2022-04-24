@@ -79,8 +79,14 @@ namespace XNCPLib.XNCP
             Debug.Assert(Fonts.Count == FontIDTable.Count);
 
             writer.WriteUInt32((uint)Fonts.Count);
-            writer.WriteUInt32(fontDataOffset);
+            if (Fonts.Count == 0)
+            {
+                writer.WriteUInt32(0);
+                writer.WriteUInt32(0);
+                return;
+            }
 
+            writer.WriteUInt32(fontDataOffset);
             uint fontIDTableOffset = fontDataOffset + (uint)Fonts.Count * 0x8;
             writer.WriteUInt32(fontIDTableOffset);
 

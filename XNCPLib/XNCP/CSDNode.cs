@@ -75,10 +75,19 @@ namespace XNCPLib.XNCP
             Debug.Assert(Scenes.Count == SceneIDTable.Count);
 
             writer.WriteUInt32((uint)Scenes.Count);
-            writer.WriteUInt32(sceneListOffset);
 
-            uint sceneIDListOffset = sceneListOffset + (uint)Scenes.Count * 0x4;
-            writer.WriteUInt32(sceneIDListOffset);
+            uint sceneIDListOffset = 0;
+            if (Scenes.Count == 0)
+            {
+                writer.WriteUInt32(0);
+                writer.WriteUInt32(0);
+            }
+            else
+            {
+                writer.WriteUInt32(sceneListOffset);
+                sceneIDListOffset = sceneListOffset + (uint)Scenes.Count * 0x4;
+                writer.WriteUInt32(sceneIDListOffset);
+            }
 
             // TODO: Sub nodes
             writer.WriteUInt32(NodeCount);
