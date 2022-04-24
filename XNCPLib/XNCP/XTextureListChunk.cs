@@ -71,6 +71,7 @@ namespace XNCPLib.XNCP
                 writer.Skip(4);
             }
             writer.Endianness = endianPrev;
+            uint dataStart = (uint)writer.Position;
 
             // TODO: is this always just 0x10?
             writer.WriteUInt32(0x10);
@@ -98,8 +99,15 @@ namespace XNCPLib.XNCP
             // Go back and write size
             writer.Endianness = Endianness.Little;
             {
+                // It looks like it always tries to align to 32-bit
+                writer.Seek(0, SeekOrigin.End);
+                while ((writer.Length - writer.GetOffsetOrigin()) % 0x10 != 0)
+                {
+                    writer.WriteByte(0x00);
+                }
+
                 writer.Seek(writer.GetOffsetOrigin() + 4, SeekOrigin.Begin);
-                writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+                writer.WriteUInt32((uint)(writer.Length - dataStart));
                 writer.Seek(0, SeekOrigin.End);
             }
             writer.Endianness = endianPrev;

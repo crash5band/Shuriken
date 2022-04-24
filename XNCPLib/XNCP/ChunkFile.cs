@@ -157,18 +157,10 @@ namespace XNCPLib.XNCP
                 TextureList.Write(writer, ref offsetList);
             }
 
-            // It looks like it always tries to align ChunkListSize to 32-bit
-            uint chunkListEnd = (uint)writer.Length;
-            uint unalignedBytes = (chunkListEnd - headerInfoEnd) % 0x10;
-            if (unalignedBytes != 0)
-            {
-                chunkListEnd += 0x10 - unalignedBytes;
-            }
-
             // Go back and write ChunkListSize
             writer.Seek(headerInfoStart + 8, SeekOrigin.Begin);
-            writer.WriteUInt32(chunkListEnd - headerInfoEnd);
-            writer.Seek(chunkListEnd, SeekOrigin.Begin);
+            writer.WriteUInt32((uint)writer.Length - headerInfoEnd);
+            writer.Seek(0, SeekOrigin.End);
 
             // TODO:
             // We're still not writing some stuff here...

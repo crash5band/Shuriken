@@ -89,7 +89,7 @@ namespace XNCPLib.XNCP
             writer.WriteUInt32(projectNameOffset);
             writer.WriteStringOffset(projectNameOffset, ProjectName);
 
-            // Align to 4 bytes if the last texture name wasn't
+            // Align to 4 bytes if the ProjectName wasn't
             writer.Seek(0, SeekOrigin.End);
             writer.Align(4);
 
@@ -99,15 +99,59 @@ namespace XNCPLib.XNCP
             writer.WriteUInt32(DXLSignature);
             writer.WriteUInt32(fontListOffset);
 
+            // Pre-allocate data memeory
+            // TODO: sub nodes will move fontDataOffset
+            uint rootSceneListOffset = fontListOffset + 0xC;
+            uint fontDataOffset = rootSceneListOffset + (uint)Root.Scenes.Count * 0xC;
+            uint rootSceneDataOffset = fontDataOffset + (uint)Fonts.Fonts.Count * 0x10;
+            uint rootSceneNamesOffset = rootSceneDataOffset + (uint)Root.Scenes.Count * 0x4C;
+            
+            uint characterMappingOffset = rootSceneNamesOffset;
+            for (int i = 0; i < Root.SceneIDTable.Count; i++)
+            {
+                int nameLength = Root.SceneIDTable[i].Name.Length + 1;
+                int unalignedBytes = nameLength % 0x4;
+                if (unalignedBytes != 0)
+                {
+                    nameLength += 0x4 - unalignedBytes;
+                }
+                characterMappingOffset += (uint)nameLength;
+            }
+
+            uint fontNamesOffset = characterMappingOffset;
+            for (int i = 0; i < Fonts.Fonts.Count; i++)
+            {
+                fontNamesOffset += (uint)Fonts.Fonts[i].CharacterMappings.Count * 0x8;
+            }
+
+            uint fontNamesEndOffset = fontNamesOffset;
+            for (int i = 0; i < Fonts.FontIDTable.Count; i++)
+            {
+                int nameLength = Fonts.FontIDTable[i].Name.Length + 1;
+                int unalignedBytes = nameLength % 0x4;
+                if (unalignedBytes != 0)
+                {
+                    nameLength += 0x4 - unalignedBytes;
+                }
+                fontNamesEndOffset += (uint)nameLength;
+            }
+
             writer.Seek(writer.GetOffsetOrigin() + rootNodeOffset, SeekOrigin.Begin);
             Root.Write(writer); // TODO: finish
 
             writer.Seek(writer.GetOffsetOrigin() + fontListOffset, SeekOrigin.Begin);
-            Fonts.Write(writer);
+            Fonts.Write(writer, fontDataOffset, characterMappingOffset, fontNamesOffset);
 
             // Go back and write size
             writer.Endianness = Endianness.Little;
             {
+                // It looks like it always tries to align to 32-bit
+                writer.Seek(0, SeekOrigin.End);
+                while ((writer.Length - writer.GetOffsetOrigin()) % 0x10 != 0)
+                {
+                    writer.WriteByte(0x00);
+                }
+
                 writer.Seek(writer.GetOffsetOrigin() + 4, SeekOrigin.Begin);
                 writer.WriteUInt32((uint)writer.Length - dataStart);
                 writer.Seek(0, SeekOrigin.End);
