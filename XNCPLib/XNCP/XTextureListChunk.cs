@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Amicitia.IO.Binary;
 using Amicitia.IO.Binary.Extensions;
 using XNCPLib.Extensions;
+using XNCPLib.Misc;
 
 namespace XNCPLib.XNCP
 {
@@ -52,8 +53,7 @@ namespace XNCPLib.XNCP
 
                 Textures.Add(texture);
             }
-            // TODO: can we verify the the position after the last texture name matches the size?
-
+            
             reader.PopOffsetOrigin();
         }
 
@@ -73,28 +73,33 @@ namespace XNCPLib.XNCP
             writer.Endianness = endianPrev;
             uint dataStart = (uint)writer.Position;
 
-            // TODO: is this always just 0x10?
+            // Is this always just 0x10?
             writer.WriteUInt32(0x10);
             writer.WriteUInt32(Field0C);
 
-            writer.WriteUInt32((uint)Textures.Count());
+            writer.WriteUInt32((uint)Textures.Count);
 
-            // TODO: DataOffset is always just 0x18?
+            // DataOffset is always just 0x18?
             uint dataOffsetPosition = (uint)(writer.Position - writer.GetOffsetOrigin());
             writer.WriteUInt32(0x18);
 
-            for (int i = 0; i < Textures.Count(); ++i)
+            uint textureDataStart = (uint)writer.Length;
+            Utilities.PadZeroBytes(writer, Textures.Count * 0x8);
+            for (int i = 0; i < Textures.Count; ++i)
             {
+                writer.Seek(textureDataStart + (i * 0x8), SeekOrigin.Begin);
                 offsetList.Add((uint)(writer.Position - writer.GetOffsetOrigin()));
-                Textures[i].Write(writer);
+
+                uint textureNameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
+                Textures[i].Write(writer, textureNameOffset);
+
+                // Align to 4 bytes if the texture name wasn't
+                writer.Seek(0, SeekOrigin.End);
+                writer.Align(4);
             }
 
             // Now add DataOffset to offset list
             offsetList.Add(dataOffsetPosition);
-
-            // Align to 4 bytes if the last texture name wasn't
-            writer.Seek(0, SeekOrigin.End);
-            writer.Align(4);
 
             // Go back and write size
             writer.Endianness = Endianness.Little;

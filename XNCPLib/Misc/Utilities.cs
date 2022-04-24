@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Amicitia.IO.Binary;
 
 namespace XNCPLib.Misc
 {
@@ -23,6 +24,14 @@ namespace XNCPLib.Misc
             }
 
             return count;
+        }
+
+        public static void PadZeroBytes(BinaryObjectWriter writer, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                writer.WriteByte(0);
+            }
         }
     }
 }
