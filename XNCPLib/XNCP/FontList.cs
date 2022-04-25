@@ -159,6 +159,7 @@ namespace XNCPLib.XNCP
                 UnwrittenPosition += 0x8;
 
                 Fonts[f].Write_Step0(writer);
+                // Finished
             }
 
             // Fill FontIDs data

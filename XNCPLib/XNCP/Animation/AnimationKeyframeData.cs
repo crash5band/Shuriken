@@ -77,7 +77,11 @@ namespace XNCPLib.XNCP.Animation
 
         public void Write_Step2(BinaryObjectWriter writer)
         {
-            // TODO:
+            // Continue GroupAnimationDataList steps
+            for (int i = 0; i < GroupCount; ++i)
+            {
+                GroupAnimationDataList[i].Write_Step1(writer);
+            }
         }
     }
 

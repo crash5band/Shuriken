@@ -123,6 +123,8 @@ namespace XNCPLib.XNCP
 
         public void Write_Step1(BinaryObjectWriter writer)
         {
+            uint newUnwrittenPosition = (uint)writer.Length;
+
             // Fill CastOffsets data
             for (int i = 0; i < CastCount; ++i)
             {
@@ -134,12 +136,22 @@ namespace XNCPLib.XNCP
                 // Allocate memory for Cast data
                 writer.Seek(0, SeekOrigin.End);
                 Utilities.PadZeroBytes(writer, 0x74);
-            } 
+            }
+
+            UnwrittenPosition = newUnwrittenPosition;
         }
 
         public void Write_Step2(BinaryObjectWriter writer)
         {
-            // TODO:
+            // Fill Cast data
+            for (int i = 0; i < CastCount; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x74;
+
+                Casts[i].Write_Step0(writer);
+                // Finished
+            }
         }
     }
 }

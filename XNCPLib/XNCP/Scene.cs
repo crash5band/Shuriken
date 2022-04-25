@@ -638,6 +638,22 @@ namespace XNCPLib.XNCP
                     Utilities.PadZeroBytes(writer, 0x4);
                 }
             }
+        }
+
+        public void Write_Step3(BinaryObjectWriter writer)
+        {
+            // Continue UICastGroups steps
+            for (int i = 0; i < GroupCount; ++i)
+            {
+                UICastGroups[i].Write_Step2(writer);
+                // Finished
+            }
+
+            // Continue AnimationKeyFrame steps
+            for (int i = 0; i < AnimationCount; ++i)
+            {
+                AnimationKeyframeDataList[i].Write_Step2(writer);
+            }
 
             // TODO:
         }
