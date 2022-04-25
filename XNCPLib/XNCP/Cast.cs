@@ -225,6 +225,10 @@ namespace XNCPLib.XNCP
                 uint fontCharactersOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
                 writer.WriteUInt32(fontCharactersOffset);
                 writer.WriteStringOffset(fontCharactersOffset, FontCharacters);
+
+                // Align to 4 bytes if the name wasn't
+                writer.Seek(0, SeekOrigin.End);
+                writer.Align(4);
             }
             else
             {
@@ -236,6 +240,10 @@ namespace XNCPLib.XNCP
                 uint fontNameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
                 writer.WriteUInt32(fontNameOffset);
                 writer.WriteStringOffset(fontNameOffset, FontName);
+
+                // Align to 4 bytes if the name wasn't
+                writer.Seek(0, SeekOrigin.End);
+                writer.Align(4);
             }
             else
             {
