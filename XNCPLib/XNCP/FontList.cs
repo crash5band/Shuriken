@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Amicitia.IO.Binary;
 using Amicitia.IO.Binary.Extensions;
 using XNCPLib.Extensions;
+using XNCPLib.Misc;
 
 namespace XNCPLib.XNCP
 {
@@ -40,6 +41,7 @@ namespace XNCPLib.XNCP
     {
         public List<Font> Fonts { get; set; }
         public List<FontID> FontIDTable { get; set; }
+        private uint UnwrittenPosition { get; set; }
 
         public FontList()
         {
@@ -112,6 +114,65 @@ namespace XNCPLib.XNCP
                     nameLength += 0x4 - unalignedBytes;
                 }
                 fontNamesOffset += (uint)nameLength;
+            }
+        }
+
+        public void Write_Step0(BinaryObjectWriter writer)
+        {
+            Debug.Assert(Fonts.Count == FontIDTable.Count);
+
+            // Allocate memory for FontList data
+            writer.Seek(0, SeekOrigin.End);
+            UnwrittenPosition = (uint)writer.Position;
+            Utilities.PadZeroBytes(writer, 0xC);
+        }
+
+        public void Write_Step1(BinaryObjectWriter writer)
+        {
+            // Fill FontList data
+            writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+            writer.WriteUInt32((uint)Fonts.Count);
+            if (Fonts.Count == 0)
+            {
+                writer.WriteUInt32(0);
+                writer.WriteUInt32(0);
+                return;
+            }
+
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            writer.WriteUInt32((uint)(writer.Length + Fonts.Count * 0x8 - writer.GetOffsetOrigin()));
+
+            // Allocate memory for Fonts and FontIDOffsets data
+            writer.Seek(0, SeekOrigin.End);
+            UnwrittenPosition = (uint)writer.Position;
+            Utilities.PadZeroBytes(writer, Fonts.Count * 0x10);
+        }
+
+        public void Write_Step2(BinaryObjectWriter writer)
+        {
+            if (Fonts.Count == 0) return;
+
+            // Fill Fonts data
+            for (int f = 0; f < Fonts.Count; ++f)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x8;
+
+                Fonts[f].Write_Step0(writer);
+            }
+
+            // Fill FontIDs data
+            for (int i = 0; i < Fonts.Count; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x8;
+
+                uint nameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
+                FontIDTable[i].Write(writer, nameOffset);
+
+                // Align to 4 bytes if the name wasn't
+                writer.Seek(0, SeekOrigin.End);
+                writer.Align(4);
             }
         }
     }

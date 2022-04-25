@@ -81,5 +81,17 @@ namespace XNCPLib.XNCP
                 CharacterMappings[m].Write(writer);
             }
         }
+
+        public void Write_Step0(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32((uint)CharacterMappings.Count);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+            writer.Seek(0, SeekOrigin.End);
+            for (int m = 0; m < CharacterMappings.Count; ++m)
+            {
+                CharacterMappings[m].Write(writer);
+            }
+        }
     }
 }

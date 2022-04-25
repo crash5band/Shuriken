@@ -80,11 +80,11 @@ namespace XNCPLib.XNCP
             writer.WriteUInt32(Field08);
             writer.WriteUInt32(Field0C);
 
-            // TODO: RootNodeOffset is always 0x20?
+            // RootNodeOffset is always 0x20?
             uint rootNodeOffset = 0x20;
             writer.WriteUInt32(rootNodeOffset);
 
-            // TODO: ProjectNameOffset is always 0x38?
+            // ProjectNameOffset is always 0x38?
             uint projectNameOffset = 0x38;
             writer.WriteUInt32(projectNameOffset);
             writer.WriteStringOffset(projectNameOffset, ProjectName);
@@ -98,6 +98,13 @@ namespace XNCPLib.XNCP
             writer.Seek(writer.GetOffsetOrigin() + 0x18, SeekOrigin.Begin);
             writer.WriteUInt32(DXLSignature);
             writer.WriteUInt32(fontListOffset);
+
+            /*Root.Write_Step0(writer);
+            Fonts.Write_Step0(writer);
+            Root.Write_Step1(writer);
+            Fonts.Write_Step1(writer);
+            Root.Write_Step2(writer);
+            Fonts.Write_Step2(writer);*/
 
             // Pre-allocate data memeory
             // TODO: sub nodes will move fontDataOffset

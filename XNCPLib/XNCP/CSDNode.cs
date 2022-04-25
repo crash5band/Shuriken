@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Amicitia.IO.Binary;
 using XNCPLib.Extensions;
+using XNCPLib.Misc;
 
 namespace XNCPLib.XNCP
 {
@@ -19,6 +20,7 @@ namespace XNCPLib.XNCP
         public List<SceneID> SceneIDTable { get; set; }
         public List<CSDNode> NextNodes { get; set; }
         public List<NodeDictionary> NodeDictionaries { get; set; }
+        private uint UnwrittenPosition { get; set; }
 
         public CSDNode()
         {
@@ -127,6 +129,73 @@ namespace XNCPLib.XNCP
                 }
                 sceneDataOffset += (uint)nameLength;
             }
+        }
+
+        public void Write_Step0(BinaryObjectWriter writer)
+        {
+            Debug.Assert(Scenes.Count == SceneIDTable.Count);
+
+            // CSDNode Data memory should be already allocated
+            UnwrittenPosition = (uint)writer.Position;
+        }
+
+        public void Write_Step1(BinaryObjectWriter writer)
+        {
+            writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+            writer.WriteUInt32((uint)Scenes.Count);
+
+            if (Scenes.Count == 0)
+            {
+                writer.WriteUInt32(0);
+                writer.WriteUInt32(0);
+            }
+            else
+            {
+                writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+                writer.WriteUInt32((uint)(writer.Length + Scenes.Count * 0x4 - writer.GetOffsetOrigin()));
+            }
+
+            // TODO: Sub nodes
+            writer.WriteUInt32(NodeCount);
+            writer.WriteUInt32(NodeListOffset);
+            writer.WriteUInt32(NodeDictionaryOffset);
+
+            // Allocate memory for SceneOffsets and SceneIDOffsets
+            writer.Seek(0, SeekOrigin.End);
+            UnwrittenPosition = (uint)writer.Position;
+            Utilities.PadZeroBytes(writer, Scenes.Count * 0xC);
+        }
+
+        public void Write_Step2(BinaryObjectWriter writer)
+        {
+            // Fill SceneOffsets data
+            uint newUnwrittenPosition = (uint)writer.Length;
+            for (int f = 0; f < Scenes.Count; ++f)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x4;
+                writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+                // Allocate memory for Scene data
+                writer.Seek(0, SeekOrigin.End);
+                Utilities.PadZeroBytes(writer, 0x4C);
+            }
+
+            // Fill SceneIDOffsets data
+            for (int i = 0; i < Scenes.Count; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x8;
+
+                uint nameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
+                SceneIDTable[i].Write(writer, nameOffset);
+
+                // Align to 4 bytes if the name wasn't
+                writer.Seek(0, SeekOrigin.End);
+                writer.Align(4);
+            }
+
+            UnwrittenPosition = newUnwrittenPosition;
         }
     }
 }
