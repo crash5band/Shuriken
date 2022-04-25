@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Amicitia.IO.Binary;
 using XNCPLib.Extensions;
+using XNCPLib.Misc;
 
 namespace XNCPLib.XNCP
 {
@@ -18,6 +19,7 @@ namespace XNCPLib.XNCP
         public List<uint> CastOffsets { get; set; }
         public List<Cast> Casts { get; set; }
         public List<CastHierarchyTreeNode> CastHierarchyTree { get; set; }
+        private uint UnwrittenPosition { get; set; }
 
         public CastGroup()
         {
@@ -88,6 +90,56 @@ namespace XNCPLib.XNCP
                 writer.WriteInt32(CastHierarchyTree[i].ChildIndex);
                 writer.WriteInt32(CastHierarchyTree[i].NextIndex);
             }
+        }
+
+        public void Write_Step0(BinaryObjectWriter writer)
+        {
+            UnwrittenPosition = (uint)writer.Position;
+
+            writer.WriteUInt32(CastCount);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            UnwrittenPosition += 0x8;
+
+            // Allocate memory for CastOffsets data
+            uint newUnwrittenPosition = (uint)writer.Length;
+            writer.Seek(0, SeekOrigin.End);
+            Utilities.PadZeroBytes(writer, (int)CastCount * 0x4);
+
+            writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+            writer.WriteUInt32(Field08);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            UnwrittenPosition += 0x8;
+
+            // Fill CastHierarchy data
+            writer.Seek(0, SeekOrigin.End);
+            for (int i = 0; i < CastCount; ++i)
+            {
+                writer.WriteInt32(CastHierarchyTree[i].ChildIndex);
+                writer.WriteInt32(CastHierarchyTree[i].NextIndex);
+            }
+
+            UnwrittenPosition = newUnwrittenPosition;
+        }
+
+        public void Write_Step1(BinaryObjectWriter writer)
+        {
+            // Fill CastOffsets data
+            for (int i = 0; i < CastCount; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x4;
+
+                writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+                // Allocate memory for Cast data
+                writer.Seek(0, SeekOrigin.End);
+                Utilities.PadZeroBytes(writer, 0x74);
+            } 
+        }
+
+        public void Write_Step2(BinaryObjectWriter writer)
+        {
+            // TODO:
         }
     }
 }

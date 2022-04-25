@@ -64,6 +64,7 @@ namespace XNCPLib.XNCP
         public List<AnimationDictionary> AnimationDictionaries { get; set; }
         public List<AnimationFrameData> AnimationFrameDataList { get; set; }
         public List<AnimationData2> AnimationData2List { get; set; }
+        private uint UnwrittenPosition { get; set; }
 
         public Scene()
         {
@@ -172,6 +173,7 @@ namespace XNCPLib.XNCP
 
                 if (data2.GroupAnimationData2ListOffset > 0)
                 {
+                    data2.IsUsed = true;
                     reader.SeekBegin(baseOffset + data2.GroupAnimationData2ListOffset);
 
                     GroupAnimationData2List groupData2List = new GroupAnimationData2List();
@@ -443,6 +445,201 @@ namespace XNCPLib.XNCP
                     }
                 }
             }
+        }
+
+        public void Write_Step0(BinaryObjectWriter writer)
+        {
+            UnwrittenPosition = (uint)writer.Position;
+
+            writer.WriteUInt32(Field00);
+            writer.WriteSingle(ZIndex);
+            writer.WriteSingle(AnimationFramerate);
+            writer.WriteUInt32(Field0C);
+            writer.WriteSingle(Field10);
+            writer.WriteUInt32(Data1Count);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            UnwrittenPosition += 0x1C;
+
+            // Fill Data1 data
+            writer.Seek(0, SeekOrigin.End);
+            for (int i = 0; i < Data1Count; ++i)
+            {
+                writer.WriteSingle(Data1[i].X);
+                writer.WriteSingle(Data1[i].Y);
+            }
+
+            writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+            writer.WriteUInt32(SubImagesCount);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            UnwrittenPosition += 0x8;
+
+            // Fill SubImage data
+            writer.Seek(0, SeekOrigin.End);
+            for (int i = 0; i < SubImagesCount; ++i)
+            {
+                SubImages[i].Write(writer);
+            }
+
+            writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+            writer.WriteUInt32(GroupCount);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            UnwrittenPosition += 0x8;
+
+            // Allocate memory for CastGroup data
+            uint newUnwrittenPosition = (uint)writer.Length;
+            writer.Seek(0, SeekOrigin.End);
+            Utilities.PadZeroBytes(writer, (int)GroupCount * 0x10);
+
+            writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+            writer.WriteUInt32(CastCount);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            UnwrittenPosition += 0x8;
+
+            // Allocate memory for CastIDOffsets data
+            writer.Seek(0, SeekOrigin.End);
+            Utilities.PadZeroBytes(writer, (int)CastCount * 0xC);
+
+            writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+            writer.WriteUInt32(AnimationCount);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            writer.WriteUInt32((uint)(writer.Length + AnimationCount * 0x8 - writer.GetOffsetOrigin()));
+            UnwrittenPosition += 0xC;
+
+            // Allocate memory for AnimationKeyFrame and AnimationIDOffsets data
+            writer.Seek(0, SeekOrigin.End);
+            Utilities.PadZeroBytes(writer, (int)AnimationCount * 0x10);
+
+            writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+            writer.WriteSingle(AspectRatio);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            writer.WriteUInt32((uint)(writer.Length + AnimationCount * 0x8 - writer.GetOffsetOrigin()));
+            UnwrittenPosition += 0xC;
+
+            // Allocate memory for AnimationFrame and Data2List data
+            writer.Seek(0, SeekOrigin.End);
+            Utilities.PadZeroBytes(writer, (int)AnimationCount * 0xC);
+
+            UnwrittenPosition = newUnwrittenPosition;
+        }
+
+        public void Write_Step1(BinaryObjectWriter writer)
+        {
+            // Fill CastGroup data
+            for (int i = 0; i < GroupCount; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x10;
+
+                UICastGroups[i].Write_Step0(writer);
+            }
+
+            // Fill CastIDOffsets data
+            for (int i = 0; i < CastCount; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0xC;
+
+                uint nameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
+                CastDictionaries[i].Write_REPLACE(writer, nameOffset);
+
+                // Align to 4 bytes if the name wasn't
+                writer.Seek(0, SeekOrigin.End);
+                writer.Align(4);
+            }
+
+            // Fill AnimationKeyFrame data
+            for (int i = 0; i < AnimationCount; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x8;
+
+                AnimationKeyframeDataList[i].Write_Step0(writer);
+            }
+
+            // Fill AnimationIDOffsets data
+            for (int i = 0; i < AnimationCount; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x8;
+
+                uint nameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
+                AnimationDictionaries[i].Write_REPLACE(writer, nameOffset);
+
+                // Align to 4 bytes if the name wasn't
+                writer.Seek(0, SeekOrigin.End);
+                writer.Align(4);
+            }
+
+            // Allocate memory for AnimationFrame data
+            for (int i = 0; i < AnimationCount; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x8;
+
+                AnimationFrameDataList[i].Write(writer);
+            }
+
+            // Data2List
+            uint newUnwrittenPosition = (uint)writer.Length;
+            for (int a = 0; a < AnimationCount; ++a)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x4;
+
+                AnimationData2 data2 = AnimationData2List[a];
+                if (data2.IsUsed)
+                {
+                    writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+                    // Allocate memory for GroupAnimationData data
+                    writer.Seek(0, SeekOrigin.End);
+                    Utilities.PadZeroBytes(writer, 0x8);
+                }
+                else
+                {
+                    writer.WriteUInt32(0);
+                }
+            }
+
+            UnwrittenPosition = newUnwrittenPosition;
+        }
+
+        public void Write_Step2(BinaryObjectWriter writer)
+        {
+            // Continue UICastGroups steps
+            for (int i = 0; i < GroupCount; ++i)
+            {
+                UICastGroups[i].Write_Step1(writer);
+            }
+
+            // Continue AnimationKeyFrame steps
+            for (int i = 0; i < AnimationCount; ++i)
+            {
+                AnimationKeyframeDataList[i].Write_Step1(writer);
+            }
+
+            // Fill GroupAnimationData data
+            for (int a = 0; a < AnimationCount; ++a)
+            {
+                AnimationData2 data2 = AnimationData2List[a];
+                if (!data2.IsUsed) continue;
+                    
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x8;
+
+                GroupAnimationData2List groupData2List = data2.GroupList;
+                writer.WriteUInt32(groupData2List.Field00);
+                writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+                for (int g = 0; g < GroupCount; ++g)
+                {
+                    // Allocate memory for GroupAnimationData2 data
+                    writer.Seek(0, SeekOrigin.End);
+                    Utilities.PadZeroBytes(writer, 0x4);
+                }
+            }
+
+            // TODO:
         }
     }
 }

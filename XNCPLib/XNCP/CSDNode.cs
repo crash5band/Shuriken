@@ -197,5 +197,25 @@ namespace XNCPLib.XNCP
 
             UnwrittenPosition = newUnwrittenPosition;
         }
+
+        public void Write_Step3(BinaryObjectWriter writer)
+        {
+            for (int i = 0; i < Scenes.Count; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                Scenes[i].Write_Step0(writer);
+                UnwrittenPosition += 0x4C;
+            }
+
+            for (int i = 0; i < Scenes.Count; ++i)
+            {
+                Scenes[i].Write_Step1(writer);
+            }
+
+            for (int i = 0; i < Scenes.Count; ++i)
+            {
+                Scenes[i].Write_Step2(writer);
+            }
+        }
     }
 }

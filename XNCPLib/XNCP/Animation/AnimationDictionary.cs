@@ -32,5 +32,13 @@ namespace XNCPLib.XNCP.Animation
             writer.WriteStringOffset(NameOffset, Name);
             writer.WriteUInt32(Index);
         }
+
+        public void Write_REPLACE(BinaryObjectWriter writer, uint nameOffset)
+        {
+            // TODO: Make this the main Write function
+            writer.WriteUInt32(nameOffset);
+            writer.WriteStringOffset(nameOffset, Name);
+            writer.WriteUInt32(Index);
+        }
     }
 }

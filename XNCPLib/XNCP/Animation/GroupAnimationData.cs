@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Amicitia.IO.Binary;
 using XNCPLib.Extensions;
+using XNCPLib.Misc;
 
 namespace XNCPLib.XNCP.Animation
 {
@@ -14,6 +15,7 @@ namespace XNCPLib.XNCP.Animation
         public uint CastCount { get; set; }
         public uint CastDataOffset { get; set; }
         public List<CastAnimationData> CastAnimationDataList { get; set; }
+        private uint UnwrittenPosition { get; set; }
 
         public GroupAnimationData()
         {
@@ -49,6 +51,22 @@ namespace XNCPLib.XNCP.Animation
 
                 CastAnimationDataList[i].Write(writer);
             }
+        }
+
+        public void Write_Step0(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(CastCount);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+            // Allocate memory for CastAnimationDataList
+            UnwrittenPosition = (uint)writer.Length;
+            writer.Seek(0, SeekOrigin.End);
+            Utilities.PadZeroBytes(writer, (int)CastCount * 0x8);
+        }
+
+        public void Write_Step1(BinaryObjectWriter writer)
+        {
+            // TODO:
         }
     }
 

@@ -30,7 +30,8 @@ namespace XNCPLib.Misc
         {
             for (int i = 0; i < count; i++)
             {
-                writer.WriteByte(0);
+                // Just a random byte so it's easier to read
+                writer.WriteByte(0xBB);
             }
         }
     }

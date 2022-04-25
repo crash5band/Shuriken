@@ -37,5 +37,15 @@ namespace XNCPLib.XNCP
             writer.WriteUInt32(GroupIndex);
             writer.WriteUInt32(CastIndex);
         }
+
+        public void Write_REPLACE(BinaryObjectWriter writer, uint nameOffset)
+        {
+            // TODO: Make this the main Write function
+            writer.WriteUInt32(nameOffset);
+            writer.WriteStringOffset(nameOffset, Name);
+
+            writer.WriteUInt32(GroupIndex);
+            writer.WriteUInt32(CastIndex);
+        }
     }
 }

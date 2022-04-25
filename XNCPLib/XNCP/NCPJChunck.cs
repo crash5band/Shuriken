@@ -98,14 +98,15 @@ namespace XNCPLib.XNCP
             writer.Seek(writer.GetOffsetOrigin() + 0x18, SeekOrigin.Begin);
             writer.WriteUInt32(DXLSignature);
             writer.WriteUInt32(fontListOffset);
-
-            /*Root.Write_Step0(writer);
+            /*
+            Root.Write_Step0(writer);
             Fonts.Write_Step0(writer);
             Root.Write_Step1(writer);
             Fonts.Write_Step1(writer);
             Root.Write_Step2(writer);
-            Fonts.Write_Step2(writer);*/
-
+            Fonts.Write_Step2(writer);
+            Root.Write_Step3(writer);
+            */
             // Pre-allocate data memeory
             // TODO: sub nodes will move fontDataOffset
             uint rootSceneListOffset = fontListOffset + 0xC;
