@@ -1,4 +1,4 @@
-﻿#define VERIFY_OFFSET_TABLE
+﻿//#define VERIFY_OFFSET_TABLE
 
 using System;
 using System.IO;
@@ -31,7 +31,6 @@ namespace XNCPLib.XNCP
 
         public void Read(BinaryObjectReader reader)
         {
-            // TODO: Remove this function
             reader.PushOffsetOrigin();
             Endianness endianPrev = reader.Endianness;
 

@@ -53,8 +53,6 @@ namespace XNCPLib.XNCP
             reader.Seek(reader.GetOffsetOrigin() + fontListOffset, SeekOrigin.Begin);
             Fonts.Read(reader);
 
-            // TODO: can we verify the the position after the last root/font matches the size?
-
             reader.PopOffsetOrigin();
         }
 
