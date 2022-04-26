@@ -397,7 +397,7 @@ namespace XNCPLib.XNCP
 
                 offsetChunk.Add(writer);
                 uint nameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
-                AnimationDictionaries[i].Write_REPLACE(writer, nameOffset);
+                AnimationDictionaries[i].Write(writer, nameOffset);
 
                 // Align to 4 bytes if the name wasn't
                 writer.Seek(0, SeekOrigin.End);
