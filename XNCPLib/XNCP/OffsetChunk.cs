@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define VERIFY_OFFSET_TABLE
+
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,12 +17,16 @@ namespace XNCPLib.XNCP
         public uint Signature { get; set; }
         public uint Field0C { get; set; }
         public List<uint> OffsetLocations { get; set; }
-        //public List<uint> OffsetLocationsTemp { get; set; }
+#if VERIFY_OFFSET_TABLE
+        public List<uint> OffsetLocationsTemp { get; set; }
+#endif
 
         public OffsetChunk()
         {
             OffsetLocations = new List<uint>();
-            //OffsetLocationsTemp = new List<uint>();
+#if VERIFY_OFFSET_TABLE
+            OffsetLocationsTemp = new List<uint>();
+#endif
         }
 
         public void Read(BinaryObjectReader reader)
@@ -43,7 +49,9 @@ namespace XNCPLib.XNCP
 
             for (int loc = 0; loc < offsetLocationCount; ++loc)
             {
-                //OffsetLocationsTemp.Add(reader.ReadUInt32());
+#if VERIFY_OFFSET_TABLE
+                OffsetLocationsTemp.Add(reader.ReadUInt32());
+#endif
             }
 
             reader.Seek(reader.GetOffsetOrigin() + size + 8, SeekOrigin.Begin);
@@ -69,8 +77,10 @@ namespace XNCPLib.XNCP
             writer.WriteUInt32((uint)OffsetLocations.Count);
             writer.WriteUInt32(Field0C);
 
+#if VERIFY_OFFSET_TABLE
             // For testing if offset table is the same
-            //var missingList = OffsetLocationsTemp.Except(OffsetLocations);
+            var missingList = OffsetLocationsTemp.Except(OffsetLocations);
+#endif
 
             for (int loc = 0; loc < OffsetLocations.Count; ++loc)
             {

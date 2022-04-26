@@ -141,6 +141,7 @@ namespace XNCPLib.XNCP
 
             offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length + Fonts.Count * 0x8 - writer.GetOffsetOrigin()));
 
             // Allocate memory for Fonts and FontIDOffsets data
