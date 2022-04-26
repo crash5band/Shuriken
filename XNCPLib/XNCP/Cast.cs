@@ -234,7 +234,9 @@ namespace XNCPLib.XNCP
             {
                 writer.WriteUInt32(0);
             }
+            unwrittenPosition += 0x4;
 
+            writer.Seek(unwrittenPosition, SeekOrigin.Begin);
             if (HasFontName)
             {
                 uint fontNameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
@@ -249,7 +251,9 @@ namespace XNCPLib.XNCP
             {
                 writer.WriteUInt32(0);
             }
+            unwrittenPosition += 0x4;
 
+            writer.Seek(unwrittenPosition, SeekOrigin.Begin);
             writer.WriteUInt32(Field4C);
             writer.WriteUInt32(Width);
             writer.WriteUInt32(Height);
