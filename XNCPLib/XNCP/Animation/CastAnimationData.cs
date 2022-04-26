@@ -16,6 +16,7 @@ namespace XNCPLib.XNCP.Animation
         public uint Flags { get; set; }
         public uint DataOffset { get; set; }
         public List<CastAnimationSubData> SubDataList { get; set; }
+        private uint UnwrittenPosition { get; set; }
 
         public CastAnimationData()
         {
@@ -59,6 +60,38 @@ namespace XNCPLib.XNCP.Animation
                     writer.Seek(writer.GetOffsetOrigin() + DataOffset + (12 * i), SeekOrigin.Begin);
                     SubDataList[i].Write(writer);
                 }
+            }
+        }
+
+        public void Write_Step0(BinaryObjectWriter writer)
+        {
+            UnwrittenPosition = (uint)writer.Length;
+            writer.WriteUInt32(Flags);
+
+            if (Flags != 0)
+            {
+                writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+                uint count = Utilities.CountSetBits(Flags);
+                writer.Seek(0, SeekOrigin.End);
+                Utilities.PadZeroBytes(writer, (int)count * 0xC);
+            }
+            else
+            {
+                writer.WriteUInt32(0);
+            }
+        }
+
+        public void Write_Step1(BinaryObjectWriter writer)
+        {
+            uint count = Utilities.CountSetBits(Flags);
+            for (int i = 0; i < count; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0xC;
+
+                SubDataList[i].Write_Step0(writer);
+                // Finished
             }
         }
     }
@@ -105,11 +138,25 @@ namespace XNCPLib.XNCP.Animation
                 Keyframes[i].Write(writer);
             }
         }
+
+        public void Write_Step0(BinaryObjectWriter writer)
+        {
+            writer.WriteUInt32(Field00);
+            writer.WriteUInt32(KeyframeCount);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+            writer.Seek(0, SeekOrigin.End);
+            for (int i = 0; i < KeyframeCount; ++i)
+            {
+                Keyframes[i].Write(writer);
+            }
+        }
     }
 
     public class CastAnimationData2List
     {
         public uint DataOffset { get; set; }
+        public bool IsUsed { get; set; }
         public List<CastAnimationData2> ListData { get; set; }
 
         public CastAnimationData2List()

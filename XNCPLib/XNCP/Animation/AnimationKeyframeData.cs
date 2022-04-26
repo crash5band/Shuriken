@@ -83,6 +83,16 @@ namespace XNCPLib.XNCP.Animation
                 GroupAnimationDataList[i].Write_Step1(writer);
             }
         }
+
+        public void Write_Step3(BinaryObjectWriter writer)
+        {
+            // Continue GroupAnimationDataList steps
+            for (int i = 0; i < GroupCount; ++i)
+            {
+                GroupAnimationDataList[i].Write_Step2(writer);
+                // Finished
+            }
+        }
     }
 
     public class AnimationData2

@@ -66,13 +66,31 @@ namespace XNCPLib.XNCP.Animation
 
         public void Write_Step1(BinaryObjectWriter writer)
         {
-            // TODO:
+            // Fill CastAnimationDataList
+            for (int i = 0; i < CastCount; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x8;
+
+                CastAnimationDataList[i].Write_Step0(writer);
+            }
+        }
+
+        public void Write_Step2(BinaryObjectWriter writer)
+        {
+            // Continue CastAnimationDataList steps
+            for (int i = 0; i < CastCount; ++i)
+            {
+                CastAnimationDataList[i].Write_Step1(writer);
+                // Finished
+            }
         }
     }
 
     public class GroupAnimationData2
     {
         public uint DataOffset { get; set; }
+        public bool IsUsed { get; set; }
         public CastAnimationData2List AnimationData2List { get; set; }
 
         public GroupAnimationData2()
@@ -85,6 +103,7 @@ namespace XNCPLib.XNCP.Animation
     {
         public uint Field00 { get; set; }
         public uint DataOffset { get; set; }
+        public bool IsUsed { get; set; }
         public List<GroupAnimationData2> GroupList { get; set; }
 
         public GroupAnimationData2List()
