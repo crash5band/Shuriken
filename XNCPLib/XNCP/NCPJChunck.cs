@@ -61,7 +61,7 @@ namespace XNCPLib.XNCP
             reader.PopOffsetOrigin();
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public void Write(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             writer.PushOffsetOrigin();
             Endianness endianPrev = writer.Endianness;
@@ -81,10 +81,12 @@ namespace XNCPLib.XNCP
             writer.WriteUInt32(Field0C);
 
             // RootNodeOffset is always 0x20?
+            offsetChunk.Add(writer);
             uint rootNodeOffset = 0x20;
             writer.WriteUInt32(rootNodeOffset);
 
             // ProjectNameOffset is always 0x38?
+            offsetChunk.Add(writer);
             uint projectNameOffset = 0x38;
             writer.WriteUInt32(projectNameOffset);
             writer.WriteStringOffset(projectNameOffset, ProjectName);
@@ -97,58 +99,16 @@ namespace XNCPLib.XNCP
             uint fontListOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
             writer.Seek(writer.GetOffsetOrigin() + 0x18, SeekOrigin.Begin);
             writer.WriteUInt32(DXLSignature);
+            offsetChunk.Add(writer);
             writer.WriteUInt32(fontListOffset);
-            /*
+            
             Root.Write_Step0(writer);
             Fonts.Write_Step0(writer);
-            Root.Write_Step1(writer);
-            Fonts.Write_Step1(writer);
-            Root.Write_Step2(writer);
-            Fonts.Write_Step2(writer);
-            Root.Write_Step3(writer);
-            */
-            // Pre-allocate data memeory
-            // TODO: sub nodes will move fontDataOffset
-            uint rootSceneListOffset = fontListOffset + 0xC;
-            uint fontDataOffset = rootSceneListOffset + (uint)Root.Scenes.Count * 0xC;
-            uint rootSceneDataOffset = fontDataOffset + (uint)Fonts.Fonts.Count * 0x10;
-            uint rootSceneNamesOffset = rootSceneDataOffset + (uint)Root.Scenes.Count * 0x4C;
-            
-            uint characterMappingOffset = rootSceneNamesOffset;
-            for (int i = 0; i < Root.SceneIDTable.Count; i++)
-            {
-                int nameLength = Root.SceneIDTable[i].Name.Length + 1;
-                int unalignedBytes = nameLength % 0x4;
-                if (unalignedBytes != 0)
-                {
-                    nameLength += 0x4 - unalignedBytes;
-                }
-                characterMappingOffset += (uint)nameLength;
-            }
-
-            uint fontNamesOffset = characterMappingOffset;
-            for (int i = 0; i < Fonts.Fonts.Count; i++)
-            {
-                fontNamesOffset += (uint)Fonts.Fonts[i].CharacterMappings.Count * 0x8;
-            }
-
-            uint fontNamesEndOffset = fontNamesOffset;
-            for (int i = 0; i < Fonts.FontIDTable.Count; i++)
-            {
-                int nameLength = Fonts.FontIDTable[i].Name.Length + 1;
-                int unalignedBytes = nameLength % 0x4;
-                if (unalignedBytes != 0)
-                {
-                    nameLength += 0x4 - unalignedBytes;
-                }
-                fontNamesEndOffset += (uint)nameLength;
-            }
-
-            writer.Seek(writer.GetOffsetOrigin() + rootNodeOffset, SeekOrigin.Begin);
-            Root.Write(writer, rootSceneListOffset, rootSceneDataOffset);
-
-            writer.Seek(writer.GetOffsetOrigin() + fontListOffset, SeekOrigin.Begin);
-            Fonts.Write(writer, fontDataOffset, characterMappingOffset, fontNamesOffset);
+            Root.Write_Step1(writer, offsetChunk);
+            Fonts.Write_Step1(writer, offsetChunk);
+            Root.Write_Step2(writer, offsetChunk);
+            Fonts.Write_Step2(writer, offsetChunk);
+            Root.Write_Step3(writer, offsetChunk);
 
             // Go back and write size
             writer.Endianness = Endianness.Little;

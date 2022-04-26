@@ -147,14 +147,13 @@ namespace XNCPLib.XNCP
             // NCPJChunk/XTextureListChunk
             //----------------------------------------------------------------
             Debug.Assert(CsdmProject.IsUsed ^ TextureList.IsUsed);
-            List<uint> offsetList = new();
             if (CsdmProject.IsUsed)
             {
-                CsdmProject.Write(writer);
+                CsdmProject.Write(writer, Offset);
             }
             else
             {
-                TextureList.Write(writer, ref offsetList);
+                TextureList.Write(writer, Offset);
             }
 
             // Go back and write ChunkListSize
@@ -162,8 +161,6 @@ namespace XNCPLib.XNCP
             writer.WriteUInt32((uint)writer.Length - headerInfoEnd);
             writer.Seek(0, SeekOrigin.End);
 
-            // TODO:
-            // We're still not writing some stuff here...
             Offset.Write(writer);
             End.Write(writer);
 

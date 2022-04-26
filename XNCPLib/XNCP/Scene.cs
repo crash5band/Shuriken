@@ -455,7 +455,7 @@ namespace XNCPLib.XNCP
             }
         }
 
-        public void Write_Step0(BinaryObjectWriter writer)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             UnwrittenPosition = (uint)writer.Position;
 
@@ -465,6 +465,7 @@ namespace XNCPLib.XNCP
             writer.WriteUInt32(Field0C);
             writer.WriteSingle(Field10);
             writer.WriteUInt32(Data1Count);
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
             UnwrittenPosition += 0x1C;
 
@@ -478,6 +479,7 @@ namespace XNCPLib.XNCP
 
             writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
             writer.WriteUInt32(SubImagesCount);
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
             UnwrittenPosition += 0x8;
 
@@ -490,6 +492,7 @@ namespace XNCPLib.XNCP
 
             writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
             writer.WriteUInt32(GroupCount);
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
             UnwrittenPosition += 0x8;
 
@@ -500,6 +503,7 @@ namespace XNCPLib.XNCP
 
             writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
             writer.WriteUInt32(CastCount);
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
             UnwrittenPosition += 0x8;
 
@@ -509,7 +513,9 @@ namespace XNCPLib.XNCP
 
             writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
             writer.WriteUInt32(AnimationCount);
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length + AnimationCount * 0x8 - writer.GetOffsetOrigin()));
             UnwrittenPosition += 0xC;
 
@@ -519,7 +525,9 @@ namespace XNCPLib.XNCP
 
             writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
             writer.WriteSingle(AspectRatio);
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length + AnimationCount * 0x8 - writer.GetOffsetOrigin()));
             UnwrittenPosition += 0xC;
 
@@ -530,7 +538,7 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step1(BinaryObjectWriter writer)
+        public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Fill CastGroup data
             for (int i = 0; i < GroupCount; ++i)
@@ -538,7 +546,7 @@ namespace XNCPLib.XNCP
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x10;
 
-                UICastGroups[i].Write_Step0(writer);
+                UICastGroups[i].Write_Step0(writer, offsetChunk);
             }
 
             // Fill CastIDOffsets data
@@ -547,6 +555,7 @@ namespace XNCPLib.XNCP
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0xC;
 
+                offsetChunk.Add(writer);
                 uint nameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
                 CastDictionaries[i].Write_REPLACE(writer, nameOffset);
 
@@ -561,7 +570,7 @@ namespace XNCPLib.XNCP
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x8;
 
-                AnimationKeyframeDataList[i].Write_Step0(writer);
+                AnimationKeyframeDataList[i].Write_Step0(writer, offsetChunk);
             }
 
             // Fill AnimationIDOffsets data
@@ -570,6 +579,7 @@ namespace XNCPLib.XNCP
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x8;
 
+                offsetChunk.Add(writer);
                 uint nameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
                 AnimationDictionaries[i].Write_REPLACE(writer, nameOffset);
 
@@ -597,6 +607,7 @@ namespace XNCPLib.XNCP
                 AnimationData2 data2 = AnimationData2List[a];
                 if (data2.IsUsed)
                 {
+                    offsetChunk.Add(writer);
                     writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
                     // Allocate memory for GroupAnimationData2List data
@@ -612,18 +623,18 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step2(BinaryObjectWriter writer)
+        public void Write_Step2(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Continue UICastGroups steps
             for (int i = 0; i < GroupCount; ++i)
             {
-                UICastGroups[i].Write_Step1(writer);
+                UICastGroups[i].Write_Step1(writer, offsetChunk);
             }
 
             // Continue AnimationKeyFrame steps
             for (int i = 0; i < AnimationCount; ++i)
             {
-                AnimationKeyframeDataList[i].Write_Step1(writer);
+                AnimationKeyframeDataList[i].Write_Step1(writer, offsetChunk);
             }
 
             // Fill GroupAnimationData2List data
@@ -640,6 +651,7 @@ namespace XNCPLib.XNCP
                 writer.WriteUInt32(groupData2List.Field00);
                 if (groupData2List.IsUsed)
                 {
+                    offsetChunk.Add(writer);
                     writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
                     for (int g = 0; g < GroupCount; ++g)
@@ -658,19 +670,19 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step3(BinaryObjectWriter writer)
+        public void Write_Step3(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Continue UICastGroups steps
             for (int i = 0; i < GroupCount; ++i)
             {
-                UICastGroups[i].Write_Step2(writer);
+                UICastGroups[i].Write_Step2(writer, offsetChunk);
                 // Finished
             }
 
             // Continue AnimationKeyFrame steps
             for (int i = 0; i < AnimationCount; ++i)
             {
-                AnimationKeyframeDataList[i].Write_Step2(writer);
+                AnimationKeyframeDataList[i].Write_Step2(writer, offsetChunk);
             }
 
             // Fill GroupAnimationData2 data
@@ -691,6 +703,7 @@ namespace XNCPLib.XNCP
                     GroupAnimationData2 groupData2 = groupData2List.GroupList[g];
                     if (groupData2.IsUsed)
                     {
+                        offsetChunk.Add(writer);
                         writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
                         // Allocate memory for CastAnimationData2List data
@@ -707,12 +720,12 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step4(BinaryObjectWriter writer)
+        public void Write_Step4(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Continue AnimationKeyFrame steps
             for (int i = 0; i < AnimationCount; ++i)
             {
-                AnimationKeyframeDataList[i].Write_Step3(writer);
+                AnimationKeyframeDataList[i].Write_Step3(writer, offsetChunk);
                 // Finished
             }
 
@@ -737,6 +750,7 @@ namespace XNCPLib.XNCP
                     CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
                     if (castAnimData2List.IsUsed)
                     {
+                        offsetChunk.Add(writer);
                         writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
                         for (int c = 0; c < UICastGroups[g].CastCount; ++c)
@@ -756,7 +770,7 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step5(BinaryObjectWriter writer)
+        public void Write_Step5(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Fill CastAnimationData2 data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -784,6 +798,7 @@ namespace XNCPLib.XNCP
                         CastAnimationData2 castAnimData2 = castAnimData2List.ListData[c];
                         if (castAnimData2.IsUsed)
                         {
+                            offsetChunk.Add(writer);
                             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
                             // Allocate memory for Data5 data
@@ -801,7 +816,7 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step6(BinaryObjectWriter writer)
+        public void Write_Step6(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Fill Data5 data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -832,6 +847,7 @@ namespace XNCPLib.XNCP
                         Data5 data5 = castAnimData2.Data;
                         if (data5.IsUsed)
                         {
+                            offsetChunk.Add(writer);
                             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
                             uint flags = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].Flags;
@@ -854,7 +870,7 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step7(BinaryObjectWriter writer)
+        public void Write_Step7(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Fill Data6 data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -892,6 +908,7 @@ namespace XNCPLib.XNCP
                             Data6 subData = castAnimData2.Data.SubData[subData1Index];
                             if (subData.IsUsed)
                             {
+                                offsetChunk.Add(writer);
                                 writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
                                 // Allocate memory for Data7 data
@@ -910,7 +927,7 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step8(BinaryObjectWriter writer)
+        public void Write_Step8(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Fill Data7 data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -951,6 +968,7 @@ namespace XNCPLib.XNCP
                             Data7 data7 = subData.Data;
                             if (data7.IsUsed)
                             {
+                                offsetChunk.Add(writer);
                                 writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
                                 uint data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].KeyframeCount;
@@ -973,7 +991,7 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
         
-        public void Write_Step9(BinaryObjectWriter writer)
+        public void Write_Step9(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Fill Data8 data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -1020,6 +1038,7 @@ namespace XNCPLib.XNCP
                                 Data8 data8 = data7.Data[v];
                                 if (data8.IsUsed)
                                 {
+                                    offsetChunk.Add(writer);
                                     writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
                                     // Allocate memory for final Vector3 data

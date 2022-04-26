@@ -127,7 +127,7 @@ namespace XNCPLib.XNCP
             Utilities.PadZeroBytes(writer, 0xC);
         }
 
-        public void Write_Step1(BinaryObjectWriter writer)
+        public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Fill FontList data
             writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
@@ -139,6 +139,7 @@ namespace XNCPLib.XNCP
                 return;
             }
 
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
             writer.WriteUInt32((uint)(writer.Length + Fonts.Count * 0x8 - writer.GetOffsetOrigin()));
 
@@ -148,7 +149,7 @@ namespace XNCPLib.XNCP
             Utilities.PadZeroBytes(writer, Fonts.Count * 0x10);
         }
 
-        public void Write_Step2(BinaryObjectWriter writer)
+        public void Write_Step2(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             if (Fonts.Count == 0) return;
 
@@ -158,7 +159,7 @@ namespace XNCPLib.XNCP
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x8;
 
-                Fonts[f].Write_Step0(writer);
+                Fonts[f].Write_Step0(writer, offsetChunk);
                 // Finished
             }
 
@@ -168,6 +169,7 @@ namespace XNCPLib.XNCP
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x8;
 
+                offsetChunk.Add(writer);
                 uint nameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
                 FontIDTable[i].Write(writer, nameOffset);
 

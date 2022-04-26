@@ -139,7 +139,7 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = (uint)writer.Position;
         }
 
-        public void Write_Step1(BinaryObjectWriter writer)
+        public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
             writer.WriteUInt32((uint)Scenes.Count);
@@ -151,7 +151,9 @@ namespace XNCPLib.XNCP
             }
             else
             {
+                offsetChunk.Add(writer);
                 writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+                offsetChunk.Add(writer);
                 writer.WriteUInt32((uint)(writer.Length + Scenes.Count * 0x4 - writer.GetOffsetOrigin()));
             }
 
@@ -166,7 +168,7 @@ namespace XNCPLib.XNCP
             Utilities.PadZeroBytes(writer, Scenes.Count * 0xC);
         }
 
-        public void Write_Step2(BinaryObjectWriter writer)
+        public void Write_Step2(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Fill SceneOffsets data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -174,6 +176,7 @@ namespace XNCPLib.XNCP
             {
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x4;
+                offsetChunk.Add(writer);
                 writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
                 // Allocate memory for Scene data
@@ -187,6 +190,7 @@ namespace XNCPLib.XNCP
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x8;
 
+                offsetChunk.Add(writer);
                 uint nameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
                 SceneIDTable[i].Write(writer, nameOffset);
 
@@ -198,58 +202,58 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step3(BinaryObjectWriter writer)
+        public void Write_Step3(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             for (int i = 0; i < Scenes.Count; ++i)
             {
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
-                Scenes[i].Write_Step0(writer);
+                Scenes[i].Write_Step0(writer, offsetChunk);
                 UnwrittenPosition += 0x4C;
             }
 
             for (int i = 0; i < Scenes.Count; ++i)
             {
-                Scenes[i].Write_Step1(writer);
+                Scenes[i].Write_Step1(writer, offsetChunk);
             }
 
             for (int i = 0; i < Scenes.Count; ++i)
             {
-                Scenes[i].Write_Step2(writer);
+                Scenes[i].Write_Step2(writer, offsetChunk);
             }
 
             for (int i = 0; i < Scenes.Count; ++i)
             {
-                Scenes[i].Write_Step3(writer);
+                Scenes[i].Write_Step3(writer, offsetChunk);
             }
 
             for (int i = 0; i < Scenes.Count; ++i)
             {
-                Scenes[i].Write_Step4(writer);
+                Scenes[i].Write_Step4(writer, offsetChunk);
             }
 
             for (int i = 0; i < Scenes.Count; ++i)
             {
-                Scenes[i].Write_Step5(writer);
+                Scenes[i].Write_Step5(writer, offsetChunk);
             }
 
             for (int i = 0; i < Scenes.Count; ++i)
             {
-                Scenes[i].Write_Step6(writer);
+                Scenes[i].Write_Step6(writer, offsetChunk);
             }
 
             for (int i = 0; i < Scenes.Count; ++i)
             {
-                Scenes[i].Write_Step7(writer);
+                Scenes[i].Write_Step7(writer, offsetChunk);
             }
 
             for (int i = 0; i < Scenes.Count; ++i)
             {
-                Scenes[i].Write_Step8(writer);
+                Scenes[i].Write_Step8(writer, offsetChunk);
             }
 
             for (int i = 0; i < Scenes.Count; ++i)
             {
-                Scenes[i].Write_Step9(writer);
+                Scenes[i].Write_Step9(writer, offsetChunk);
             }
 
             for (int i = 0; i < Scenes.Count; ++i)

@@ -53,9 +53,10 @@ namespace XNCPLib.XNCP.Animation
             }
         }
 
-        public void Write_Step0(BinaryObjectWriter writer)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             writer.WriteUInt32(GroupCount);
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
             // Allocate memory for GroupAnimationDataList
@@ -64,32 +65,32 @@ namespace XNCPLib.XNCP.Animation
             Utilities.PadZeroBytes(writer, (int)GroupCount * 0x8);
         }
 
-        public void Write_Step1(BinaryObjectWriter writer)
+        public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             for (int i = 0; i < GroupCount; ++i)
             {
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x8;
 
-                GroupAnimationDataList[i].Write_Step0(writer);
+                GroupAnimationDataList[i].Write_Step0(writer, offsetChunk);
             }
         }
 
-        public void Write_Step2(BinaryObjectWriter writer)
+        public void Write_Step2(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Continue GroupAnimationDataList steps
             for (int i = 0; i < GroupCount; ++i)
             {
-                GroupAnimationDataList[i].Write_Step1(writer);
+                GroupAnimationDataList[i].Write_Step1(writer, offsetChunk);
             }
         }
 
-        public void Write_Step3(BinaryObjectWriter writer)
+        public void Write_Step3(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Continue GroupAnimationDataList steps
             for (int i = 0; i < GroupCount; ++i)
             {
-                GroupAnimationDataList[i].Write_Step2(writer);
+                GroupAnimationDataList[i].Write_Step2(writer, offsetChunk);
                 // Finished
             }
         }

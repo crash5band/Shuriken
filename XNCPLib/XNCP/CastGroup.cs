@@ -92,11 +92,12 @@ namespace XNCPLib.XNCP
             }
         }
 
-        public void Write_Step0(BinaryObjectWriter writer)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             UnwrittenPosition = (uint)writer.Position;
 
             writer.WriteUInt32(CastCount);
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
             UnwrittenPosition += 0x8;
 
@@ -107,6 +108,7 @@ namespace XNCPLib.XNCP
 
             writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
             writer.WriteUInt32(Field08);
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
             UnwrittenPosition += 0x8;
 
@@ -121,7 +123,7 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step1(BinaryObjectWriter writer)
+        public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             uint newUnwrittenPosition = (uint)writer.Length;
 
@@ -131,6 +133,7 @@ namespace XNCPLib.XNCP
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x4;
 
+                offsetChunk.Add(writer);
                 writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
                 // Allocate memory for Cast data
@@ -141,7 +144,7 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step2(BinaryObjectWriter writer)
+        public void Write_Step2(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Fill Cast data
             for (int i = 0; i < CastCount; ++i)
@@ -149,7 +152,7 @@ namespace XNCPLib.XNCP
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x74;
 
-                Casts[i].Write_Step0(writer);
+                Casts[i].Write_Step0(writer, offsetChunk);
                 // Finished
             }
         }

@@ -164,7 +164,7 @@ namespace XNCPLib.XNCP
             }
         }
 
-        public void Write_Step0(BinaryObjectWriter writer)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             uint unwrittenPosition = (uint)writer.Position;
 
@@ -187,6 +187,7 @@ namespace XNCPLib.XNCP
             // CastMaterialInfo goes before CastInfo...
             if (HasCastInfo)
             {
+                offsetChunk.Add(writer);
                 writer.WriteUInt32((uint)(writer.Length + 0x80 - writer.GetOffsetOrigin()));
             }
             else
@@ -200,6 +201,7 @@ namespace XNCPLib.XNCP
 
             if (HasCastMaterialInfo)
             {
+                offsetChunk.Add(writer);
                 writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
             }
             else
@@ -222,6 +224,7 @@ namespace XNCPLib.XNCP
             writer.Seek(unwrittenPosition, SeekOrigin.Begin);
             if (HasFontCharacters)
             {
+                offsetChunk.Add(writer);
                 uint fontCharactersOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
                 writer.WriteUInt32(fontCharactersOffset);
                 writer.WriteStringOffset(fontCharactersOffset, FontCharacters);
@@ -239,6 +242,7 @@ namespace XNCPLib.XNCP
             writer.Seek(unwrittenPosition, SeekOrigin.Begin);
             if (HasFontName)
             {
+                offsetChunk.Add(writer);
                 uint fontNameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
                 writer.WriteUInt32(fontNameOffset);
                 writer.WriteStringOffset(fontNameOffset, FontName);

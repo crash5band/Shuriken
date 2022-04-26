@@ -63,13 +63,14 @@ namespace XNCPLib.XNCP.Animation
             }
         }
 
-        public void Write_Step0(BinaryObjectWriter writer)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             UnwrittenPosition = (uint)writer.Length;
             writer.WriteUInt32(Flags);
 
             if (Flags != 0)
             {
+                offsetChunk.Add(writer);
                 writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
                 uint count = Utilities.CountSetBits(Flags);
@@ -82,7 +83,7 @@ namespace XNCPLib.XNCP.Animation
             }
         }
 
-        public void Write_Step1(BinaryObjectWriter writer)
+        public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             uint count = Utilities.CountSetBits(Flags);
             for (int i = 0; i < count; ++i)
@@ -90,7 +91,7 @@ namespace XNCPLib.XNCP.Animation
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0xC;
 
-                SubDataList[i].Write_Step0(writer);
+                SubDataList[i].Write_Step0(writer, offsetChunk);
                 // Finished
             }
         }
@@ -139,10 +140,11 @@ namespace XNCPLib.XNCP.Animation
             }
         }
 
-        public void Write_Step0(BinaryObjectWriter writer)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             writer.WriteUInt32(Field00);
             writer.WriteUInt32(KeyframeCount);
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
             writer.Seek(0, SeekOrigin.End);

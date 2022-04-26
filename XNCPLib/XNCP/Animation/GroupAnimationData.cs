@@ -53,9 +53,10 @@ namespace XNCPLib.XNCP.Animation
             }
         }
 
-        public void Write_Step0(BinaryObjectWriter writer)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             writer.WriteUInt32(CastCount);
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
             // Allocate memory for CastAnimationDataList
@@ -64,7 +65,7 @@ namespace XNCPLib.XNCP.Animation
             Utilities.PadZeroBytes(writer, (int)CastCount * 0x8);
         }
 
-        public void Write_Step1(BinaryObjectWriter writer)
+        public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Fill CastAnimationDataList
             for (int i = 0; i < CastCount; ++i)
@@ -72,16 +73,16 @@ namespace XNCPLib.XNCP.Animation
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x8;
 
-                CastAnimationDataList[i].Write_Step0(writer);
+                CastAnimationDataList[i].Write_Step0(writer, offsetChunk);
             }
         }
 
-        public void Write_Step2(BinaryObjectWriter writer)
+        public void Write_Step2(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Continue CastAnimationDataList steps
             for (int i = 0; i < CastCount; ++i)
             {
-                CastAnimationDataList[i].Write_Step1(writer);
+                CastAnimationDataList[i].Write_Step1(writer, offsetChunk);
                 // Finished
             }
         }

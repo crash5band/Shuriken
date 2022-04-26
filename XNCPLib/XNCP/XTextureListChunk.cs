@@ -57,7 +57,7 @@ namespace XNCPLib.XNCP
             reader.PopOffsetOrigin();
         }
 
-        public void Write(BinaryObjectWriter writer, ref List<uint> offsetList)
+        public void Write(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             writer.PushOffsetOrigin();
             Endianness endianPrev = writer.Endianness;
@@ -80,7 +80,7 @@ namespace XNCPLib.XNCP
             writer.WriteUInt32((uint)Textures.Count);
 
             // DataOffset is always just 0x18?
-            uint dataOffsetPosition = (uint)(writer.Position - writer.GetOffsetOrigin());
+            offsetChunk.Add(writer);
             writer.WriteUInt32(0x18);
 
             uint textureDataStart = (uint)writer.Length;
@@ -88,8 +88,8 @@ namespace XNCPLib.XNCP
             for (int i = 0; i < Textures.Count; ++i)
             {
                 writer.Seek(textureDataStart + (i * 0x8), SeekOrigin.Begin);
-                offsetList.Add((uint)(writer.Position - writer.GetOffsetOrigin()));
 
+                offsetChunk.Add(writer);
                 uint textureNameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
                 Textures[i].Write(writer, textureNameOffset);
 
@@ -97,9 +97,6 @@ namespace XNCPLib.XNCP
                 writer.Seek(0, SeekOrigin.End);
                 writer.Align(4);
             }
-
-            // Now add DataOffset to offset list
-            offsetList.Add(dataOffsetPosition);
 
             // Go back and write size
             writer.Endianness = Endianness.Little;

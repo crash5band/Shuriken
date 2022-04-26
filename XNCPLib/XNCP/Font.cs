@@ -82,9 +82,10 @@ namespace XNCPLib.XNCP
             }
         }
 
-        public void Write_Step0(BinaryObjectWriter writer)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             writer.WriteUInt32((uint)CharacterMappings.Count);
+            offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
             writer.Seek(0, SeekOrigin.End);
