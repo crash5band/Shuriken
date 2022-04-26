@@ -25,8 +25,6 @@ namespace XNCPLib.XNCP
 
         public ChunkFile()
         {
-            CsdmProject = new NCPJChunck();
-            TextureList = new XTextureListChunk();
             Offset = new OffsetChunk();
             End = new EndChunk();
         }
@@ -79,10 +77,12 @@ namespace XNCPLib.XNCP
             reader.Seek(reader.GetOffsetOrigin() + nextChunkOffset, SeekOrigin.Begin);
             if (nextSignature != Utilities.Make4CCLE("NXTL"))
             {
+                CsdmProject = new NCPJChunck();
                 CsdmProject.Read(reader);
             }
             else
             {
+                TextureList = new XTextureListChunk();
                 TextureList.Read(reader);
             }
             // TODO: can we verify chunkListSize matches the current largest offset?
@@ -146,8 +146,8 @@ namespace XNCPLib.XNCP
             //----------------------------------------------------------------
             // NCPJChunk/XTextureListChunk
             //----------------------------------------------------------------
-            Debug.Assert(CsdmProject.IsUsed ^ TextureList.IsUsed);
-            if (CsdmProject.IsUsed)
+            Debug.Assert((CsdmProject == null) ^ (TextureList == null));
+            if (CsdmProject != null)
             {
                 CsdmProject.Write(writer, Offset);
             }

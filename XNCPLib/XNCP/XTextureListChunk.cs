@@ -14,7 +14,6 @@ namespace XNCPLib.XNCP
 {
     public class XTextureListChunk
     {
-        public bool IsUsed { get; set; }
         public uint Signature { get; set; }
         public uint Field0C { get; set; }
         public List<XTexture> Textures { get; set; }
@@ -26,8 +25,6 @@ namespace XNCPLib.XNCP
 
         public void Read(BinaryObjectReader reader)
         {
-            IsUsed = true;
-
             reader.PushOffsetOrigin();
             Endianness endianPrev = reader.Endianness;
 
