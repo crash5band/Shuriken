@@ -76,47 +76,6 @@ namespace XNCPLib.XNCP
             }
         }
 
-        public void Write(BinaryObjectWriter writer, uint fontDataOffset, uint characterMappingOffset, uint fontNamesOffset)
-        {
-            Debug.Assert(Fonts.Count == FontIDTable.Count);
-
-            writer.WriteUInt32((uint)Fonts.Count);
-            if (Fonts.Count == 0)
-            {
-                writer.WriteUInt32(0);
-                writer.WriteUInt32(0);
-                return;
-            }
-
-            writer.WriteUInt32(fontDataOffset);
-            uint fontIDTableOffset = fontDataOffset + (uint)Fonts.Count * 0x8;
-            writer.WriteUInt32(fontIDTableOffset);
-
-            for (int f = 0; f < Fonts.Count; ++f)
-            {
-                writer.Seek(writer.GetOffsetOrigin() + fontDataOffset + (8 * f), SeekOrigin.Begin);
-                Fonts[f].Write(writer, characterMappingOffset);
-
-                // Get the next mapping offset
-                characterMappingOffset += (uint)Fonts[f].CharacterMappings.Count * 0x8;
-            }
-
-            for (int i = 0; i < Fonts.Count; ++i)
-            {
-                writer.Seek(writer.GetOffsetOrigin() + fontIDTableOffset + (8 * i), SeekOrigin.Begin);
-                FontIDTable[i].Write(writer, fontNamesOffset);
-
-                // Get the next name offset
-                int nameLength = FontIDTable[i].Name.Length + 1;
-                int unalignedBytes = nameLength % 0x4;
-                if (unalignedBytes != 0)
-                {
-                    nameLength += 0x4 - unalignedBytes;
-                }
-                fontNamesOffset += (uint)nameLength;
-            }
-        }
-
         public void Write_Step0(BinaryObjectWriter writer)
         {
             Debug.Assert(Fonts.Count == FontIDTable.Count);

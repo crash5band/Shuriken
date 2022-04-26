@@ -104,6 +104,17 @@ namespace XNCPLib.XNCP
             Root.Write_Step2(writer, offsetChunk);
             Fonts.Write_Step2(writer, offsetChunk);
             Root.Write_Step3(writer, offsetChunk);
+            Root.Write_Step4(writer, offsetChunk);
+            Root.Write_Step5(writer, offsetChunk);
+            Root.Write_Step6(writer, offsetChunk);
+            Root.Write_Step7(writer, offsetChunk);
+            Root.Write_Step8(writer, offsetChunk);
+            Root.Write_Step9(writer, offsetChunk);
+            Root.Write_Step10(writer, offsetChunk);
+            Root.Write_Step11(writer, offsetChunk);
+            Root.Write_Step12(writer, offsetChunk);
+            Root.Write_Step13(writer, offsetChunk);
+            Root.Write_Step14(writer, offsetChunk);
 
             // Go back and write size
             writer.Endianness = Endianness.Little;
