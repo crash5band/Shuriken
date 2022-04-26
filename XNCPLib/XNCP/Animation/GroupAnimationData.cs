@@ -90,26 +90,20 @@ namespace XNCPLib.XNCP.Animation
 
     public class GroupAnimationData2
     {
-        public uint DataOffset { get; set; }
-        public bool IsUsed { get; set; }
         public CastAnimationData2List AnimationData2List { get; set; }
 
         public GroupAnimationData2()
         {
-            AnimationData2List = new CastAnimationData2List();
         }
     }
 
     public class GroupAnimationData2List
     {
         public uint Field00 { get; set; }
-        public uint DataOffset { get; set; }
-        public bool IsUsed { get; set; }
         public List<GroupAnimationData2> GroupList { get; set; }
 
         public GroupAnimationData2List()
         {
-            GroupList = new List<GroupAnimationData2>();
         }
     }
 }

@@ -157,67 +157,51 @@ namespace XNCPLib.XNCP.Animation
 
     public class CastAnimationData2List
     {
-        public uint DataOffset { get; set; }
-        public bool IsUsed { get; set; }
         public List<CastAnimationData2> ListData { get; set; }
 
         public CastAnimationData2List()
         {
-            ListData = new List<CastAnimationData2>();
         }
     }
 
     public class CastAnimationData2
     {
-        public uint DataOffset { get; set; }
-        public bool IsUsed { get; set; }
         public Data5 Data { get; set; }
 
         public CastAnimationData2()
         {
-            Data = new Data5();
         }
     }
 
     public class Data5
     {
-        public uint DataOffset { get; set; }
-        public bool IsUsed { get; set; }
         public List<Data6> SubData { get; set; }
 
         public Data5()
         {
-            SubData = new List<Data6>();
         }
     }
 
     public class Data6
     {
-        public uint DataOffset { get; set; }
-        public bool IsUsed { get; set; }
         public Data7 Data { get; set; }
 
         public Data6()
         {
-            Data = new Data7();
         }
     }
 
     public class Data7
     {
-        public uint DataOffset { get; set; }
-        public bool IsUsed { get; set; }
         public List<Data8> Data { get; set; }
 
         public Data7()
         {
-            Data = new List<Data8>();
         }
     }
 
     public class Data8
     {
-        public uint ValueOffset { get; set; }
         public bool IsUsed { get; set; }
         public Vector3 Value { get; set; }
     }

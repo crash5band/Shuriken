@@ -222,7 +222,7 @@ namespace Shuriken.ViewModels
 
         private void SaveCasts(UIScene uiScene, Scene scene)
         {
-            for (int g = 0; g < scene.GroupCount; ++g)
+            for (int g = 0; g < scene.UICastGroups.Count; ++g)
             {
                 scene.UICastGroups[g].Field08 = uiScene.Groups[g].Field08;
             }

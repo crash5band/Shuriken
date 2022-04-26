@@ -91,7 +91,7 @@ namespace Shuriken.Models
         private void ProcessCasts(Scene scene, TextureList texList, IEnumerable<UIFont> fonts)
         {
             // Create groups
-            for (int g = 0; g < scene.GroupCount; ++g)
+            for (int g = 0; g < scene.UICastGroups.Count; ++g)
             {
                 Groups.Add(new UICastGroup
                 {

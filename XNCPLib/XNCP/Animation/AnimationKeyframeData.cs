@@ -99,12 +99,10 @@ namespace XNCPLib.XNCP.Animation
     public class AnimationData2
     {
         public uint GroupAnimationData2ListOffset { get; set; }
-        public bool  IsUsed { get; set; }
         public GroupAnimationData2List GroupList { get; set; }
 
         public AnimationData2()
         {
-            GroupList = new GroupAnimationData2List();
         }
     }
 
