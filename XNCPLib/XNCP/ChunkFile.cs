@@ -15,8 +15,6 @@ namespace XNCPLib.XNCP
     public class ChunkFile
     {
         public uint Signature { get; set; }
-        public uint OffsetChunkOffset { get; set; }
-        public uint OffsetChunkSize { get; set; }
         public uint Field1C { get; set; }
         public NCPJChunck CsdmProject { get; set; }
         public XTextureListChunk TextureList { get; set; }
@@ -46,18 +44,13 @@ namespace XNCPLib.XNCP
             }
             reader.Endianness = endianPrev;
 
-            uint chunkCount;
-            uint nextChunkOffset;
-            uint chunkListSize;
             uint headerStart = (uint)reader.Position;
-            {
-                chunkCount = reader.ReadUInt32(); // TODO: multiple chunk count
-                nextChunkOffset = reader.ReadUInt32();
-                chunkListSize = reader.ReadUInt32();
-                OffsetChunkOffset = reader.ReadUInt32();
-                OffsetChunkSize = reader.ReadUInt32();
-                Field1C = reader.ReadUInt32();
-            }
+            uint chunkCount = reader.ReadUInt32(); // TODO: multiple chunk count
+            uint nextChunkOffset = reader.ReadUInt32();
+            uint chunkListSize = reader.ReadUInt32();
+            uint offsetChunkOffset = reader.ReadUInt32();
+            uint offsetChunkSize = reader.ReadUInt32();
+            Field1C = reader.ReadUInt32();
             Debug.Assert(reader.Position - headerStart == headerSize);
 
             //----------------------------------------------------------------
@@ -85,10 +78,8 @@ namespace XNCPLib.XNCP
                 TextureList = new XTextureListChunk();
                 TextureList.Read(reader);
             }
-            // TODO: can we verify chunkListSize matches the current largest offset?
 
-            // TODO:
-            reader.Seek(reader.GetOffsetOrigin() + nextChunkOffset + chunkListSize, SeekOrigin.Begin);
+            reader.Seek(reader.GetOffsetOrigin() + offsetChunkOffset, SeekOrigin.Begin);
             Offset.Read(reader);
             End.Read(reader);
 
@@ -123,8 +114,12 @@ namespace XNCPLib.XNCP
                 // Skipped: ChunkListSize
                 writer.Skip(4);
 
-                writer.WriteUInt32(OffsetChunkOffset);
-                writer.WriteUInt32(OffsetChunkSize);
+                // Skipped: OffsetChunkOffset
+                writer.Skip(4);
+
+                // Skipped: OffsetChunkSize
+                writer.Skip(4);
+
                 writer.WriteUInt32(Field1C);
             }
             uint headerInfoEnd = (uint)writer.Position;
@@ -156,9 +151,11 @@ namespace XNCPLib.XNCP
                 TextureList.Write(writer, Offset);
             }
 
-            // Go back and write ChunkListSize
+            // Go back and write ChunkListSize, OffsetChunkOffset, OffsetChunkSize
             writer.Seek(headerInfoStart + 8, SeekOrigin.Begin);
             writer.WriteUInt32((uint)writer.Length - headerInfoEnd);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            writer.WriteUInt32((uint)Offset.OffsetLocations.Count * 0x4 + 0x10);
             writer.Seek(0, SeekOrigin.End);
 
             Offset.Write(writer);
