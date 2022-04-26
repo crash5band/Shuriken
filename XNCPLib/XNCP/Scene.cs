@@ -210,12 +210,14 @@ namespace XNCPLib.XNCP
 
                                         if (castAnimData2.DataOffset > 0)
                                         {
+                                            castAnimData2.IsUsed = true;
                                             reader.SeekBegin(baseOffset + castAnimData2.DataOffset);
 
                                             // Data5
                                             castAnimData2.Data.DataOffset = reader.ReadUInt32();
                                             if (castAnimData2.Data.DataOffset > 0)
                                             {
+                                                castAnimData2.Data.IsUsed = true;
                                                 uint flags = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].Flags;
                                                 uint castAnimationDataSubData1Count = Utilities.CountSetBits(flags);
 
@@ -228,6 +230,7 @@ namespace XNCPLib.XNCP
 
                                                     if (subData.DataOffset > 0)
                                                     {
+                                                        subData.IsUsed = true;
                                                         reader.SeekBegin(baseOffset + subData.DataOffset);
 
                                                         Data7 data = new Data7();
@@ -235,6 +238,7 @@ namespace XNCPLib.XNCP
 
                                                         if (data.DataOffset > 0)
                                                         {
+                                                            data.IsUsed = true;
                                                             uint data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].KeyframeCount;
                                                             data.Data.Capacity = (int)data8Count;
 
@@ -247,6 +251,7 @@ namespace XNCPLib.XNCP
 
                                                                 if (value.ValueOffset > 0)
                                                                 {
+                                                                    value.IsUsed = true;
                                                                     reader.SeekBegin(baseOffset + value.ValueOffset);
 
                                                                     value.Value = reader.ReadVector3();
@@ -753,7 +758,341 @@ namespace XNCPLib.XNCP
 
         public void Write_Step5(BinaryObjectWriter writer)
         {
-            // TODO:
+            // Fill CastAnimationData2 data
+            uint newUnwrittenPosition = (uint)writer.Length;
+            for (int a = 0; a < AnimationCount; ++a)
+            {
+                AnimationData2 data2 = AnimationData2List[a];
+                if (!data2.IsUsed) continue;
+
+                GroupAnimationData2List groupData2List = data2.GroupList;
+                if (!groupData2List.IsUsed) continue;
+
+                for (int g = 0; g < GroupCount; ++g)
+                {
+                    GroupAnimationData2 groupData2 = groupData2List.GroupList[g];
+                    if (!groupData2.IsUsed) continue;
+
+                    CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
+                    if (!castAnimData2List.IsUsed) continue;
+
+                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                    {
+                        writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                        UnwrittenPosition += 0x4;
+
+                        CastAnimationData2 castAnimData2 = castAnimData2List.ListData[c];
+                        if (castAnimData2.IsUsed)
+                        {
+                            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+                            // Allocate memory for Data5 data
+                            writer.Seek(0, SeekOrigin.End);
+                            Utilities.PadZeroBytes(writer, 0x4);
+                        }
+                        else
+                        {
+                            writer.WriteUInt32(0);
+                        }
+                    }
+                }
+            }
+
+            UnwrittenPosition = newUnwrittenPosition;
+        }
+
+        public void Write_Step6(BinaryObjectWriter writer)
+        {
+            // Fill Data5 data
+            uint newUnwrittenPosition = (uint)writer.Length;
+            for (int a = 0; a < AnimationCount; ++a)
+            {
+                AnimationData2 data2 = AnimationData2List[a];
+                if (!data2.IsUsed) continue;
+
+                GroupAnimationData2List groupData2List = data2.GroupList;
+                if (!groupData2List.IsUsed) continue;
+
+                for (int g = 0; g < GroupCount; ++g)
+                {
+                    GroupAnimationData2 groupData2 = groupData2List.GroupList[g];
+                    if (!groupData2.IsUsed) continue;
+
+                    CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
+                    if (!castAnimData2List.IsUsed) continue;
+
+                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                    {
+                        CastAnimationData2 castAnimData2 = castAnimData2List.ListData[c];
+                        if (!castAnimData2.IsUsed) continue;
+
+                        writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                        UnwrittenPosition += 0x4;
+
+                        Data5 data5 = castAnimData2.Data;
+                        if (data5.IsUsed)
+                        {
+                            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+                            uint flags = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].Flags;
+                            uint castAnimationDataSubData1Count = Utilities.CountSetBits(flags);
+                            for (int subData1Index = 0; subData1Index < castAnimationDataSubData1Count; ++subData1Index)
+                            {
+                                // Allocate memory for Data6 data
+                                writer.Seek(0, SeekOrigin.End);
+                                Utilities.PadZeroBytes(writer, 0x4);
+                            }
+                        }
+                        else
+                        {
+                            writer.WriteUInt32(0);
+                        }
+                    }
+                }
+            }
+
+            UnwrittenPosition = newUnwrittenPosition;
+        }
+
+        public void Write_Step7(BinaryObjectWriter writer)
+        {
+            // Fill Data6 data
+            uint newUnwrittenPosition = (uint)writer.Length;
+            for (int a = 0; a < AnimationCount; ++a)
+            {
+                AnimationData2 data2 = AnimationData2List[a];
+                if (!data2.IsUsed) continue;
+
+                GroupAnimationData2List groupData2List = data2.GroupList;
+                if (!groupData2List.IsUsed) continue;
+
+                for (int g = 0; g < GroupCount; ++g)
+                {
+                    GroupAnimationData2 groupData2 = groupData2List.GroupList[g];
+                    if (!groupData2.IsUsed) continue;
+
+                    CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
+                    if (!castAnimData2List.IsUsed) continue;
+
+                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                    {
+                        CastAnimationData2 castAnimData2 = castAnimData2List.ListData[c];
+                        if (!castAnimData2.IsUsed) continue;
+
+                        Data5 data5 = castAnimData2.Data;
+                        if (!data5.IsUsed) continue;
+
+                        uint flags = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].Flags;
+                        uint castAnimationDataSubData1Count = Utilities.CountSetBits(flags);
+                        for (int subData1Index = 0; subData1Index < castAnimationDataSubData1Count; ++subData1Index)
+                        {
+                            writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                            UnwrittenPosition += 0x4;
+
+                            Data6 subData = castAnimData2.Data.SubData[subData1Index];
+                            if (subData.IsUsed)
+                            {
+                                writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+                                // Allocate memory for Data7 data
+                                writer.Seek(0, SeekOrigin.End);
+                                Utilities.PadZeroBytes(writer, 0x4);
+                            }
+                            else
+                            {
+                                writer.WriteUInt32(0);
+                            }
+                        }
+                    }
+                }
+            }
+
+            UnwrittenPosition = newUnwrittenPosition;
+        }
+
+        public void Write_Step8(BinaryObjectWriter writer)
+        {
+            // Fill Data7 data
+            uint newUnwrittenPosition = (uint)writer.Length;
+            for (int a = 0; a < AnimationCount; ++a)
+            {
+                AnimationData2 data2 = AnimationData2List[a];
+                if (!data2.IsUsed) continue;
+
+                GroupAnimationData2List groupData2List = data2.GroupList;
+                if (!groupData2List.IsUsed) continue;
+
+                for (int g = 0; g < GroupCount; ++g)
+                {
+                    GroupAnimationData2 groupData2 = groupData2List.GroupList[g];
+                    if (!groupData2.IsUsed) continue;
+
+                    CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
+                    if (!castAnimData2List.IsUsed) continue;
+
+                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                    {
+                        CastAnimationData2 castAnimData2 = castAnimData2List.ListData[c];
+                        if (!castAnimData2.IsUsed) continue;
+
+                        Data5 data5 = castAnimData2.Data;
+                        if (!data5.IsUsed) continue;
+
+                        uint flags = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].Flags;
+                        uint castAnimationDataSubData1Count = Utilities.CountSetBits(flags);
+                        for (int subData1Index = 0; subData1Index < castAnimationDataSubData1Count; ++subData1Index)
+                        {
+                            Data6 subData = castAnimData2.Data.SubData[subData1Index];
+                            if (!subData.IsUsed) continue;
+
+                            writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                            UnwrittenPosition += 0x4;
+
+                            Data7 data7 = subData.Data;
+                            if (data7.IsUsed)
+                            {
+                                writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+                                uint data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].KeyframeCount;
+                                for (int v = 0; v < data8Count; ++v)
+                                {
+                                    // Allocate memory for Data8 data
+                                    writer.Seek(0, SeekOrigin.End);
+                                    Utilities.PadZeroBytes(writer, 0x4);
+                                }
+                            }
+                            else
+                            {
+                                writer.WriteUInt32(0);
+                            }
+                        }
+                    }
+                }
+            }
+
+            UnwrittenPosition = newUnwrittenPosition;
+        }
+        
+        public void Write_Step9(BinaryObjectWriter writer)
+        {
+            // Fill Data8 data
+            uint newUnwrittenPosition = (uint)writer.Length;
+            for (int a = 0; a < AnimationCount; ++a)
+            {
+                AnimationData2 data2 = AnimationData2List[a];
+                if (!data2.IsUsed) continue;
+
+                GroupAnimationData2List groupData2List = data2.GroupList;
+                if (!groupData2List.IsUsed) continue;
+
+                for (int g = 0; g < GroupCount; ++g)
+                {
+                    GroupAnimationData2 groupData2 = groupData2List.GroupList[g];
+                    if (!groupData2.IsUsed) continue;
+
+                    CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
+                    if (!castAnimData2List.IsUsed) continue;
+
+                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                    {
+                        CastAnimationData2 castAnimData2 = castAnimData2List.ListData[c];
+                        if (!castAnimData2.IsUsed) continue;
+
+                        Data5 data5 = castAnimData2.Data;
+                        if (!data5.IsUsed) continue;
+
+                        uint flags = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].Flags;
+                        uint castAnimationDataSubData1Count = Utilities.CountSetBits(flags);
+                        for (int subData1Index = 0; subData1Index < castAnimationDataSubData1Count; ++subData1Index)
+                        {
+                            Data6 subData = castAnimData2.Data.SubData[subData1Index];
+                            if (!subData.IsUsed) continue;
+
+                            Data7 data7 = subData.Data;
+                            if (!data7.IsUsed) continue;
+
+                            uint data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].KeyframeCount;
+                            for (int v = 0; v < data8Count; ++v)
+                            {
+                                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                                UnwrittenPosition += 0x4;
+
+                                Data8 data8 = data7.Data[v];
+                                if (data8.IsUsed)
+                                {
+                                    writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+
+                                    // Allocate memory for final Vector3 data
+                                    writer.Seek(0, SeekOrigin.End);
+                                    Utilities.PadZeroBytes(writer, 0xC);
+                                }
+                                else
+                                {
+                                    writer.WriteUInt32(0);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            UnwrittenPosition = newUnwrittenPosition;
+        }
+        
+        public void Write_Step10(BinaryObjectWriter writer)
+        {
+            // Fill final Vector3 data
+            for (int a = 0; a < AnimationCount; ++a)
+            {
+                AnimationData2 data2 = AnimationData2List[a];
+                if (!data2.IsUsed) continue;
+
+                GroupAnimationData2List groupData2List = data2.GroupList;
+                if (!groupData2List.IsUsed) continue;
+
+                for (int g = 0; g < GroupCount; ++g)
+                {
+                    GroupAnimationData2 groupData2 = groupData2List.GroupList[g];
+                    if (!groupData2.IsUsed) continue;
+
+                    CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
+                    if (!castAnimData2List.IsUsed) continue;
+
+                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                    {
+                        CastAnimationData2 castAnimData2 = castAnimData2List.ListData[c];
+                        if (!castAnimData2.IsUsed) continue;
+
+                        Data5 data5 = castAnimData2.Data;
+                        if (!data5.IsUsed) continue;
+
+                        uint flags = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].Flags;
+                        uint castAnimationDataSubData1Count = Utilities.CountSetBits(flags);
+                        for (int subData1Index = 0; subData1Index < castAnimationDataSubData1Count; ++subData1Index)
+                        {
+                            Data6 subData = castAnimData2.Data.SubData[subData1Index];
+                            if (!subData.IsUsed) continue;
+
+                            Data7 data7 = subData.Data;
+                            if (!data7.IsUsed) continue;
+
+                            uint data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].KeyframeCount;
+                            for (int v = 0; v < data8Count; ++v)
+                            {
+                                Data8 data8 = data7.Data[v];
+                                if (!data8.IsUsed) continue;
+
+                                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                                UnwrittenPosition += 0xC;
+
+                                writer.WriteSingle(data8.Value.X);
+                                writer.WriteSingle(data8.Value.Y);
+                                writer.WriteSingle(data8.Value.Z);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

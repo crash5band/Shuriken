@@ -231,6 +231,32 @@ namespace XNCPLib.XNCP
             {
                 Scenes[i].Write_Step5(writer);
             }
+
+            for (int i = 0; i < Scenes.Count; ++i)
+            {
+                Scenes[i].Write_Step6(writer);
+            }
+
+            for (int i = 0; i < Scenes.Count; ++i)
+            {
+                Scenes[i].Write_Step7(writer);
+            }
+
+            for (int i = 0; i < Scenes.Count; ++i)
+            {
+                Scenes[i].Write_Step8(writer);
+            }
+
+            for (int i = 0; i < Scenes.Count; ++i)
+            {
+                Scenes[i].Write_Step9(writer);
+            }
+
+            for (int i = 0; i < Scenes.Count; ++i)
+            {
+                Scenes[i].Write_Step10(writer);
+                // Finished
+            }
         }
     }
 }

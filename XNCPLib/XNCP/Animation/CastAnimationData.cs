@@ -168,6 +168,7 @@ namespace XNCPLib.XNCP.Animation
     public class CastAnimationData2
     {
         public uint DataOffset { get; set; }
+        public bool IsUsed { get; set; }
         public Data5 Data { get; set; }
 
         public CastAnimationData2()
@@ -179,6 +180,7 @@ namespace XNCPLib.XNCP.Animation
     public class Data5
     {
         public uint DataOffset { get; set; }
+        public bool IsUsed { get; set; }
         public List<Data6> SubData { get; set; }
 
         public Data5()
@@ -190,6 +192,7 @@ namespace XNCPLib.XNCP.Animation
     public class Data6
     {
         public uint DataOffset { get; set; }
+        public bool IsUsed { get; set; }
         public Data7 Data { get; set; }
 
         public Data6()
@@ -201,6 +204,7 @@ namespace XNCPLib.XNCP.Animation
     public class Data7
     {
         public uint DataOffset { get; set; }
+        public bool IsUsed { get; set; }
         public List<Data8> Data { get; set; }
 
         public Data7()
@@ -212,6 +216,7 @@ namespace XNCPLib.XNCP.Animation
     public class Data8
     {
         public uint ValueOffset { get; set; }
+        public bool IsUsed { get; set; }
         public Vector3 Value { get; set; }
     }
 }
