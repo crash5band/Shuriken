@@ -156,11 +156,11 @@ namespace XNCPLib.XNCP
                 reader.Seek(baseOffset + AnimationCastTableOffset + (a * 4), SeekOrigin.Begin);
 
                 AnimationData2 data2 = new AnimationData2();
-                data2.GroupAnimationData2ListOffset = reader.ReadUInt32();
+                uint data2GroupAnimationData2ListOffset = reader.ReadUInt32();
 
-                if (data2.GroupAnimationData2ListOffset > 0)
+                if (data2GroupAnimationData2ListOffset > 0)
                 {
-                    reader.SeekBegin(baseOffset + data2.GroupAnimationData2ListOffset);
+                    reader.SeekBegin(baseOffset + data2GroupAnimationData2ListOffset);
 
                     GroupAnimationData2List groupData2List = new GroupAnimationData2List();
                     groupData2List.Field00 = reader.ReadUInt32();
@@ -186,7 +186,7 @@ namespace XNCPLib.XNCP
                                 if (castAnimData2ListDataOffset > 0)
                                 {
                                     castAnimData2List.ListData = new List<CastAnimationData2>();
-                                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                                    for (int c = 0; c < UICastGroups[g].Casts.Count; ++c)
                                     {
                                         reader.SeekBegin(baseOffset + castAnimData2ListDataOffset + (4 * c));
 
@@ -223,8 +223,8 @@ namespace XNCPLib.XNCP
                                                         if (data7DataOffset > 0)
                                                         {
                                                             data.Data = new List<Data8>();
-                                                            uint data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].KeyframeCount;
-                                                            data.Data.Capacity = (int)data8Count;
+                                                            int data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].Keyframes.Count;
+                                                            data.Data.Capacity = data8Count;
 
                                                             for (int v = 0; v < data8Count; ++v)
                                                             {
@@ -569,7 +569,7 @@ namespace XNCPLib.XNCP
                         offsetChunk.Add(writer);
                         writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
-                        for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                        for (int c = 0; c < UICastGroups[g].Casts.Count; ++c)
                         {
                             // Allocate memory for CastAnimationData2 data
                             writer.Seek(0, SeekOrigin.End);
@@ -606,7 +606,7 @@ namespace XNCPLib.XNCP
                     CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
                     if (castAnimData2List.ListData == null) continue;
 
-                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                    for (int c = 0; c < UICastGroups[g].Casts.Count; ++c)
                     {
                         writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                         UnwrittenPosition += 0x4;
@@ -652,7 +652,7 @@ namespace XNCPLib.XNCP
                     CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
                     if (castAnimData2List.ListData == null) continue;
 
-                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                    for (int c = 0; c < UICastGroups[g].Casts.Count; ++c)
                     {
                         CastAnimationData2 castAnimData2 = castAnimData2List.ListData[c];
                         if (castAnimData2.Data == null) continue;
@@ -706,7 +706,7 @@ namespace XNCPLib.XNCP
                     CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
                     if (castAnimData2List.ListData == null) continue;
 
-                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                    for (int c = 0; c < UICastGroups[g].Casts.Count; ++c)
                     {
                         CastAnimationData2 castAnimData2 = castAnimData2List.ListData[c];
                         if (castAnimData2.Data == null) continue;
@@ -763,7 +763,7 @@ namespace XNCPLib.XNCP
                     CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
                     if (castAnimData2List.ListData == null) continue;
 
-                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                    for (int c = 0; c < UICastGroups[g].Casts.Count; ++c)
                     {
                         CastAnimationData2 castAnimData2 = castAnimData2List.ListData[c];
                         if (castAnimData2.Data == null) continue;
@@ -787,7 +787,7 @@ namespace XNCPLib.XNCP
                                 offsetChunk.Add(writer);
                                 writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
-                                uint data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].KeyframeCount;
+                                int data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].Keyframes.Count;
                                 for (int v = 0; v < data8Count; ++v)
                                 {
                                     // Allocate memory for Data8 data
@@ -827,7 +827,7 @@ namespace XNCPLib.XNCP
                     CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
                     if (castAnimData2List.ListData == null) continue;
 
-                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                    for (int c = 0; c < UICastGroups[g].Casts.Count; ++c)
                     {
                         CastAnimationData2 castAnimData2 = castAnimData2List.ListData[c];
                         if (castAnimData2.Data == null) continue;
@@ -845,7 +845,7 @@ namespace XNCPLib.XNCP
                             Data7 data7 = subData.Data;
                             if (data7.Data == null) continue;
 
-                            uint data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].KeyframeCount;
+                            int data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].Keyframes.Count;
                             for (int v = 0; v < data8Count; ++v)
                             {
                                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
@@ -893,7 +893,7 @@ namespace XNCPLib.XNCP
                     CastAnimationData2List castAnimData2List = groupData2.AnimationData2List;
                     if (castAnimData2List.ListData == null) continue;
 
-                    for (int c = 0; c < UICastGroups[g].CastCount; ++c)
+                    for (int c = 0; c < UICastGroups[g].Casts.Count; ++c)
                     {
                         CastAnimationData2 castAnimData2 = castAnimData2List.ListData[c];
                         if (castAnimData2.Data == null) continue;
@@ -911,7 +911,7 @@ namespace XNCPLib.XNCP
                             Data7 data7 = subData.Data;
                             if (data7.Data == null) continue;
 
-                            uint data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].KeyframeCount;
+                            int data8Count = AnimationKeyframeDataList[a].GroupAnimationDataList[g].CastAnimationDataList[c].SubDataList[subData1Index].Keyframes.Count;
                             for (int v = 0; v < data8Count; ++v)
                             {
                                 Data8 data8 = data7.Data[v];

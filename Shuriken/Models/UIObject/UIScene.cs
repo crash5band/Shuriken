@@ -118,7 +118,7 @@ namespace Shuriken.Models
             List<UICast> tempCasts = new List<UICast>();
             for (int g = 0; g < Groups.Count; ++g)
             {
-                for (int c = 0; c < scene.UICastGroups[g].CastCount; ++c)
+                for (int c = 0; c < scene.UICastGroups[g].Casts.Count; ++c)
                 {
                     UICast cast = new UICast(scene.UICastGroups[g].Casts[c], GetCastName(g, c, scene.CastDictionaries), c);
 
@@ -146,7 +146,7 @@ namespace Shuriken.Models
                 foreach (var entry in entryIndexMap)
                 {
                     XNCPLib.XNCP.Animation.AnimationKeyframeData keyframeData = scene.AnimationKeyframeDataList[entry.Value];
-                    for (int c = 0; c < keyframeData.GroupAnimationDataList[g].CastCount; ++c)
+                    for (int c = 0; c < keyframeData.GroupAnimationDataList[g].CastAnimationDataList.Count; ++c)
                     {
                         XNCPLib.XNCP.Animation.CastAnimationData castAnimData = keyframeData.GroupAnimationDataList[g].CastAnimationDataList[c];
                         List<AnimationTrack> tracks = new List<AnimationTrack>((int)XNCPLib.Misc.Utilities.CountSetBits(castAnimData.Flags));

@@ -14,7 +14,6 @@ namespace XNCPLib.XNCP.Animation
     public class CastAnimationData
     {
         public uint Flags { get; set; }
-        public uint DataOffset { get; set; }
         public List<CastAnimationSubData> SubDataList { get; set; }
         private uint UnwrittenPosition { get; set; }
 
@@ -26,7 +25,7 @@ namespace XNCPLib.XNCP.Animation
         public void Read(BinaryObjectReader reader)
         {
             Flags = reader.ReadUInt32();
-            DataOffset = reader.ReadUInt32();
+            uint DataOffset = reader.ReadUInt32();
 
             if (DataOffset > 0)
             {
@@ -41,24 +40,6 @@ namespace XNCPLib.XNCP.Animation
                     CastAnimationSubData subData = new CastAnimationSubData();
                     subData.Read(reader);
                     SubDataList.Add(subData);
-                }
-            }
-        }
-
-        public void Write(BinaryObjectWriter writer)
-        {
-            writer.WriteUInt32(Flags);
-            writer.WriteUInt32(DataOffset);
-
-            if (DataOffset > 0)
-            {
-                writer.Seek(writer.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
-                uint count = Utilities.CountSetBits(Flags);
-
-                for (int i = 0; i < count; ++i)
-                {
-                    writer.Seek(writer.GetOffsetOrigin() + DataOffset + (12 * i), SeekOrigin.Begin);
-                    SubDataList[i].Write(writer);
                 }
             }
         }
@@ -100,8 +81,6 @@ namespace XNCPLib.XNCP.Animation
     public class CastAnimationSubData
     {
         public uint Field00 { get; set; }
-        public uint KeyframeCount { get; set; }
-        public uint DataOffset { get; set; }
         public List<Keyframe> Keyframes { get; set; }
 
         public CastAnimationSubData()
@@ -112,8 +91,8 @@ namespace XNCPLib.XNCP.Animation
         public void Read(BinaryObjectReader reader)
         {
             Field00 = reader.ReadUInt32();
-            KeyframeCount = reader.ReadUInt32();
-            DataOffset = reader.ReadUInt32();
+            uint KeyframeCount = reader.ReadUInt32();
+            uint DataOffset = reader.ReadUInt32();
 
             Keyframes.Capacity = (int)KeyframeCount;
 
@@ -127,28 +106,15 @@ namespace XNCPLib.XNCP.Animation
             }
         }
 
-        public void Write(BinaryObjectWriter writer)
-        {
-            writer.WriteUInt32(Field00);
-            writer.WriteUInt32(KeyframeCount);
-            writer.WriteUInt32(DataOffset);
-
-            writer.Seek(writer.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
-            for (int i = 0; i < KeyframeCount; ++i)
-            {
-                Keyframes[i].Write(writer);
-            }
-        }
-
         public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             writer.WriteUInt32(Field00);
-            writer.WriteUInt32(KeyframeCount);
+            writer.WriteUInt32((uint)Keyframes.Count);
             offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
             writer.Seek(0, SeekOrigin.End);
-            for (int i = 0; i < KeyframeCount; ++i)
+            for (int i = 0; i < Keyframes.Count; ++i)
             {
                 Keyframes[i].Write(writer);
             }

@@ -241,7 +241,7 @@ namespace Shuriken.ViewModels
             // process group layers
             for (int g = 0; g < uiScene.Groups.Count; ++g)
             {
-                for (int c = 0; c < scene.UICastGroups[g].CastCount; ++c)
+                for (int c = 0; c < scene.UICastGroups[g].Casts.Count; ++c)
                 {
                     Cast cast = scene.UICastGroups[g].Casts[c];
                     UICast uiCast = uiScene.Groups[g].CastsOrderedByIndex[c];
@@ -329,7 +329,7 @@ namespace Shuriken.ViewModels
                     int trackIndex = 0;
                     int trackAnimIndex = 0;
                     XNCPLib.XNCP.Animation.AnimationKeyframeData keyframeData = scene.AnimationKeyframeDataList[entry.Value];
-                    for (int c = 0; c < keyframeData.GroupAnimationDataList[g].CastCount; ++c)
+                    for (int c = 0; c < keyframeData.GroupAnimationDataList[g].CastAnimationDataList.Count; ++c)
                     {
                         XNCPLib.XNCP.Animation.CastAnimationData castAnimData = keyframeData.GroupAnimationDataList[g].CastAnimationDataList[c];
 

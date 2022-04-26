@@ -12,10 +12,7 @@ namespace XNCPLib.XNCP
 {
     public class CastGroup
     {
-        public uint CastCount { get; set; }
-        public uint CastTableOffset { get; set; }
         public uint Field08 { get; set; }
-        public uint CastHierarchyTreeOffset { get; set; }
         public List<uint> CastOffsets { get; set; }
         public List<Cast> Casts { get; set; }
         public List<CastHierarchyTreeNode> CastHierarchyTree { get; set; }
@@ -30,13 +27,13 @@ namespace XNCPLib.XNCP
 
         public void Read(BinaryObjectReader reader)
         {
-            CastCount = reader.ReadUInt32();
+            uint CastCount = reader.ReadUInt32();
             Casts.Capacity = (int)CastCount;
             CastOffsets.Capacity = (int)CastCount;
 
-            CastTableOffset = reader.ReadUInt32();
+            uint CastTableOffset = reader.ReadUInt32();
             Field08 = reader.ReadUInt32();
-            CastHierarchyTreeOffset = reader.ReadUInt32();
+            uint CastHierarchyTreeOffset = reader.ReadUInt32();
 
             long baseOffset = reader.GetOffsetOrigin();
             reader.Seek(baseOffset + CastTableOffset, SeekOrigin.Begin);
@@ -63,40 +60,11 @@ namespace XNCPLib.XNCP
             }
         }
 
-        public void Write(BinaryObjectWriter writer)
-        {
-            writer.WriteUInt32(CastCount);
-            writer.WriteUInt32(CastTableOffset);
-            writer.WriteUInt32(Field08);
-            writer.WriteUInt32(CastHierarchyTreeOffset);
-
-            long baseOffset = writer.GetOffsetOrigin();
-            writer.Seek(baseOffset + CastTableOffset, SeekOrigin.Begin);
-
-            for (int i = 0; i < CastCount; ++i)
-            {
-                writer.WriteUInt32(CastOffsets[i]);
-            }
-
-            for (int i = 0; i < CastCount; ++i)
-            {
-                writer.Seek(baseOffset + CastOffsets[i], SeekOrigin.Begin);
-                Casts[i].Write(writer);
-            }
-
-            writer.Seek(baseOffset + CastHierarchyTreeOffset, SeekOrigin.Begin);
-            for (int i = 0; i < CastCount; ++i)
-            {
-                writer.WriteInt32(CastHierarchyTree[i].ChildIndex);
-                writer.WriteInt32(CastHierarchyTree[i].NextIndex);
-            }
-        }
-
         public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             UnwrittenPosition = (uint)writer.Position;
 
-            writer.WriteUInt32(CastCount);
+            writer.WriteUInt32((uint)Casts.Count);
             offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
             UnwrittenPosition += 0x8;
@@ -104,7 +72,7 @@ namespace XNCPLib.XNCP
             // Allocate memory for CastOffsets data
             uint newUnwrittenPosition = (uint)writer.Length;
             writer.Seek(0, SeekOrigin.End);
-            Utilities.PadZeroBytes(writer, (int)CastCount * 0x4);
+            Utilities.PadZeroBytes(writer, Casts.Count * 0x4);
 
             writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
             writer.WriteUInt32(Field08);
@@ -114,7 +82,7 @@ namespace XNCPLib.XNCP
 
             // Fill CastHierarchy data
             writer.Seek(0, SeekOrigin.End);
-            for (int i = 0; i < CastCount; ++i)
+            for (int i = 0; i < Casts.Count; ++i)
             {
                 writer.WriteInt32(CastHierarchyTree[i].ChildIndex);
                 writer.WriteInt32(CastHierarchyTree[i].NextIndex);
@@ -128,7 +96,7 @@ namespace XNCPLib.XNCP
             uint newUnwrittenPosition = (uint)writer.Length;
 
             // Fill CastOffsets data
-            for (int i = 0; i < CastCount; ++i)
+            for (int i = 0; i < Casts.Count; ++i)
             {
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x4;
@@ -147,7 +115,7 @@ namespace XNCPLib.XNCP
         public void Write_Step2(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Fill Cast data
-            for (int i = 0; i < CastCount; ++i)
+            for (int i = 0; i < Casts.Count; ++i)
             {
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x74;

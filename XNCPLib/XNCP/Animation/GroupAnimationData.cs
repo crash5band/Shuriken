@@ -12,8 +12,6 @@ namespace XNCPLib.XNCP.Animation
 {
     public class GroupAnimationData
     {
-        public uint CastCount { get; set; }
-        public uint CastDataOffset { get; set; }
         public List<CastAnimationData> CastAnimationDataList { get; set; }
         private uint UnwrittenPosition { get; set; }
 
@@ -24,8 +22,8 @@ namespace XNCPLib.XNCP.Animation
 
         public void Read(BinaryObjectReader reader)
         {
-            CastCount = reader.ReadUInt32();
-            CastDataOffset = reader.ReadUInt32();
+            uint CastCount = reader.ReadUInt32();
+            uint CastDataOffset = reader.ReadUInt32();
 
             CastAnimationDataList.Capacity = (int)CastCount;
 
@@ -40,35 +38,22 @@ namespace XNCPLib.XNCP.Animation
             }
         }
 
-        public void Write(BinaryObjectWriter writer)
-        {
-            writer.WriteUInt32(CastCount);
-            writer.WriteUInt32(CastDataOffset);
-
-            for (int i = 0; i < CastCount; ++i)
-            {
-                writer.Seek(writer.GetOffsetOrigin() + CastDataOffset + (8 * i), SeekOrigin.Begin);
-
-                CastAnimationDataList[i].Write(writer);
-            }
-        }
-
         public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
-            writer.WriteUInt32(CastCount);
+            writer.WriteUInt32((uint)CastAnimationDataList.Count);
             offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
             // Allocate memory for CastAnimationDataList
             UnwrittenPosition = (uint)writer.Length;
             writer.Seek(0, SeekOrigin.End);
-            Utilities.PadZeroBytes(writer, (int)CastCount * 0x8);
+            Utilities.PadZeroBytes(writer, CastAnimationDataList.Count * 0x8);
         }
 
         public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Fill CastAnimationDataList
-            for (int i = 0; i < CastCount; ++i)
+            for (int i = 0; i < CastAnimationDataList.Count; ++i)
             {
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x8;
@@ -80,7 +65,7 @@ namespace XNCPLib.XNCP.Animation
         public void Write_Step2(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Continue CastAnimationDataList steps
-            for (int i = 0; i < CastCount; ++i)
+            for (int i = 0; i < CastAnimationDataList.Count; ++i)
             {
                 CastAnimationDataList[i].Write_Step1(writer, offsetChunk);
                 // Finished
