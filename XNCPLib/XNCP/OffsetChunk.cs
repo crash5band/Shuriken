@@ -85,6 +85,7 @@ namespace XNCPLib.XNCP
             {
                 writer.WriteUInt32(OffsetLocations[loc]);
             }
+            OffsetLocations.Clear();
 
             // Go back and write size
             writer.Endianness = Endianness.Little;
