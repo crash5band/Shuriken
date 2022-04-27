@@ -160,34 +160,24 @@ namespace Shuriken.ViewModels
                 }
             }
 
-            // Sprite Saving: Has some conversion issues
-            if (xScenes.Count > 0)
+            List<SubImage> newSubImages = new List<SubImage>();
+            foreach (KeyValuePair<int, Sprite> entry in Project.Sprites)
             {
-                foreach (Scene scene in xScenes)
-                {
-                    int nextSpriteId = 1;
-                    foreach (SubImage subimage in scene.SubImages)
-                    {
-                        int textureIndex = (int)subimage.TextureIndex;
-                        if (textureIndex >= 0 && textureIndex < texList.Textures.Count)
-                        {
-                            Sprite sprite = Project.TryGetSprite(nextSpriteId++);
-                            int newTextureIndex = texList.Textures.IndexOf(sprite.Texture);
+                Sprite sprite = entry.Value;
+                int textureIndex = texList.Textures.IndexOf(sprite.Texture);
 
-                            subimage.TextureIndex = (uint)newTextureIndex;
-                            if (sprite.HasChanged)
-                            {
-                                subimage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, (float)sprite.Y / sprite.Texture.Height);
-                                subimage.BottomRight = new Vector2(((float)sprite.Width / sprite.Texture.Width) + subimage.TopLeft.X, ((float)sprite.Height / sprite.Texture.Height) + subimage.TopLeft.Y);
-                            }
-                            else
-                            {
-                                subimage.TopLeft = new Vector2(sprite.OriginalLeft, sprite.OriginalTop);
-                                subimage.BottomRight = new Vector2(sprite.OriginalRight, sprite.OriginalBottom);
-                            }
-                        }
-                    }
-                }
+                SubImage subimage = new SubImage();
+                subimage.TextureIndex = (uint)textureIndex;
+                subimage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, (float)sprite.Y / sprite.Texture.Height);
+                subimage.BottomRight = new Vector2(((float)sprite.Width / sprite.Texture.Width) + subimage.TopLeft.X, ((float)sprite.Height / sprite.Texture.Height) + subimage.TopLeft.Y);
+                subimage.TopLeft = new Vector2(sprite.OriginalLeft, sprite.OriginalTop);
+                subimage.BottomRight = new Vector2(sprite.OriginalRight, sprite.OriginalBottom);
+                newSubImages.Add(subimage);
+            }
+
+            foreach (Scene scene in xScenes)
+            {
+                scene.SubImages = newSubImages;
             }
 
             int sceneIndex = 0;
