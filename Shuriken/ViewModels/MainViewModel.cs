@@ -135,16 +135,13 @@ namespace Shuriken.ViewModels
             List<XTexture> xTextures = WorkFile.Resources[1].Content.TextureList.Textures;
             FontList xFontList = WorkFile.Resources[0].Content.CsdmProject.Fonts;
 
+            xTextures.Clear();
             TextureList texList = Project.TextureLists[0];
-            int nextTextureIndex = 0;
-            foreach (XTexture texture in xTextures)
+            foreach (Texture texture in texList.Textures)
             {
-                string texPath = Path.Combine(root, texture.Name);
-                if (File.Exists(texPath))
-                {
-                    Texture t = texList.Textures[nextTextureIndex++];
-                    texture.Name = Path.GetFileName(t.FullName).Substring(0, texture.Name.Length); // TODO: This will break with names larger than the original one
-                }
+                XTexture xTexture = new XTexture();
+                xTexture.Name = texture.Name + ".dds";
+                xTextures.Add(xTexture);
             }
 
             int nextFontIndex = 0;
