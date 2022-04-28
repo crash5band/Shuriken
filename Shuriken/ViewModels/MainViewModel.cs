@@ -143,24 +143,8 @@ namespace Shuriken.ViewModels
                 xTextures.Add(xTexture);
             }
 
-            int nextFontIndex = 0;
-            foreach (var entry in xFontList.FontIDTable)
-            {
-                UIFont font = Project.Fonts[nextFontIndex++];
-                int nextMappingIndex = 0;
-                foreach (var mapping in xFontList.Fonts[(int)entry.Index].CharacterMappings)
-                {
-                    Models.CharacterMapping map = font.Mappings[nextMappingIndex++];
-                    mapping.SourceCharacter = map.Character;
-                    Sprite sp = Project.TryGetSprite(map.Sprite);
-
-                    // This seems to work fine, but causes different values to be saved in ui_gameplay.xncp. Duplicate subimage entry?
-                    mapping.SubImageIndex = Utilities.FindSubImageIndexFromSprite(sp, xScenes[0].SubImages, texList.Textures);
-                }
-            }
-
             List<SubImage> newSubImages = new List<SubImage>();
-            foreach (KeyValuePair<int, Sprite> entry in Project.Sprites)
+            foreach (var entry in Project.Sprites)
             {
                 Sprite sprite = entry.Value;
                 int textureIndex = texList.Textures.IndexOf(sprite.Texture);
@@ -177,6 +161,29 @@ namespace Shuriken.ViewModels
             foreach (Scene scene in xScenes)
             {
                 scene.SubImages = newSubImages;
+            }
+
+            xFontList.Fonts.Clear();
+            xFontList.FontIDTable.Clear();
+            foreach (var entry in Project.Fonts)
+            {
+                UIFont uiFont = entry.Value;
+
+                FontID fontID = new FontID();
+                fontID.Index = (uint)xFontList.Fonts.Count;
+                fontID.Name = uiFont.Name;
+                xFontList.FontIDTable.Add(fontID);
+
+                Font font = new Font();
+                foreach (var mapping in uiFont.Mappings)
+                {
+                    // This seems to work fine, but causes different values to be saved in ui_gameplay.xncp. Duplicate subimage entry?
+                    XNCPLib.XNCP.CharacterMapping characterMapping = new XNCPLib.XNCP.CharacterMapping();
+                    characterMapping.SubImageIndex = Utilities.FindSubImageIndexFromSprite(Project.TryGetSprite(mapping.Sprite), xScenes[0].SubImages, texList.Textures);
+                    characterMapping.SourceCharacter = mapping.Character;
+                    font.CharacterMappings.Add(characterMapping);
+                }
+                xFontList.Fonts.Add(font);
             }
 
             int sceneIndex = 0;
@@ -306,7 +313,7 @@ namespace Shuriken.ViewModels
                         {
                             UIFont uiFont = Project.TryGetFont(uiCast.FontID);
                             if (uiFont != null)
-                                cast.FontName = uiFont.Name.Substring(0, cast.FontName.Length); // TODO: Will break with longer names
+                                cast.FontName = uiFont.Name;
                         }
                     }
                     
