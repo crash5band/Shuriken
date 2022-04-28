@@ -206,12 +206,12 @@ namespace Shuriken.Controls
             double y2 = ValueToHeight(k2.KValue, minValue, maxValue);
 
             Line line = new Line();
-            line.X1 = x1;
-            line.X2 = x2;
-            line.Y1 = y1;
-            line.Y2 = y2;
-            line.Stroke = curveBrush;
-            line.StrokeThickness = 2.0;
+            //line.X1 = x1;
+            //line.X2 = x2;
+            //line.Y1 = y1;
+            //line.Y2 = y2;
+            //line.Stroke = curveBrush;
+            //line.StrokeThickness = 2.0;
 
             return line;
         }

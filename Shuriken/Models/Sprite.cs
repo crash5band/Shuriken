@@ -69,7 +69,10 @@ namespace Shuriken.Models
         private void CreateCrop()
         {
             if (X + Width <= Texture.Width && Y + Height <= Texture.Height)
-                Crop = new CroppedBitmap(Texture.ImageSource, new Int32Rect(X, Y, Width, Height));
+            {
+                if (Width > 0 && Height > 0)
+                    Crop = new CroppedBitmap(Texture.ImageSource, new Int32Rect(X, Y, Width, Height));
+            }
         }
 
         public Sprite(int id, Texture tex, float top = 0.0f, float left = 0.0f, float bottom = 1.0f, float right = 1.0f)

@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Shuriken.Models;
 
 namespace Shuriken.Controls
 {
@@ -26,7 +27,28 @@ namespace Shuriken.Controls
         {
             InitializeComponent();
             zoom = 1.0;
+
+            LayoutRoot.DataContext = this;
         }
+
+        public Sprite Sprite
+        {
+            get => (Sprite)GetValue(SpriteProperty);
+            set => SetValue(SpriteProperty, value);
+        }
+
+        private static readonly DependencyProperty SpriteProperty = DependencyProperty.Register(
+            "Sprite", typeof(Sprite), typeof(TextureAtlasControl), new PropertyMetadata(null));
+
+
+        public Texture Texture
+        {
+            get => (Texture)GetValue(TextureProperty);
+            set => SetValue(TextureProperty, value);
+        }
+
+        private static readonly DependencyProperty TextureProperty = DependencyProperty.Register(
+            "Texture", typeof(Texture), typeof(TextureAtlasControl), new PropertyMetadata(null));
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -36,15 +58,7 @@ namespace Shuriken.Controls
         private Point mouseDownPos;
 
         private Point mousePos;
-        public Point MousePos
-        {
-            get => mousePos;
-            set
-            {
-                mousePos = value;
-                ;
-            }
-        }
+        public Point MousePos { get; set; }
 
         private double zoom;
         public double Zoom
@@ -54,7 +68,6 @@ namespace Shuriken.Controls
             {
                 zoom = value;
                 SelectionBorder.LayoutTransform = new ScaleTransform(zoom, zoom);
-                ;
             }
         }
 

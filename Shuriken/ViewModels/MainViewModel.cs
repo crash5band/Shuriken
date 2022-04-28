@@ -268,7 +268,7 @@ namespace Shuriken.ViewModels
 
                     cast.FontCharacters = uiCast.FontCharacters;
 
-                    cast.Field4C = uiCast.Field4C;
+                    cast.FontSpacingAdjustment = uiCast.FontSpacingAdjustment;
                     cast.Width = uiCast.Width;
                     cast.Height = uiCast.Height;
                     cast.Field58 = uiCast.Field58;
@@ -278,7 +278,7 @@ namespace Shuriken.ViewModels
 
                     cast.Field68 = uiCast.Field68;
                     cast.Field6C = uiCast.Field6C;
-                    cast.FontSpacingCorrection = uiCast.FontSpacingCorrection;
+                    cast.FontSpacingAdjustment = uiCast.FontSpacingAdjustment;
 
                     // Cast Info
                     cast.CastInfoData.Field00 = uiCast.InfoField00;
