@@ -119,7 +119,7 @@ namespace XNCPLib.XNCP
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x8;
 
-                Fonts[f].Write_Step0(writer, offsetChunk);
+                Fonts[f].Write(writer, offsetChunk);
                 // Finished
             }
 
