@@ -102,18 +102,17 @@ namespace Shuriken.ViewModels
 
             foreach (var entry in xFontList.FontIDTable)
             {
-                UIFont font = new UIFont(entry.Name);
+                int id = Project.CreateFont(entry.Name);
+                UIFont font = Project.TryGetFont(id);
                 foreach (var mapping in xFontList.Fonts[(int)entry.Index].CharacterMappings)
                 {
                     var sprite = Utilities.FindSpriteIDFromNCPScene((int)mapping.SubImageIndex, xScenes[0].SubImages, texList.Textures);
                     font.Mappings.Add(new Models.CharacterMapping(mapping.SourceCharacter, sprite));
                 }
-
-                Project.Fonts.Add(font);
             }
 
             foreach (SceneID sceneID in xIDs)
-                Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name, texList, Project.Fonts));
+                Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name, texList));
 
             Project.TextureLists.Add(texList);
 
@@ -255,7 +254,7 @@ namespace Shuriken.ViewModels
 
                     cast.FontCharacters = uiCast.FontCharacters;
 
-                    cast.Field4C = uiCast.Field4C;
+                    cast.FontSpacingAdjustment = uiCast.FontSpacingAdjustment;
                     cast.Width = uiCast.Width;
                     cast.Height = uiCast.Height;
                     cast.Field58 = uiCast.Field58;
@@ -265,7 +264,7 @@ namespace Shuriken.ViewModels
 
                     cast.Field68 = uiCast.Field68;
                     cast.Field6C = uiCast.Field6C;
-                    cast.FontSpacingCorrection = uiCast.FontSpacingCorrection;
+                    cast.FontSpacingAdjustment = uiCast.FontSpacingAdjustment;
 
                     // Cast Info
                     cast.CastInfoData.Field00 = uiCast.InfoField00;
@@ -305,7 +304,9 @@ namespace Shuriken.ViewModels
                     {
                         foreach (var font in Project.Fonts)
                         {
-                            cast.FontName = uiCast.Font.Name.Substring(0, cast.FontName.Length); // TODO: Will break with longer names
+                            UIFont uiFont = Project.TryGetFont(uiCast.FontID);
+                            if (uiFont != null)
+                                cast.FontName = uiFont.Name.Substring(0, cast.FontName.Length); // TODO: Will break with longer names
                         }
                     }
                     

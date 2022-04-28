@@ -29,12 +29,8 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <ListBox Grid.Row="0" Grid.ColumnSpan="2" Name="FontsView" ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type models:UIFont}">
-                            <TextBlock Text="{Binding Name}"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
+                <ListBox Grid.Row="0" Grid.ColumnSpan="2" Name="FontsView" ItemsSource="{Binding Source={x:Static models:Project.Fonts}}"
+                         SelectedValuePath="Value" DisplayMemberPath="Value.Name" SelectedValue="{Binding SelectedFont}">
                 </ListBox>
                 <Button Content="Add Font" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" Margin="5" Command="{Binding CreateFontCommand}"/>
                 <Button Content="Remove Font" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5" Command="{Binding RemoveFontCommand}"/>

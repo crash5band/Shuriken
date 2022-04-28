@@ -7,12 +7,26 @@
              xmlns:adorners="clr-namespace:Shuriken.Misc"
              mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="600">
-    <Canvas x:Name="SelectionBorder" MouseDown="GridMouseDown" MouseUp="GridMouseUp" MouseMove="GridMouseMove"
-            Width="{Binding ElementName=TexImage, Path=ActualWidth}" Height="{Binding ElementName=TexImage, Path=ActualHeight}">
-        <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
-            <Image x:Name="TexImage" Source="{Binding Texture.ImageSource}" HorizontalAlignment="Stretch"/>
-        </Border>
-        <Rectangle x:Name="SelectionRectangle" Visibility="Visible" Stroke="{StaticResource PrimaryTextBrush}" StrokeThickness="1" StrokeDashArray="2, 1"
-                       Canvas.Left="{Binding X, Mode=TwoWay}" Canvas.Top="{Binding Y, Mode=TwoWay}" Width="{Binding Width, Mode=TwoWay}" Height="{Binding Height, Mode=TwoWay}"/>
-    </Canvas>
+    <Grid Name="LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer HorizontalScrollBarVisibility="Auto">
+            <Canvas Grid.Row="0" x:Name="SelectionBorder" MouseDown="GridMouseDown" MouseUp="GridMouseUp" MouseMove="GridMouseMove"
+                    Width="{Binding ElementName=TexImage, Path=ActualWidth}" Height="{Binding ElementName=TexImage, Path=ActualHeight}">
+                <Border BorderBrush="Gray" BorderThickness="1">
+                    <Image x:Name="TexImage" Source="{Binding Texture.ImageSource}" HorizontalAlignment="Stretch"/>
+                </Border>
+                <Rectangle x:Name="SelectionRectangle" Visibility="Visible" Stroke="#333" StrokeThickness="1" StrokeDashArray="2, 1"
+                               Canvas.Left="{Binding Sprite.X, Mode=TwoWay}" Canvas.Top="{Binding Sprite.Y, Mode=TwoWay}"
+                           Width="{Binding Sprite.Width, Mode=TwoWay}" Height="{Binding Sprite.Height, Mode=TwoWay}"/>
+            </Canvas>
+        </ScrollViewer>
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Slider Value="{Binding Zoom}" Minimum="0.25" Maximum="2.5" MinWidth="100" Width="200"/>
+            <TextBlock Text="{Binding Zoom}"/>
+        </StackPanel>
+    </Grid>
 </UserControl>

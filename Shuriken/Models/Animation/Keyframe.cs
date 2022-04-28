@@ -59,5 +59,15 @@ namespace Shuriken.Models.Animation
             Offset2 = k.Offset2;
             Field14 = (int)k.Field14;
         }
+
+        public Keyframe(Keyframe k)
+        {
+            Frame = k.Frame;
+            KValue = k.KValue;
+            Field08 = k.Field08;
+            Offset1 = k.Offset1;
+            Offset2 = k.Offset2;
+            Field14 = k.Field14;
+        }
     }
 }

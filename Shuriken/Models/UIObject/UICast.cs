@@ -47,10 +47,10 @@ namespace Shuriken.Models
         public uint Flags { get; set; }
         public uint Field3C { get; set; }
 
-        public UIFont Font { get; set; }
+        public int FontID { get; set; }
         public string FontCharacters { get; set; }
 
-        public uint Field4C { get; set; }
+        public float FontSpacingAdjustment { get; set; }
         public uint Width { get; set; }
         public uint Height { get; set; }
         public uint Field58 { get; set; }
@@ -59,7 +59,7 @@ namespace Shuriken.Models
         public Vector2 Offset { get; set; }
         public float Field68 { get; set; }
         public float Field6C { get; set; }
-        public uint FontSpacingCorrection { get; set; }
+        public uint Field70 { get; set; }
         public int InfoField00 { get; set; }
 
         public Vector2 Translation { get; set; }
@@ -115,10 +115,10 @@ namespace Shuriken.Models
             Flags = cast.Field38;
             Field3C = cast.Field3C;
 
-            Font = null;
+            FontID = -1;
             FontCharacters = cast.FontCharacters;
 
-            Field4C = cast.Field4C;
+            FontSpacingAdjustment = cast.FontSpacingAdjustment;
             Width = cast.Width;
             Height = cast.Height;
             Field58 = cast.Field58;
@@ -128,7 +128,7 @@ namespace Shuriken.Models
 
             Field68 = cast.Field68;
             Field6C = cast.Field6C;
-            FontSpacingCorrection = cast.FontSpacingCorrection;
+            Field70 = cast.Field70;
 
             InfoField00 = cast.CastInfoData.Field00;
             Translation = new Vector2(cast.CastInfoData.Translation);
@@ -164,10 +164,10 @@ namespace Shuriken.Models
             Flags = 0;
             Field3C = 0;
 
-            Font = null;
+            FontID = -1;
             FontCharacters = "";
 
-            Field4C = 0;
+            FontSpacingAdjustment = 0;
             Width = 64;
             Height = 64;
             Field58 = 0;
@@ -182,7 +182,7 @@ namespace Shuriken.Models
 
             Field68 = 0;
             Field6C = 0;
-            FontSpacingCorrection = 0;
+            Field70 = 0;
 
             InfoField00 = 0;
             Translation = new Vector2();
@@ -223,10 +223,10 @@ namespace Shuriken.Models
             Flags = c.Flags;
             Field3C = c.Field3C;
 
-            Font = null;
+            FontID = -1;
             FontCharacters = c.FontCharacters;
 
-            Field4C = c.Field4C;
+            FontSpacingAdjustment = c.FontSpacingAdjustment;
             Width = c.Width;
             Height = c.Height;
             Field58 = c.Field58;
@@ -236,7 +236,7 @@ namespace Shuriken.Models
 
             Field68 = c.Field68;
             Field6C = c.Field6C;
-            FontSpacingCorrection = c.FontSpacingCorrection;
+            Field70 = c.Field70;
 
             InfoField00 = c.InfoField00;
             Translation = new Vector2(c.Translation);

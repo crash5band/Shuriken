@@ -30,7 +30,7 @@ namespace XNCPLib.XNCP
         public string FontCharacters{ get; set; }
         public bool HasFontName { get; set; }
         public string FontName { get; set; }
-        public uint Field4C { get; set; }
+        public float FontSpacingAdjustment { get; set; }
         public uint Width { get; set; }
         public uint Height { get; set; }
         public uint Field58 { get; set; }
@@ -38,7 +38,7 @@ namespace XNCPLib.XNCP
         public Vector2 Offset { get; set; }
         public float Field68 { get; set; }
         public float Field6C { get; set; }
-        public uint FontSpacingCorrection { get; set; }
+        public uint Field70 { get; set; }
         public CastInfo CastInfoData { get; set; }
         public CastMaterialInfo CastMaterialData { get; set; }
 
@@ -78,7 +78,7 @@ namespace XNCPLib.XNCP
             HasFontName = (FontNameOffset != 0);
             FontName = reader.ReadStringOffset(FontNameOffset);
 
-            Field4C = reader.ReadUInt32();
+            FontSpacingAdjustment = reader.ReadSingle();
             Width = reader.ReadUInt32();
             Height = reader.ReadUInt32();
             Field58 = reader.ReadUInt32();
@@ -87,7 +87,7 @@ namespace XNCPLib.XNCP
             Offset = new Vector2(reader.ReadSingle(), reader.ReadSingle());
             Field68 = reader.ReadSingle();
             Field6C = reader.ReadSingle();
-            FontSpacingCorrection = reader.ReadUInt32();
+            Field70 = reader.ReadUInt32();
 
             long baseOffset = reader.GetOffsetOrigin();
 
@@ -198,7 +198,7 @@ namespace XNCPLib.XNCP
             unwrittenPosition += 0x4;
 
             writer.Seek(unwrittenPosition, SeekOrigin.Begin);
-            writer.WriteUInt32(Field4C);
+            writer.WriteSingle(FontSpacingAdjustment);
             writer.WriteUInt32(Width);
             writer.WriteUInt32(Height);
             writer.WriteUInt32(Field58);
@@ -208,7 +208,7 @@ namespace XNCPLib.XNCP
             writer.WriteSingle(Offset.Y);
             writer.WriteSingle(Field68);
             writer.WriteSingle(Field6C);
-            writer.WriteUInt32(FontSpacingCorrection);
+            writer.WriteUInt32(Field70);
         }
     }
 }

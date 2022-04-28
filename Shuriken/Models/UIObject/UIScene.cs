@@ -38,7 +38,7 @@ namespace Shuriken.Models
         public ObservableCollection<Vector2> TextureSizes { get; set; }
         public ObservableCollection<UICastGroup> Groups { get; set; }
         public ObservableCollection<AnimationGroup> Animations { get; set; }
-        public UIScene(Scene scene, string sceneName, TextureList texList, IEnumerable<UIFont> fonts)
+        public UIScene(Scene scene, string sceneName, TextureList texList)
         {
             Name = sceneName;
             Field00 = scene.Field00;
@@ -56,7 +56,7 @@ namespace Shuriken.Models
                 TextureSizes.Add(new Vector2(texSize.X, texSize.Y));
             }
 
-            ProcessCasts(scene, texList, fonts);
+            ProcessCasts(scene, texList);
             Visible = false;
         }
 
@@ -88,7 +88,7 @@ namespace Shuriken.Models
             Visible = false;
         }
 
-        private void ProcessCasts(Scene scene, TextureList texList, IEnumerable<UIFont> fonts)
+        private void ProcessCasts(Scene scene, TextureList texList)
         {
             // Create groups
             for (int g = 0; g < scene.UICastGroups.Count; ++g)
@@ -133,10 +133,10 @@ namespace Shuriken.Models
                     }
                     else if (cast.Type == DrawType.Font)
                     {
-                        foreach (var font in fonts)
+                        foreach (var font in Project.Fonts.Values)
                         {
                             if (font.Name == scene.UICastGroups[g].Casts[c].FontName)
-                                cast.Font = font;
+                                cast.FontID = font.ID;
                         }
                     }
 
