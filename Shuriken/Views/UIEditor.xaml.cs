@@ -80,7 +80,7 @@ namespace Shuriken.Views
             }
         }
 
-        private void UpdateScenes(IEnumerable<UIScene> scenes, IEnumerable<UIFont> fonts, float time)
+        private void UpdateScenes(IEnumerable<UIScene> scenes, Dictionary<int, UIFont> fonts, float time)
         {
             renderer.ConfigureShader(renderer.shaderDictionary["basic"]);
             foreach (var scene in scenes)
@@ -315,7 +315,8 @@ namespace Shuriken.Views
             foreach (var c in lyr.FontCharacters)
             {
                 int sprID = -1;
-                foreach (var mapping in lyr.Font.Mappings)
+                var font = Project.TryGetFont(lyr.FontID);
+                foreach (var mapping in font.Mappings)
                 {
                     if (mapping.Character == c)
                     {

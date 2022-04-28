@@ -14,8 +14,6 @@ namespace Shuriken.ViewModels
     {
         public UIFont SelectedFont { get; set; }
         public CharacterMapping SelectedMapping { get; set; }
-        public ObservableCollection<UIFont> Fonts => Project.Fonts;
-
         public RelayCommand CreateFontCommand { get; }
         public RelayCommand RemoveFontCommand { get; }
         public RelayCommand CreateCharDefCommand { get; }
@@ -24,13 +22,13 @@ namespace Shuriken.ViewModels
 
         public void CreateFont()
         {
-            Fonts.Add(new UIFont("new_font"));
+            Project.CreateFont("new_font");
         }
 
         public void RemoveFont()
         {
             if (SelectedFont != null)
-                Fonts.Remove(SelectedFont);
+                Project.RemoveFont(SelectedFont.ID);
         }
 
         public void CreateCharacterDefinition()

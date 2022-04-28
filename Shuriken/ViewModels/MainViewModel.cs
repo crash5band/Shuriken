@@ -102,18 +102,17 @@ namespace Shuriken.ViewModels
 
             foreach (var entry in xFontList.FontIDTable)
             {
-                UIFont font = new UIFont(entry.Name);
+                int id = Project.CreateFont(entry.Name);
+                UIFont font = Project.TryGetFont(id);
                 foreach (var mapping in xFontList.Fonts[(int)entry.Index].CharacterMappings)
                 {
                     var sprite = Utilities.FindSpriteIDFromNCPScene((int)mapping.SubImageIndex, xScenes[0].SubImages, texList.Textures);
                     font.Mappings.Add(new Models.CharacterMapping(mapping.SourceCharacter, sprite));
                 }
-
-                Project.Fonts.Add(font);
             }
 
             foreach (SceneID sceneID in xIDs)
-                Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name, texList, Project.Fonts));
+                Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name, texList));
 
             Project.TextureLists.Add(texList);
 
@@ -318,7 +317,9 @@ namespace Shuriken.ViewModels
                     {
                         foreach (var font in Project.Fonts)
                         {
-                            cast.FontName = uiCast.Font.Name.Substring(0, cast.FontName.Length); // TODO: Will break with longer names
+                            UIFont uiFont = Project.TryGetFont(uiCast.FontID);
+                            if (uiFont != null)
+                                cast.FontName = uiFont.Name.Substring(0, cast.FontName.Length); // TODO: Will break with longer names
                         }
                     }
                     

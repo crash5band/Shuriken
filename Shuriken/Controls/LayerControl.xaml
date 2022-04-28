@@ -112,7 +112,8 @@
                 <Border>
                     <StackPanel>
                         <Label>Font</Label>
-                        <TextBox Text="{Binding Font.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                        <ComboBox ItemsSource="{Binding Source={x:Static models:Project.Fonts}}"
+                                  DisplayMemberPath="Value.Name" SelectedValuePath="Key" SelectedValue="{Binding FontID}"/>
 
                         <Label>Font Characters</Label>
                         <TextBox Text="{Binding FontCharacters, UpdateSourceTrigger=PropertyChanged}"/>

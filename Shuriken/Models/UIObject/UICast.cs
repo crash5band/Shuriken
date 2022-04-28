@@ -47,7 +47,7 @@ namespace Shuriken.Models
         public uint Flags { get; set; }
         public uint Field3C { get; set; }
 
-        public UIFont Font { get; set; }
+        public int FontID { get; set; }
         public string FontCharacters { get; set; }
 
         public float FontSpacingAdjustment { get; set; }
@@ -115,7 +115,7 @@ namespace Shuriken.Models
             Flags = cast.Field38;
             Field3C = cast.Field3C;
 
-            Font = null;
+            FontID = -1;
             FontCharacters = cast.FontCharacters;
 
             FontSpacingAdjustment = cast.FontSpacingAdjustment;
@@ -164,7 +164,7 @@ namespace Shuriken.Models
             Flags = 0;
             Field3C = 0;
 
-            Font = null;
+            FontID = -1;
             FontCharacters = "";
 
             FontSpacingAdjustment = 0;
@@ -223,7 +223,7 @@ namespace Shuriken.Models
             Flags = c.Flags;
             Field3C = c.Field3C;
 
-            Font = null;
+            FontID = -1;
             FontCharacters = c.FontCharacters;
 
             FontSpacingAdjustment = c.FontSpacingAdjustment;

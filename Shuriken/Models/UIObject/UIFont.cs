@@ -12,6 +12,8 @@ namespace Shuriken.Models
 {
     public class UIFont : INotifyPropertyChanged
     {
+        public readonly int ID;
+
         private string name;
         public string Name
         {
@@ -27,8 +29,9 @@ namespace Shuriken.Models
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public UIFont(string name)
+        public UIFont(string name, int id)
         {
+            ID = id;
             Name = name;
             Mappings = new ObservableCollection<CharacterMapping>();
         }
