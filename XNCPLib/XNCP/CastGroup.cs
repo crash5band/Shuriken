@@ -13,7 +13,6 @@ namespace XNCPLib.XNCP
     public class CastGroup
     {
         public uint Field08 { get; set; }
-        public List<uint> CastOffsets { get; set; }
         public List<Cast> Casts { get; set; }
         public List<CastHierarchyTreeNode> CastHierarchyTree { get; set; }
         private uint UnwrittenPosition { get; set; }
@@ -21,7 +20,6 @@ namespace XNCPLib.XNCP
         public CastGroup()
         {
             Casts = new List<Cast>();
-            CastOffsets = new List<uint>();
             CastHierarchyTree = new List<CastHierarchyTreeNode>();
         }
 
@@ -29,7 +27,7 @@ namespace XNCPLib.XNCP
         {
             uint CastCount = reader.ReadUInt32();
             Casts.Capacity = (int)CastCount;
-            CastOffsets.Capacity = (int)CastCount;
+            List<uint> CastOffsets = new List<uint>((int)CastCount);
 
             uint CastTableOffset = reader.ReadUInt32();
             Field08 = reader.ReadUInt32();
