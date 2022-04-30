@@ -153,8 +153,6 @@ namespace Shuriken.ViewModels
                 subimage.TextureIndex = (uint)textureIndex;
                 subimage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, (float)sprite.Y / sprite.Texture.Height);
                 subimage.BottomRight = new Vector2(((float)sprite.Width / sprite.Texture.Width) + subimage.TopLeft.X, ((float)sprite.Height / sprite.Texture.Height) + subimage.TopLeft.Y);
-                subimage.TopLeft = new Vector2(sprite.OriginalLeft, sprite.OriginalTop);
-                subimage.BottomRight = new Vector2(sprite.OriginalRight, sprite.OriginalBottom);
                 newSubImages.Add(subimage);
             }
 
