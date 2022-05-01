@@ -444,20 +444,18 @@ namespace Shuriken.ViewModels
 
         private void SaveCasts(UIScene uiScene, Scene scene)
         {
+            // TODO: Deprecate this
             for (int g = 0; g < scene.UICastGroups.Count; ++g)
             {
                 scene.UICastGroups[g].Field08 = uiScene.Groups[g].Field08;
             }
 
             // Pre-process animations
-            Dictionary<int, int> entryIndexMap = new Dictionary<int, int>();
-            int animIndex = 0;
-            foreach (var entry in scene.AnimationDictionaries)
+            List<AnimationDictionary> AnimIDSorted = scene.AnimationDictionaries.OrderBy(o => o.Index).ToList();
+            for (int a = 0; a < scene.AnimationFrameDataList.Count; a++)
             {
-                scene.AnimationFrameDataList[(int)entry.Index].Field00 = uiScene.Animations[animIndex].Field00;
-                scene.AnimationFrameDataList[(int)entry.Index].FrameCount = uiScene.Animations[animIndex].Duration;
-
-                entryIndexMap.Add(animIndex++, (int)entry.Index);
+                scene.AnimationFrameDataList[a].Field00 = uiScene.Animations[a].Field00;
+                scene.AnimationFrameDataList[a].FrameCount = uiScene.Animations[a].Duration;
             }
 
             // process group layers
@@ -548,11 +546,11 @@ namespace Shuriken.ViewModels
                     
                 }
 
-                foreach (var entry in entryIndexMap)
+                for (int a = 0; a < scene.AnimationFrameDataList.Count; a++)
                 {
                     int trackIndex = 0;
                     int trackAnimIndex = 0;
-                    XNCPLib.XNCP.Animation.AnimationKeyframeData keyframeData = scene.AnimationKeyframeDataList[entry.Value];
+                    XNCPLib.XNCP.Animation.AnimationKeyframeData keyframeData = scene.AnimationKeyframeDataList[a];
                     for (int c = 0; c < keyframeData.GroupAnimationDataList[g].CastAnimationDataList.Count; ++c)
                     {
                         XNCPLib.XNCP.Animation.CastAnimationData castAnimData = keyframeData.GroupAnimationDataList[g].CastAnimationDataList[c];
@@ -569,7 +567,7 @@ namespace Shuriken.ViewModels
 
                                 if (tracks == null)
                                 {
-                                    tracks = uiScene.Animations[entry.Key].LayerAnimations[trackIndex++].Tracks.ToList();
+                                    tracks = uiScene.Animations[a].LayerAnimations[trackIndex++].Tracks.ToList();
                                     trackAnimIndex = 0;
                                 }
                                 AnimationTrack anim = tracks[trackAnimIndex++];

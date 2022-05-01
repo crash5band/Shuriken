@@ -101,17 +101,14 @@ namespace Shuriken.Models
             }
 
             // Pre-process animations
-            Dictionary<int, int> entryIndexMap = new Dictionary<int, int>();
-            int animIndex = 0;
-            foreach (var entry in scene.AnimationDictionaries)
+            List<XNCPLib.XNCP.Animation.AnimationDictionary> AnimIDSorted = scene.AnimationDictionaries.OrderBy(o => o.Index).ToList();
+            for (int a = 0; a < scene.AnimationFrameDataList.Count; a++)
             {
-                Animations.Add(new AnimationGroup(entry.Name)
+                Animations.Add(new AnimationGroup(AnimIDSorted[a].Name)
                 {
-                    Field00 = scene.AnimationFrameDataList[(int)entry.Index].Field00,
-                    Duration = scene.AnimationFrameDataList[(int)entry.Index].FrameCount
+                    Field00 = scene.AnimationFrameDataList[a].Field00,
+                    Duration = scene.AnimationFrameDataList[a].FrameCount
                 });
-
-                entryIndexMap.Add(animIndex++, (int)entry.Index);
             }
 
             // process group layers
@@ -143,9 +140,9 @@ namespace Shuriken.Models
                     tempCasts.Add(cast);
                 }
 
-                foreach (var entry in entryIndexMap)
+                for (int a = 0; a < scene.AnimationFrameDataList.Count; a++)
                 {
-                    XNCPLib.XNCP.Animation.AnimationKeyframeData keyframeData = scene.AnimationKeyframeDataList[entry.Value];
+                    XNCPLib.XNCP.Animation.AnimationKeyframeData keyframeData = scene.AnimationKeyframeDataList[a];
                     for (int c = 0; c < keyframeData.GroupAnimationDataList[g].CastAnimationDataList.Count; ++c)
                     {
                         XNCPLib.XNCP.Animation.CastAnimationData castAnimData = keyframeData.GroupAnimationDataList[g].CastAnimationDataList[c];
@@ -176,7 +173,7 @@ namespace Shuriken.Models
                         if (tracks.Count > 0)
                         {
                             AnimationList layerAnimationList = new AnimationList(tempCasts[c], tracks);
-                            Animations[entry.Key].LayerAnimations.Add(layerAnimationList);
+                            Animations[a].LayerAnimations.Add(layerAnimationList);
                         }
                     }
                 }
