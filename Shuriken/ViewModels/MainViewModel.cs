@@ -147,7 +147,14 @@ namespace Shuriken.ViewModels
             List<SubImage> subImageList = BuildSubImageList();
             SaveTextures(xTextures);
             SaveFonts(xFontList, subImageList);
-            SaveScenes(new CSDNode(), subImageList);
+
+            List<System.Numerics.Vector2> Data1 = new List<System.Numerics.Vector2>();
+            TextureList texList = Project.TextureLists[0];
+            foreach (Texture tex in texList.Textures)
+            {
+                Data1.Add(new System.Numerics.Vector2((float)tex.Width / 1280F, (float)tex.Height / 720F));
+            }
+            SaveScenes(new CSDNode(), subImageList, Data1);
 
             foreach (SceneID sceneID in xIDs)
             {
@@ -238,7 +245,7 @@ namespace Shuriken.ViewModels
             xFontList.FontIDTable = xFontList.FontIDTable.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
         }
 
-        private void SaveScenes(CSDNode xNode, List<SubImage> subImageList)
+        private void SaveScenes(CSDNode xNode, List<SubImage> subImageList, List<System.Numerics.Vector2> Data1)
         {
             // TODO: sub nodes, sort sub node names
 
@@ -258,9 +265,8 @@ namespace Shuriken.ViewModels
                 xScene.Field0C = uiScene.Field0C;
                 xScene.Field10 = uiScene.Field10;
                 xScene.AspectRatio = uiScene.AspectRatio;
+                xScene.Data1 = Data1;
                 xScene.SubImages = subImageList;
-
-                // TODO: Data1
 
                 for (int g = 0; g < uiScene.Groups.Count; g++)
                 {
