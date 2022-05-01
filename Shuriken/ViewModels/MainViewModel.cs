@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -209,6 +210,44 @@ namespace Shuriken.ViewModels
             }
 
             WorkFile.Save(path);
+        }
+
+        private void SaveHierarchyTree(UICastGroup uiCastGroup, CastGroup castGroup)
+        {
+            castGroup.CastHierarchyTree = new List<CastHierarchyTreeNode>();
+            castGroup.CastHierarchyTree.AddRange
+            (
+                Enumerable.Repeat(new CastHierarchyTreeNode(-1, -1), uiCastGroup.CastsOrderedByIndex.Count)
+            );
+
+            GenerateHierarchyForCastList(uiCastGroup, uiCastGroup.Casts, castGroup.CastHierarchyTree);
+        }
+
+        private void GenerateHierarchyForCastList(UICastGroup uiCastGroup, ObservableCollection<UICast> uiCasts, List<CastHierarchyTreeNode> o_tree)
+        {
+            for (int i = 0; i < uiCasts.Count; i++)
+            {
+                UICast uiCast = uiCasts[i];
+
+                int currentIndex = uiCastGroup.CastsOrderedByIndex.IndexOf(uiCast);
+                Debug.Assert(currentIndex != -1);
+                CastHierarchyTreeNode castHierarchyTreeNode = new CastHierarchyTreeNode(-1, -1);
+
+                if (uiCast.Children.Count > 0)
+                {
+                    castHierarchyTreeNode.ChildIndex = uiCastGroup.CastsOrderedByIndex.IndexOf(uiCast.Children[0]);
+                    Debug.Assert(castHierarchyTreeNode.ChildIndex != -1);
+                }
+
+                if (i + 1 < uiCasts.Count)
+                {
+                    castHierarchyTreeNode.NextIndex = uiCastGroup.CastsOrderedByIndex.IndexOf(uiCasts[i + 1]);
+                    Debug.Assert(castHierarchyTreeNode.NextIndex != -1);
+                }
+
+                o_tree[currentIndex] = castHierarchyTreeNode;
+                GenerateHierarchyForCastList(uiCastGroup, uiCast.Children, o_tree);
+            }
         }
 
         private void SaveCasts(UIScene uiScene, Scene scene)
