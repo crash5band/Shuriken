@@ -302,7 +302,7 @@ namespace Shuriken.ViewModels
                 // Sort cast names
                 xScene.CastDictionaries = xScene.CastDictionaries.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
 
-                // TODO: AnimationKeyframeDataList, AnimationFrameDataList, AnimationData2List
+                // TODO: AnimationKeyframeDataList, AnimationData2List
 
                 foreach (AnimationGroup animGroup in uiScene.Animations)
                 {
@@ -311,6 +311,12 @@ namespace Shuriken.ViewModels
                     animationDictionary.Index = (uint)xScene.AnimationDictionaries.Count;
                     animationDictionary.Name = animGroup.Name;
                     xScene.AnimationDictionaries.Add(animationDictionary);
+
+                    // AnimationFrameDataList
+                    AnimationFrameData animationFrameData = new AnimationFrameData();
+                    animationFrameData.Field00 = animGroup.Field00;
+                    animationFrameData.FrameCount = animGroup.Duration;
+                    xScene.AnimationFrameDataList.Add(animationFrameData);
                 }
 
                 // Sort animation names
