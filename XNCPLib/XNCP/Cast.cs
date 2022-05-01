@@ -21,14 +21,10 @@ namespace XNCPLib.XNCP
         public Vector2 TopRight { get; set; }
         public Vector2 BottomRight { get; set; }
         public uint Field2C { get; set; }
-        public bool HasCastInfo { get; set; }
         public uint Field34 { get; set; }
         public uint Field38 { get; set; }
         public uint Field3C { get; set; }
-        public bool HasCastMaterialInfo { get; set; }
-        public bool HasFontCharacters { get; set; }
         public string FontCharacters{ get; set; }
-        public bool HasFontName { get; set; }
         public string FontName { get; set; }
         public float FontSpacingAdjustment { get; set; }
         public uint Width { get; set; }
@@ -45,9 +41,6 @@ namespace XNCPLib.XNCP
         public Cast()
         {
             Offset = new Vector2(0.0f, 0.0f);
-
-            CastInfoData = new CastInfo();
-            CastMaterialData = new CastMaterialInfo();
         }
 
         public void Read(BinaryObjectReader reader)
@@ -63,20 +56,22 @@ namespace XNCPLib.XNCP
 
             Field2C = reader.ReadUInt32();
             uint CastInfoOffset = reader.ReadUInt32();
-            HasCastInfo = (CastInfoOffset != 0);
             Field34 = reader.ReadUInt32();
             Field38 = reader.ReadUInt32();
             Field3C = reader.ReadUInt32();
             uint CastMaterialInfoOffset = reader.ReadUInt32();
-            HasCastMaterialInfo = (CastMaterialInfoOffset != 0);
 
             uint FontCharactersOffset = reader.ReadUInt32();
-            HasFontCharacters = (FontCharactersOffset != 0);
-            FontCharacters = reader.ReadStringOffset(FontCharactersOffset);
+            if (FontCharactersOffset != 0)
+            {
+                FontCharacters = reader.ReadStringOffset(FontCharactersOffset);
+            }
 
             uint FontNameOffset = reader.ReadUInt32();
-            HasFontName = (FontNameOffset != 0);
-            FontName = reader.ReadStringOffset(FontNameOffset);
+            if (FontNameOffset != 0)
+            {
+                FontName = reader.ReadStringOffset(FontNameOffset);
+            }
 
             FontSpacingAdjustment = reader.ReadSingle();
             Width = reader.ReadUInt32();
@@ -94,12 +89,14 @@ namespace XNCPLib.XNCP
             if (CastInfoOffset != 0)
             {
                 reader.Seek(baseOffset + CastInfoOffset, SeekOrigin.Begin);
+                CastInfoData = new CastInfo();
                 CastInfoData.Read(reader);
             }
 
             if (CastMaterialInfoOffset != 0)
             {
                 reader.Seek(baseOffset + CastMaterialInfoOffset, SeekOrigin.Begin);
+                CastMaterialData = new CastMaterialInfo();
                 CastMaterialData.Read(reader);
             }
         }
@@ -125,7 +122,7 @@ namespace XNCPLib.XNCP
             writer.WriteUInt32(Field2C);
 
             // CastMaterialInfo goes before CastInfo...
-            if (HasCastInfo)
+            if (CastInfoData != null)
             {
                 offsetChunk.Add(writer);
                 writer.WriteUInt32((uint)(writer.Length + 0x80 - writer.GetOffsetOrigin()));
@@ -139,7 +136,7 @@ namespace XNCPLib.XNCP
             writer.WriteUInt32(Field38);
             writer.WriteUInt32(Field3C);
 
-            if (HasCastMaterialInfo)
+            if (CastMaterialData != null)
             {
                 offsetChunk.Add(writer);
                 writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
@@ -152,17 +149,17 @@ namespace XNCPLib.XNCP
 
             // Fill CastMaterialInfo and CastInfo
             writer.Seek(0, SeekOrigin.End);
-            if (HasCastMaterialInfo)
+            if (CastMaterialData != null)
             {
                 CastMaterialData.Write(writer);
             }
-            if (HasCastInfo)
+            if (CastInfoData != null)
             {
                 CastInfoData.Write(writer);
             }
 
             writer.Seek(unwrittenPosition, SeekOrigin.Begin);
-            if (HasFontCharacters)
+            if (FontCharacters != null)
             {
                 offsetChunk.Add(writer);
                 uint fontCharactersOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
@@ -180,7 +177,7 @@ namespace XNCPLib.XNCP
             unwrittenPosition += 0x4;
 
             writer.Seek(unwrittenPosition, SeekOrigin.Begin);
-            if (HasFontName)
+            if (FontName != null)
             {
                 offsetChunk.Add(writer);
                 uint fontNameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
