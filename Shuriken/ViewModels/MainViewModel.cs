@@ -135,6 +135,8 @@ namespace Shuriken.ViewModels
             if (path == null) path = WorkFilePath;
             else WorkFilePath = path;
 
+            // TODO: We should create a FACPFile from scratch instead of overwritting the working one
+
             string root = Path.GetDirectoryName(Path.GetFullPath(WorkFilePath));
 
             List<Scene> xScenes = WorkFile.Resources[0].Content.CsdmProject.Root.Scenes;
@@ -169,14 +171,26 @@ namespace Shuriken.ViewModels
                 scene.SubImages = newSubImages;
             }
 
-            xFontList.Fonts.Clear();
-            xFontList.FontIDTable.Clear();
+            Dictionary<string, int> fontNameToInternalIndexMap = new Dictionary<string, int>();
+            List<string> fontNamesSorted = new List<string>();
             foreach (var entry in Project.Fonts)
             {
+                int internalIndex = entry.Key;
                 UIFont uiFont = entry.Value;
+                fontNameToInternalIndexMap.Add(uiFont.Name, internalIndex);
+                fontNamesSorted.Add(uiFont.Name);
+            }
+            fontNamesSorted.Sort(StringComparer.Ordinal);
+
+            xFontList.Fonts.Clear();
+            xFontList.FontIDTable.Clear();
+            foreach (string fontName in fontNamesSorted)
+            {
+                int internalIndex = fontNameToInternalIndexMap[fontName];
+                UIFont uiFont = Project.Fonts[internalIndex];
 
                 FontID fontID = new FontID();
-                fontID.Index = (uint)xFontList.Fonts.Count;
+                fontID.Index = (uint)xFontList.FontIDTable.Count;
                 fontID.Name = uiFont.Name;
                 xFontList.FontIDTable.Add(fontID);
 
