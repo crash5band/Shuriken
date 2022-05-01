@@ -267,16 +267,12 @@ namespace Shuriken.ViewModels
                     CastGroup xCastGroup = new CastGroup();
                     UICastGroup uiCastGroup = uiScene.Groups[g];
 
+                    xCastGroup.Field08 = uiCastGroup.Field08;
+
                     // Get 1-dimensional UICast list, this will be in order of casts from top to bottom in UI
                     List<UICast> uiCastList = new List<UICast>();
                     GetAllUICastInGroup(uiCastGroup.Casts, uiCastList);
-
-                    // TODO: save casts
-                    foreach (UICast uiCast in uiCastList)
-                    {
-                        Cast xCast = new Cast();
-
-                    }
+                    SaveCasts(uiCastList, xCastGroup, subImageList);
 
                     // Save the hierarchy tree for the current group
                     xCastGroup.CastHierarchyTree = new List<CastHierarchyTreeNode>();
@@ -350,6 +346,83 @@ namespace Shuriken.ViewModels
 
                 tree[currentIndex] = castHierarchyTreeNode;
                 SaveHierarchyTree(uiCast.Children, uiCastList, tree);
+            }
+        }
+
+        private void SaveCasts(List<UICast> uiCastList, CastGroup xCastGroup, List<SubImage> subImageList)
+        {
+            foreach (UICast uiCast in uiCastList)
+            {
+                Cast xCast = new Cast();
+
+                xCast.Field00 = uiCast.Field00;
+                xCast.Field04 = (uint)uiCast.Type;
+                xCast.IsEnabled = uiCast.IsEnabled ? 1u : 0u;
+
+                xCast.TopLeft = new Vector2(uiCast.TopLeft);
+                xCast.TopRight = new Vector2(uiCast.TopRight);
+                xCast.BottomLeft = new Vector2(uiCast.BottomLeft);
+                xCast.BottomRight = new Vector2(uiCast.BottomRight);
+
+                xCast.Field2C = uiCast.Field2C;
+                xCast.Field34 = uiCast.Field34;
+                xCast.Field38 = uiCast.Flags;
+                xCast.Field3C = uiCast.Field3C;
+
+                xCast.FontCharacters = uiCast.FontCharacters;
+                if (uiCast.Type == DrawType.Font)
+                {
+                    UIFont uiFont = Project.TryGetFont(uiCast.FontID);
+                    if (uiFont != null)
+                    {
+                        xCast.FontName = uiFont.Name;
+                    }
+                }
+                xCast.FontSpacingAdjustment = uiCast.FontSpacingAdjustment;
+
+                xCast.Width = uiCast.Width;
+                xCast.Height = uiCast.Height;
+                xCast.Field58 = uiCast.Field58;
+                xCast.Field5C = uiCast.Field5C;
+
+                xCast.Offset = new Vector2(uiCast.Offset);
+                
+                xCast.Field68 = uiCast.Field68;
+                xCast.Field6C = uiCast.Field6C;
+                xCast.Field70 = uiCast.Field70;
+
+                // Cast Info
+                xCast.CastInfoData = new CastInfo();
+                xCast.CastInfoData.Field00 = uiCast.InfoField00;
+                xCast.CastInfoData.Translation = new Vector2(uiCast.Translation);
+                xCast.CastInfoData.Rotation = uiCast.Rotation;
+                xCast.CastInfoData.Scale = new Vector2(uiCast.Scale.X, uiCast.Scale.Y);
+                xCast.CastInfoData.Field18 = uiCast.InfoField18;
+                xCast.CastInfoData.Color = uiCast.Color.ToUint();
+                xCast.CastInfoData.GradientTopLeft = uiCast.GradientTopLeft.ToUint();
+                xCast.CastInfoData.GradientBottomLeft = uiCast.GradientBottomLeft.ToUint();
+                xCast.CastInfoData.GradientTopRight = uiCast.GradientTopRight.ToUint();
+                xCast.CastInfoData.GradientBottomRight = uiCast.GradientBottomRight.ToUint();
+                xCast.CastInfoData.Field30 = uiCast.InfoField30;
+                xCast.CastInfoData.Field34 = uiCast.InfoField34;
+                xCast.CastInfoData.Field38 = uiCast.InfoField38;
+
+                // Cast Material Info
+                xCast.CastMaterialData = new CastMaterialInfo();
+                Debug.Assert(uiCast.Sprites.Count == 32);
+                for (int index = 0; index < 32; index++)
+                {
+                    if (uiCast.Sprites[index] == -1)
+                    {
+                        xCast.CastMaterialData.SubImageIndices[index] = -1;
+                        continue;
+                    }
+
+                    Sprite uiSprite = Project.TryGetSprite(uiCast.Sprites[index]);
+                    xCast.CastMaterialData.SubImageIndices[index] = (int)Utilities.FindSubImageIndexFromSprite(uiSprite, subImageList, Project.TextureLists[0].Textures);
+                }
+
+                xCastGroup.Casts.Add(xCast);
             }
         }
 
