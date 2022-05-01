@@ -81,7 +81,7 @@ namespace Shuriken.Misc
 
         public static uint FindSubImageIndexFromSprite(Sprite sprite, List<SubImage> subImages, ObservableCollection<Texture> textures)
         {
-            // TODO: May not always be correct
+            // TODO: May not always be correct, this breaks when removing a sprite
             return (uint)(sprite.ID - 1);
 
             /*

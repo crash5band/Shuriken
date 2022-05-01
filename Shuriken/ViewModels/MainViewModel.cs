@@ -144,67 +144,10 @@ namespace Shuriken.ViewModels
             List<XTexture> xTextures = WorkFile.Resources[1].Content.TextureList.Textures;
             FontList xFontList = WorkFile.Resources[0].Content.CsdmProject.Fonts;
 
-            xTextures.Clear();
-            TextureList texList = Project.TextureLists[0];
-            foreach (Texture texture in texList.Textures)
-            {
-                XTexture xTexture = new XTexture();
-                xTexture.Name = texture.Name + ".dds";
-                xTextures.Add(xTexture);
-            }
-
-            List<SubImage> newSubImages = new List<SubImage>();
-            foreach (var entry in Project.Sprites)
-            {
-                Sprite sprite = entry.Value;
-                int textureIndex = texList.Textures.IndexOf(sprite.Texture);
-
-                SubImage subimage = new SubImage();
-                subimage.TextureIndex = (uint)textureIndex;
-                subimage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, (float)sprite.Y / sprite.Texture.Height);
-                subimage.BottomRight = new Vector2((float)(sprite.X + sprite.Width) / sprite.Texture.Width, (float)(sprite.Y + sprite.Height) / sprite.Texture.Height);
-                newSubImages.Add(subimage);
-            }
-
-            foreach (Scene scene in xScenes)
-            {
-                scene.SubImages = newSubImages;
-            }
-
-            Dictionary<string, int> fontNameToInternalIndexMap = new Dictionary<string, int>();
-            List<string> fontNamesSorted = new List<string>();
-            foreach (var entry in Project.Fonts)
-            {
-                int internalIndex = entry.Key;
-                UIFont uiFont = entry.Value;
-                fontNameToInternalIndexMap.Add(uiFont.Name, internalIndex);
-                fontNamesSorted.Add(uiFont.Name);
-            }
-            fontNamesSorted.Sort(StringComparer.Ordinal);
-
-            xFontList.Fonts.Clear();
-            xFontList.FontIDTable.Clear();
-            foreach (string fontName in fontNamesSorted)
-            {
-                int internalIndex = fontNameToInternalIndexMap[fontName];
-                UIFont uiFont = Project.Fonts[internalIndex];
-
-                FontID fontID = new FontID();
-                fontID.Index = (uint)xFontList.FontIDTable.Count;
-                fontID.Name = uiFont.Name;
-                xFontList.FontIDTable.Add(fontID);
-
-                Font font = new Font();
-                foreach (var mapping in uiFont.Mappings)
-                {
-                    // This seems to work fine, but causes different values to be saved in ui_gameplay.xncp. Duplicate subimage entry?
-                    XNCPLib.XNCP.CharacterMapping characterMapping = new XNCPLib.XNCP.CharacterMapping();
-                    characterMapping.SubImageIndex = Utilities.FindSubImageIndexFromSprite(Project.TryGetSprite(mapping.Sprite), xScenes[0].SubImages, texList.Textures);
-                    characterMapping.SourceCharacter = mapping.Character;
-                    font.CharacterMappings.Add(characterMapping);
-                }
-                xFontList.Fonts.Add(font);
-            }
+            List<SubImage> subImageList = BuildSubImageList();
+            SaveTextures(xTextures);
+            SaveFonts(xFontList, subImageList);
+            SaveScenes(new CSDNode(), subImageList);
 
             foreach (SceneID sceneID in xIDs)
             {
@@ -232,41 +175,181 @@ namespace Shuriken.ViewModels
             WorkFile.Save(path);
         }
 
-        private void SaveHierarchyTree(UICastGroup uiCastGroup, CastGroup castGroup)
+        private List<SubImage> BuildSubImageList()
         {
-            castGroup.CastHierarchyTree = new List<CastHierarchyTreeNode>();
-            castGroup.CastHierarchyTree.AddRange
-            (
-                Enumerable.Repeat(new CastHierarchyTreeNode(-1, -1), uiCastGroup.CastsOrderedByIndex.Count)
-            );
+            List<SubImage> newSubImages = new List<SubImage>();
+            TextureList texList = Project.TextureLists[0];
+            foreach (var entry in Project.Sprites)
+            {
+                Sprite sprite = entry.Value;
+                int textureIndex = texList.Textures.IndexOf(sprite.Texture);
 
-            GenerateHierarchyForCastList(uiCastGroup, uiCastGroup.Casts, castGroup.CastHierarchyTree);
+                SubImage subimage = new SubImage();
+                subimage.TextureIndex = (uint)textureIndex;
+                subimage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, (float)sprite.Y / sprite.Texture.Height);
+                subimage.BottomRight = new Vector2((float)(sprite.X + sprite.Width) / sprite.Texture.Width, (float)(sprite.Y + sprite.Height) / sprite.Texture.Height);
+                newSubImages.Add(subimage);
+            }
+
+            return newSubImages;
         }
 
-        private void GenerateHierarchyForCastList(UICastGroup uiCastGroup, ObservableCollection<UICast> uiCasts, List<CastHierarchyTreeNode> o_tree)
+        private void SaveTextures(List<XTexture> xTextures)
         {
-            for (int i = 0; i < uiCasts.Count; i++)
+            xTextures.Clear();
+            TextureList texList = Project.TextureLists[0];
+            foreach (Texture texture in texList.Textures)
             {
-                UICast uiCast = uiCasts[i];
+                XTexture xTexture = new XTexture();
+                xTexture.Name = texture.Name + ".dds";
+                xTextures.Add(xTexture);
+            }
+        }
 
-                int currentIndex = uiCastGroup.CastsOrderedByIndex.IndexOf(uiCast);
+        private void SaveFonts(FontList xFontList, List<SubImage> subImageList)
+        {
+            xFontList.Fonts.Clear();
+            xFontList.FontIDTable.Clear();
+
+            TextureList texList = Project.TextureLists[0];
+            foreach (var entry in Project.Fonts)
+            {
+                UIFont uiFont = entry.Value;
+
+                // NOTE: need to sort by name after
+                FontID fontID = new FontID();
+                fontID.Index = (uint)xFontList.FontIDTable.Count;
+                fontID.Name = uiFont.Name;
+                xFontList.FontIDTable.Add(fontID);
+
+                Font font = new Font();
+                foreach (var mapping in uiFont.Mappings)
+                {
+                    // This seems to work fine, but causes different values to be saved in ui_gameplay.xncp. Duplicate subimage entry?
+                    XNCPLib.XNCP.CharacterMapping characterMapping = new XNCPLib.XNCP.CharacterMapping();
+                    characterMapping.SubImageIndex = Utilities.FindSubImageIndexFromSprite(Project.TryGetSprite(mapping.Sprite), subImageList, texList.Textures);
+                    characterMapping.SourceCharacter = mapping.Character;
+                    font.CharacterMappings.Add(characterMapping);
+                }
+                xFontList.Fonts.Add(font);
+            }
+
+            // Sort font names
+            xFontList.FontIDTable = xFontList.FontIDTable.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
+        }
+
+        private void SaveScenes(CSDNode xNode, List<SubImage> subImageList)
+        {
+            // TODO: sub nodes, sort sub node names
+
+            xNode.Scenes.Clear();
+            xNode.SceneIDTable.Clear();
+
+            // Save individual scenes
+            for (int s = 0; s < Project.Scenes.Count; s++)
+            {
+                UIScene uiScene = Project.Scenes[s];
+                Scene xScene = new Scene();
+
+                // Save scene parameters
+                xScene.Field00 = uiScene.Field00;
+                xScene.ZIndex = uiScene.ZIndex;
+                xScene.AnimationFramerate = uiScene.AnimationFramerate;
+                xScene.Field0C = uiScene.Field0C;
+                xScene.Field10 = uiScene.Field10;
+                xScene.AspectRatio = uiScene.AspectRatio;
+                xScene.SubImages = subImageList;
+
+                // TODO: Data1
+
+                for (int g = 0; g < uiScene.Groups.Count; g++)
+                {
+                    CastGroup xCastGroup = new CastGroup();
+                    UICastGroup uiCastGroup = uiScene.Groups[g];
+
+                    // Get 1-dimensional UICast list, this will be in order of casts from top to bottom in UI
+                    List<UICast> uiCastList = new List<UICast>();
+                    GetAllUICastInGroup(uiCastGroup.Casts, uiCastList);
+
+                    // TODO: save casts
+                    foreach (UICast uiCast in uiCastList)
+                    {
+                        Cast xCast = new Cast();
+
+                    }
+
+                    // Save the hierarchy tree for the current group
+                    xCastGroup.CastHierarchyTree = new List<CastHierarchyTreeNode>();
+                    xCastGroup.CastHierarchyTree.AddRange
+                    (
+                        Enumerable.Repeat(new CastHierarchyTreeNode(-1, -1), uiCastList.Count)
+                    );
+                    SaveHierarchyTree(uiCastGroup.Casts, uiCastList, xCastGroup.CastHierarchyTree);
+
+                    // Add cast name to dictionary, NOTE: this need to be sorted after
+                    for (int c = 0; c < uiCastList.Count; c++)
+                    {
+                        CastDictionary castDictionary = new CastDictionary();
+                        castDictionary.Name = uiCastList[c].Name;
+                        castDictionary.GroupIndex = (uint)g;
+                        castDictionary.CastIndex = (uint)c;
+                        xScene.CastDictionaries.Add(castDictionary);
+                    }
+
+                    xScene.UICastGroups.Add(xCastGroup);
+                }
+
+                // Sort cast names
+                xScene.CastDictionaries = xScene.CastDictionaries.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
+
+                // TODO: AnimationKeyframeDataList, AnimationDictionaries, AnimationFrameDataList, AnimationData2List
+
+                // Add scene name to dictionary, NOTE: this need to sorted after
+                SceneID xSceneID = new SceneID();
+                xSceneID.Name = uiScene.Name;
+                xSceneID.Index = (uint)s;
+                xNode.SceneIDTable.Add(xSceneID);
+
+                xNode.Scenes.Add(xScene);
+            }
+
+            // Sort scene names
+            xNode.SceneIDTable = xNode.SceneIDTable.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
+        }
+
+        private void GetAllUICastInGroup(ObservableCollection<UICast> children, List<UICast> uiCastList)
+        {
+            foreach (UICast uiCast in children)
+            {
+                uiCastList.Add(uiCast);
+                GetAllUICastInGroup(uiCast.Children, uiCastList);
+            }
+        }
+
+        private void SaveHierarchyTree(ObservableCollection<UICast> children, List<UICast> uiCastList, List<CastHierarchyTreeNode> tree)
+        {
+            for (int i = 0; i < children.Count; i++)
+            {
+                UICast uiCast = children[i];
+
+                int currentIndex = uiCastList.IndexOf(uiCast);
                 Debug.Assert(currentIndex != -1);
                 CastHierarchyTreeNode castHierarchyTreeNode = new CastHierarchyTreeNode(-1, -1);
 
                 if (uiCast.Children.Count > 0)
                 {
-                    castHierarchyTreeNode.ChildIndex = uiCastGroup.CastsOrderedByIndex.IndexOf(uiCast.Children[0]);
+                    castHierarchyTreeNode.ChildIndex = uiCastList.IndexOf(uiCast.Children[0]);
                     Debug.Assert(castHierarchyTreeNode.ChildIndex != -1);
                 }
 
-                if (i + 1 < uiCasts.Count)
+                if (i + 1 < children.Count)
                 {
-                    castHierarchyTreeNode.NextIndex = uiCastGroup.CastsOrderedByIndex.IndexOf(uiCasts[i + 1]);
+                    castHierarchyTreeNode.NextIndex = uiCastList.IndexOf(children[i + 1]);
                     Debug.Assert(castHierarchyTreeNode.NextIndex != -1);
                 }
 
-                o_tree[currentIndex] = castHierarchyTreeNode;
-                GenerateHierarchyForCastList(uiCastGroup, uiCast.Children, o_tree);
+                tree[currentIndex] = castHierarchyTreeNode;
+                SaveHierarchyTree(uiCast.Children, uiCastList, tree);
             }
         }
 
