@@ -162,7 +162,7 @@ namespace Shuriken.ViewModels
                 SubImage subimage = new SubImage();
                 subimage.TextureIndex = (uint)textureIndex;
                 subimage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, (float)sprite.Y / sprite.Texture.Height);
-                subimage.BottomRight = new Vector2(((float)sprite.Width / sprite.Texture.Width) + subimage.TopLeft.X, ((float)sprite.Height / sprite.Texture.Height) + subimage.TopLeft.Y);
+                subimage.BottomRight = new Vector2((float)(sprite.X + sprite.Width) / sprite.Texture.Width, (float)(sprite.Y + sprite.Height) / sprite.Texture.Height);
                 newSubImages.Add(subimage);
             }
 
@@ -206,7 +206,6 @@ namespace Shuriken.ViewModels
                 xFontList.Fonts.Add(font);
             }
 
-            int sceneIndex = 0;
             foreach (SceneID sceneID in xIDs)
             {
                 Scene scene = xScenes[(int)sceneID.Index];
