@@ -84,7 +84,7 @@ namespace Shuriken.Models
             Start.X = Math.Clamp(Start.X, 0, Texture.Width);
             Start.Y = Math.Clamp(Start.Y, 0, Texture.Height);
 
-            Dimensions = new Vector2((right - left) * tex.Width, (bottom - top) * tex.Height);
+            Dimensions = new Vector2(MathF.Round((right - left) * tex.Width), MathF.Round((bottom - top) * tex.Height));
             CreateCrop();
 
             OriginalTop = top;
