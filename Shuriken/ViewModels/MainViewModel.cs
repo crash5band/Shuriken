@@ -102,25 +102,22 @@ namespace Shuriken.ViewModels
                 }
             }
 
-            foreach (var entry in xFontList.FontIDTable)
+            List<FontID> fontIDSorted = xFontList.FontIDTable.OrderBy(o => o.Index).ToList();
+            for (int i = 0; i < xFontList.FontIDTable.Count; i++)
             {
-                int id = Project.CreateFont(entry.Name);
+                int id = Project.CreateFont(fontIDSorted[i].Name);
                 UIFont font = Project.TryGetFont(id);
-                foreach (var mapping in xFontList.Fonts[(int)entry.Index].CharacterMappings)
+                foreach (var mapping in xFontList.Fonts[i].CharacterMappings)
                 {
                     var sprite = Utilities.FindSpriteIDFromNCPScene((int)mapping.SubImageIndex, xScenes[0].SubImages, texList.Textures);
                     font.Mappings.Add(new Models.CharacterMapping(mapping.SourceCharacter, sprite));
                 }
             }
 
-            Dictionary<int, string> sceneIndexToNameMap = new Dictionary<int, string>();
-            foreach (SceneID xSceneID in xSceneIDs)
-            {
-                sceneIndexToNameMap.Add((int)xSceneID.Index, xSceneID.Name);
-            }
+            List<SceneID> xSceneIDSorted = xSceneIDs.OrderBy(o => o.Index).ToList();
             for (int i = 0; i < xScenes.Count; i++)
             {
-                Project.Scenes.Add(new UIScene(xScenes[i], sceneIndexToNameMap[i], texList));
+                Project.Scenes.Add(new UIScene(xScenes[i], xSceneIDSorted[i].Name, texList));
             }
 
             Project.TextureLists.Add(texList);
