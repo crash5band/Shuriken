@@ -62,7 +62,7 @@ namespace Shuriken.ViewModels
             string root = Path.GetDirectoryName(Path.GetFullPath(filename));
 
             List<Scene> xScenes = WorkFile.Resources[0].Content.CsdmProject.Root.Scenes;
-            List<SceneID> xIDs = WorkFile.Resources[0].Content.CsdmProject.Root.SceneIDTable;
+            List<SceneID> xSceneIDs = WorkFile.Resources[0].Content.CsdmProject.Root.SceneIDTable;
             List<XTexture> xTextures = WorkFile.Resources[1].Content.TextureList.Textures;
             FontList xFontList = WorkFile.Resources[0].Content.CsdmProject.Fonts;
 
@@ -112,8 +112,15 @@ namespace Shuriken.ViewModels
                 }
             }
 
-            foreach (SceneID sceneID in xIDs)
-                Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name, texList));
+            Dictionary<int, string> sceneIndexToNameMap = new Dictionary<int, string>();
+            foreach (SceneID xSceneID in xSceneIDs)
+            {
+                sceneIndexToNameMap.Add((int)xSceneID.Index, xSceneID.Name);
+            }
+            for (int i = 0; i < xScenes.Count; i++)
+            {
+                Project.Scenes.Add(new UIScene(xScenes[i], sceneIndexToNameMap[i], texList));
+            }
 
             Project.TextureLists.Add(texList);
 
@@ -189,7 +196,7 @@ namespace Shuriken.ViewModels
             foreach (SceneID sceneID in xIDs)
             {
                 Scene scene = xScenes[(int)sceneID.Index];
-                UIScene uiScene = Project.Scenes[sceneIndex++];
+                UIScene uiScene = Project.Scenes[(int)sceneID.Index];
 
                 sceneID.Name = uiScene.Name.Substring(0, sceneID.Name.Length); // TODO: This will break with names larger than the original one
 
