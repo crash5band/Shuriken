@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Collections.ObjectModel;
 using XNCPLib.XNCP;
+using XNCPLib.XNCP.Animation;
 using Shuriken.Models;
 using Shuriken.Commands;
 using System.Windows;
@@ -304,7 +305,19 @@ namespace Shuriken.ViewModels
                 // Sort cast names
                 xScene.CastDictionaries = xScene.CastDictionaries.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
 
-                // TODO: AnimationKeyframeDataList, AnimationDictionaries, AnimationFrameDataList, AnimationData2List
+                // TODO: AnimationKeyframeDataList, AnimationFrameDataList, AnimationData2List
+
+                foreach (AnimationGroup animGroup in uiScene.Animations)
+                {
+                    // Add animation names, NOTE: need to be sorted after
+                    AnimationDictionary animationDictionary = new AnimationDictionary();
+                    animationDictionary.Index = (uint)xScene.AnimationDictionaries.Count;
+                    animationDictionary.Name = animGroup.Name;
+                    xScene.AnimationDictionaries.Add(animationDictionary);
+                }
+
+                // Sort animation names
+                xScene.AnimationDictionaries = xScene.AnimationDictionaries.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
 
                 // Add scene name to dictionary, NOTE: this need to sorted after
                 SceneID xSceneID = new SceneID();
