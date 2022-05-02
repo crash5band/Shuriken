@@ -146,7 +146,7 @@ namespace Shuriken.ViewModels
             SaveTextures(xTextures);
             SaveFonts(xFontList, subImageList);
 
-            List<System.Numerics.Vector2> Data1 = new List<System.Numerics.Vector2>();
+            List<System.Numerics.Vector2> Data1 = new();
             TextureList texList = Project.TextureLists[0];
             foreach (Texture tex in texList.Textures)
             {
@@ -182,14 +182,14 @@ namespace Shuriken.ViewModels
 
         private List<SubImage> BuildSubImageList()
         {
-            List<SubImage> newSubImages = new List<SubImage>();
+            List<SubImage> newSubImages = new();
             TextureList texList = Project.TextureLists[0];
             foreach (var entry in Project.Sprites)
             {
                 Sprite sprite = entry.Value;
                 int textureIndex = texList.Textures.IndexOf(sprite.Texture);
 
-                SubImage subimage = new SubImage();
+                SubImage subimage = new();
                 subimage.TextureIndex = (uint)textureIndex;
                 subimage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, (float)sprite.Y / sprite.Texture.Height);
                 subimage.BottomRight = new Vector2((float)(sprite.X + sprite.Width) / sprite.Texture.Width, (float)(sprite.Y + sprite.Height) / sprite.Texture.Height);
@@ -205,7 +205,7 @@ namespace Shuriken.ViewModels
             TextureList texList = Project.TextureLists[0];
             foreach (Texture texture in texList.Textures)
             {
-                XTexture xTexture = new XTexture();
+                XTexture xTexture = new();
                 xTexture.Name = texture.Name + ".dds";
                 xTextures.Add(xTexture);
             }
@@ -222,16 +222,16 @@ namespace Shuriken.ViewModels
                 UIFont uiFont = entry.Value;
 
                 // NOTE: need to sort by name after
-                FontID fontID = new FontID();
+                FontID fontID = new();
                 fontID.Index = (uint)xFontList.FontIDTable.Count;
                 fontID.Name = uiFont.Name;
                 xFontList.FontIDTable.Add(fontID);
 
-                Font font = new Font();
+                Font font = new();
                 foreach (var mapping in uiFont.Mappings)
                 {
                     // This seems to work fine, but causes different values to be saved in ui_gameplay.xncp. Duplicate subimage entry?
-                    XNCPLib.XNCP.CharacterMapping characterMapping = new XNCPLib.XNCP.CharacterMapping();
+                    XNCPLib.XNCP.CharacterMapping characterMapping = new();
                     characterMapping.SubImageIndex = Utilities.FindSubImageIndexFromSprite(Project.TryGetSprite(mapping.Sprite), subImageList, texList.Textures);
                     characterMapping.SourceCharacter = mapping.Character;
                     font.CharacterMappings.Add(characterMapping);
@@ -254,7 +254,7 @@ namespace Shuriken.ViewModels
             for (int s = 0; s < Project.Scenes.Count; s++)
             {
                 UIScene uiScene = Project.Scenes[s];
-                Scene xScene = new Scene();
+                Scene xScene = new();
 
                 // Save scene parameters
                 xScene.Field00 = uiScene.Field00;
@@ -269,17 +269,17 @@ namespace Shuriken.ViewModels
                 // Initial AnimationKeyframeData so we can add groups and cast data in it
                 foreach (AnimationGroup animGroup in uiScene.Animations)
                 {
-                    AnimationKeyframeData keyframeData = new AnimationKeyframeData();
+                    AnimationKeyframeData keyframeData = new();
                     xScene.AnimationKeyframeDataList.Add(keyframeData);
 
                     // Add animation names, NOTE: need to be sorted after
-                    AnimationDictionary animationDictionary = new AnimationDictionary();
+                    AnimationDictionary animationDictionary = new();
                     animationDictionary.Index = (uint)xScene.AnimationDictionaries.Count;
                     animationDictionary.Name = animGroup.Name;
                     xScene.AnimationDictionaries.Add(animationDictionary);
 
                     // AnimationFrameDataList
-                    AnimationFrameData animationFrameData = new AnimationFrameData();
+                    AnimationFrameData animationFrameData = new();
                     animationFrameData.Field00 = animGroup.Field00;
                     animationFrameData.FrameCount = animGroup.Duration;
                     xScene.AnimationFrameDataList.Add(animationFrameData);
@@ -290,18 +290,18 @@ namespace Shuriken.ViewModels
 
                 for (int g = 0; g < uiScene.Groups.Count; g++)
                 {
-                    CastGroup xCastGroup = new CastGroup();
+                    CastGroup xCastGroup = new();
                     UICastGroup uiCastGroup = uiScene.Groups[g];
 
                     xCastGroup.Field08 = uiCastGroup.Field08;
 
                     // Get 1-dimensional UICast list, this will be in order of casts from top to bottom in UI
-                    List<UICast> uiCastList = new List<UICast>();
+                    List<UICast> uiCastList = new();
                     GetAllUICastInGroup(uiCastGroup.Casts, uiCastList);
                     SaveCasts(uiCastList, xCastGroup, subImageList);
 
                     // Save the hierarchy tree for the current group
-                    xCastGroup.CastHierarchyTree = new List<CastHierarchyTreeNode>();
+                    xCastGroup.CastHierarchyTree = new();
                     xCastGroup.CastHierarchyTree.AddRange
                     (
                         Enumerable.Repeat(new CastHierarchyTreeNode(-1, -1), uiCastList.Count)
@@ -311,7 +311,7 @@ namespace Shuriken.ViewModels
                     // Add cast name to dictionary, NOTE: this need to be sorted after
                     for (int c = 0; c < uiCastList.Count; c++)
                     {
-                        CastDictionary castDictionary = new CastDictionary();
+                        CastDictionary castDictionary = new();
                         castDictionary.Name = uiCastList[c].Name;
                         castDictionary.GroupIndex = (uint)g;
                         castDictionary.CastIndex = (uint)c;
@@ -368,7 +368,7 @@ namespace Shuriken.ViewModels
                 // TODO: AnimationData2List
 
                 // Add scene name to dictionary, NOTE: this need to sorted after
-                SceneID xSceneID = new SceneID();
+                SceneID xSceneID = new();
                 xSceneID.Name = uiScene.Name;
                 xSceneID.Index = (uint)s;
                 xNode.SceneIDTable.Add(xSceneID);
@@ -397,7 +397,7 @@ namespace Shuriken.ViewModels
 
                 int currentIndex = uiCastList.IndexOf(uiCast);
                 Debug.Assert(currentIndex != -1);
-                CastHierarchyTreeNode castHierarchyTreeNode = new CastHierarchyTreeNode(-1, -1);
+                CastHierarchyTreeNode castHierarchyTreeNode = new(-1, -1);
 
                 if (uiCast.Children.Count > 0)
                 {
@@ -420,7 +420,7 @@ namespace Shuriken.ViewModels
         {
             foreach (UICast uiCast in uiCastList)
             {
-                Cast xCast = new Cast();
+                Cast xCast = new();
 
                 xCast.Field00 = uiCast.Field00;
                 xCast.Field04 = (uint)uiCast.Type;
@@ -459,11 +459,11 @@ namespace Shuriken.ViewModels
                 xCast.Field70 = uiCast.Field70;
 
                 // Cast Info
-                xCast.CastInfoData = new CastInfo();
+                xCast.CastInfoData = new();
                 xCast.CastInfoData.Field00 = uiCast.InfoField00;
                 xCast.CastInfoData.Translation = new Vector2(uiCast.Translation);
                 xCast.CastInfoData.Rotation = uiCast.Rotation;
-                xCast.CastInfoData.Scale = new Vector2(uiCast.Scale.X, uiCast.Scale.Y);
+                xCast.CastInfoData.Scale = new(uiCast.Scale.X, uiCast.Scale.Y);
                 xCast.CastInfoData.Field18 = uiCast.InfoField18;
                 xCast.CastInfoData.Color = uiCast.Color.ToUint();
                 xCast.CastInfoData.GradientTopLeft = uiCast.GradientTopLeft.ToUint();
@@ -475,7 +475,7 @@ namespace Shuriken.ViewModels
                 xCast.CastInfoData.Field38 = uiCast.InfoField38;
 
                 // Cast Material Info
-                xCast.CastMaterialData = new CastMaterialInfo();
+                xCast.CastMaterialData = new();
                 Debug.Assert(uiCast.Sprites.Count == 32);
                 for (int index = 0; index < 32; index++)
                 {
