@@ -142,9 +142,12 @@ namespace Shuriken.ViewModels
             List<XTexture> xTextures = WorkFile.Resources[1].Content.TextureList.Textures;
             FontList xFontList = WorkFile.Resources[0].Content.CsdmProject.Fonts;
 
-            List<SubImage> subImageList = BuildSubImageList();
+            List<SubImage> subImageList = new();
+            List<Sprite> spriteList = new();
+            BuildSubImageList(ref subImageList, ref spriteList);
+
             SaveTextures(xTextures);
-            SaveFonts(xFontList, subImageList);
+            SaveFonts(xFontList, spriteList);
 
             List<System.Numerics.Vector2> Data1 = new();
             TextureList texList = Project.TextureLists[0];
@@ -154,7 +157,7 @@ namespace Shuriken.ViewModels
             }
 
             CSDNode rootNode = new();
-            SaveScenes(rootNode, subImageList, Data1);
+            SaveScenes(rootNode, subImageList, Data1, spriteList);
 
             // TODO: REMOVE HACK to use original Data2
             for (int s = 0; s < xScenes.Count; s++)
@@ -167,23 +170,24 @@ namespace Shuriken.ViewModels
             WorkFile.Save(path);
         }
 
-        private List<SubImage> BuildSubImageList()
+        private void BuildSubImageList(ref List<SubImage> subImages, ref List<Sprite> spriteList)
         {
-            List<SubImage> newSubImages = new();
+            subImages = new();
+            spriteList = new();
+
             TextureList texList = Project.TextureLists[0];
             foreach (var entry in Project.Sprites)
             {
                 Sprite sprite = entry.Value;
                 int textureIndex = texList.Textures.IndexOf(sprite.Texture);
+                spriteList.Add(sprite);
 
-                SubImage subimage = new();
-                subimage.TextureIndex = (uint)textureIndex;
-                subimage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, (float)sprite.Y / sprite.Texture.Height);
-                subimage.BottomRight = new Vector2((float)(sprite.X + sprite.Width) / sprite.Texture.Width, (float)(sprite.Y + sprite.Height) / sprite.Texture.Height);
-                newSubImages.Add(subimage);
+                SubImage subImage = new();
+                subImage.TextureIndex = (uint)textureIndex;
+                subImage.TopLeft = new Vector2((float)sprite.X / sprite.Texture.Width, (float)sprite.Y / sprite.Texture.Height);
+                subImage.BottomRight = new Vector2((float)(sprite.X + sprite.Width) / sprite.Texture.Width, (float)(sprite.Y + sprite.Height) / sprite.Texture.Height);
+                subImages.Add(subImage);
             }
-
-            return newSubImages;
         }
 
         private void SaveTextures(List<XTexture> xTextures)
@@ -198,7 +202,7 @@ namespace Shuriken.ViewModels
             }
         }
 
-        private void SaveFonts(FontList xFontList, List<SubImage> subImageList)
+        private void SaveFonts(FontList xFontList, List<Sprite> spriteList)
         {
             xFontList.Fonts.Clear();
             xFontList.FontIDTable.Clear();
@@ -219,8 +223,9 @@ namespace Shuriken.ViewModels
                 {
                     // This seems to work fine, but causes different values to be saved in ui_gameplay.xncp. Duplicate subimage entry?
                     XNCPLib.XNCP.CharacterMapping characterMapping = new();
-                    characterMapping.SubImageIndex = Utilities.FindSubImageIndexFromSprite(Project.TryGetSprite(mapping.Sprite), subImageList, texList.Textures);
+                    characterMapping.SubImageIndex = (uint)spriteList.IndexOf(Project.TryGetSprite(mapping.Sprite));
                     characterMapping.SourceCharacter = mapping.Character;
+                    Debug.Assert(characterMapping.SubImageIndex != 0xFFFFFFFF);
                     font.CharacterMappings.Add(characterMapping);
                 }
                 xFontList.Fonts.Add(font);
@@ -230,7 +235,7 @@ namespace Shuriken.ViewModels
             xFontList.FontIDTable = xFontList.FontIDTable.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
         }
 
-        private void SaveScenes(CSDNode xNode, List<SubImage> subImageList, List<System.Numerics.Vector2> Data1)
+        private void SaveScenes(CSDNode xNode, List<SubImage> subImageList, List<System.Numerics.Vector2> Data1, List<Sprite> spriteList)
         {
             // TODO: sub nodes, sort sub node names
 
@@ -286,9 +291,10 @@ namespace Shuriken.ViewModels
                     xCastGroup.Field08 = uiCastGroup.Field08;
 
                     // Get 1-dimensional UICast list, this will be in order of casts from top to bottom in UI
+                    // TODO: the list order is not the same as original!
                     List<UICast> uiCastList = new();
                     GetAllUICastInGroup(uiCastGroup.Casts, uiCastList);
-                    SaveCasts(uiCastList, xCastGroup, subImageList);
+                    SaveCasts(uiCastList, xCastGroup, spriteList);
 
                     // Save the hierarchy tree for the current group
                     xCastGroup.CastHierarchyTree = new();
@@ -432,7 +438,7 @@ namespace Shuriken.ViewModels
             }
         }
 
-        private void SaveCasts(List<UICast> uiCastList, CastGroup xCastGroup, List<SubImage> subImageList)
+        private void SaveCasts(List<UICast> uiCastList, CastGroup xCastGroup, List<Sprite> spriteList)
         {
             foreach (UICast uiCast in uiCastList)
             {
@@ -502,7 +508,7 @@ namespace Shuriken.ViewModels
                     }
 
                     Sprite uiSprite = Project.TryGetSprite(uiCast.Sprites[index]);
-                    xCast.CastMaterialData.SubImageIndices[index] = (int)Utilities.FindSubImageIndexFromSprite(uiSprite, subImageList, Project.TextureLists[0].Textures);
+                    xCast.CastMaterialData.SubImageIndices[index] = spriteList.IndexOf(uiSprite);
                 }
 
                 xCastGroup.Casts.Add(xCast);
