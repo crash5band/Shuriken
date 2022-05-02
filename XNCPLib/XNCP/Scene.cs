@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -232,15 +233,10 @@ namespace XNCPLib.XNCP
 
                                                                 Data8 value = new Data8();
                                                                 uint valueValueOffset = reader.ReadUInt32();
+                                                                Debug.Assert(valueValueOffset > 0);
 
-                                                                if (valueValueOffset > 0)
-                                                                {
-                                                                    value.IsUsed = true;
-                                                                    reader.SeekBegin(baseOffset + valueValueOffset);
-
-                                                                    value.Value = reader.ReadVector3();
-                                                                }
-
+                                                                reader.SeekBegin(baseOffset + valueValueOffset);
+                                                                value.Value = reader.ReadVector3();
                                                                 data.Data.Add(value);
                                                             }
                                                         }
@@ -851,20 +847,12 @@ namespace XNCPLib.XNCP
                                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                                 UnwrittenPosition += 0x4;
 
-                                Data8 data8 = data7.Data[v];
-                                if (data8.IsUsed)
-                                {
-                                    offsetChunk.Add(writer);
-                                    writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+                                offsetChunk.Add(writer);
+                                writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
-                                    // Allocate memory for final Vector3 data
-                                    writer.Seek(0, SeekOrigin.End);
-                                    Utilities.PadZeroBytes(writer, 0xC);
-                                }
-                                else
-                                {
-                                    writer.WriteUInt32(0);
-                                }
+                                // Allocate memory for final Vector3 data
+                                writer.Seek(0, SeekOrigin.End);
+                                Utilities.PadZeroBytes(writer, 0xC);
                             }
                         }
                     }
@@ -915,7 +903,6 @@ namespace XNCPLib.XNCP
                             for (int v = 0; v < data8Count; ++v)
                             {
                                 Data8 data8 = data7.Data[v];
-                                if (!data8.IsUsed) continue;
 
                                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                                 UnwrittenPosition += 0xC;

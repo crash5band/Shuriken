@@ -168,7 +168,6 @@ namespace XNCPLib.XNCP.Animation
 
     public class Data8
     {
-        public bool IsUsed { get; set; }
         public Vector3 Value { get; set; }
     }
 }
