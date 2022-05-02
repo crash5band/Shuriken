@@ -289,26 +289,21 @@ namespace Shuriken.ViewModels
                     UICastGroup uiCastGroup = uiScene.Groups[g];
 
                     xCastGroup.Field08 = uiCastGroup.Field08;
-
-                    // Get 1-dimensional UICast list, this will be in order of casts from top to bottom in UI
-                    // TODO: the list order is not the same as original!
-                    List<UICast> uiCastList = new();
-                    GetAllUICastInGroup(uiCastGroup.Casts, uiCastList);
-                    SaveCasts(uiCastList, xCastGroup, spriteList);
+                    SaveCasts(uiCastGroup.CastsOrderedByIndex, xCastGroup, spriteList);
 
                     // Save the hierarchy tree for the current group
                     xCastGroup.CastHierarchyTree = new();
                     xCastGroup.CastHierarchyTree.AddRange
                     (
-                        Enumerable.Repeat(new CastHierarchyTreeNode(-1, -1), uiCastList.Count)
+                        Enumerable.Repeat(new CastHierarchyTreeNode(-1, -1), uiCastGroup.CastsOrderedByIndex.Count)
                     );
-                    SaveHierarchyTree(uiCastGroup.Casts, uiCastList, xCastGroup.CastHierarchyTree);
+                    SaveHierarchyTree(uiCastGroup.Casts, uiCastGroup.CastsOrderedByIndex, xCastGroup.CastHierarchyTree);
 
                     // Add cast name to dictionary, NOTE: this need to be sorted after
-                    for (int c = 0; c < uiCastList.Count; c++)
+                    for (int c = 0; c < uiCastGroup.CastsOrderedByIndex.Count; c++)
                     {
                         CastDictionary castDictionary = new();
-                        castDictionary.Name = uiCastList[c].Name;
+                        castDictionary.Name = uiCastGroup.CastsOrderedByIndex[c].Name;
                         castDictionary.GroupIndex = (uint)g;
                         castDictionary.CastIndex = (uint)c;
                         xScene.CastDictionaries.Add(castDictionary);
@@ -331,13 +326,13 @@ namespace Shuriken.ViewModels
                         groupAnimationData2.AnimationData2List.ListData = new();
 
                         GroupAnimationData groupAnimationData = new();
-                        for (int c = 0; c < uiCastList.Count; c++)
+                        for (int c = 0; c < uiCastGroup.CastsOrderedByIndex.Count; c++)
                         {
                             CastAnimationData2 castAnimationData2 = new();
                             castAnimationData2.Data = new();
                             CastAnimationData castAnimationData = new();
 
-                            UICast uiCast = uiCastList[c];
+                            UICast uiCast = uiCastGroup.CastsOrderedByIndex[c];
                             for (int t = 0; t < 12; t++)
                             {
                                 AnimationType type = (AnimationType)(1u << t);
@@ -400,15 +395,6 @@ namespace Shuriken.ViewModels
 
             // Sort scene names
             xNode.SceneIDTable = xNode.SceneIDTable.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
-        }
-
-        private void GetAllUICastInGroup(ObservableCollection<UICast> children, List<UICast> uiCastList)
-        {
-            foreach (UICast uiCast in children)
-            {
-                uiCastList.Add(uiCast);
-                GetAllUICastInGroup(uiCast.Children, uiCastList);
-            }
         }
 
         private void SaveHierarchyTree(ObservableCollection<UICast> children, List<UICast> uiCastList, List<CastHierarchyTreeNode> tree)
