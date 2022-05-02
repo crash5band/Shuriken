@@ -80,7 +80,7 @@ namespace Shuriken.Models
             ID = id;
             Texture = tex;
 
-            Start = new Vector2(left * tex.Width, top * tex.Height);
+            Start = new Vector2(MathF.Round(left * tex.Width), MathF.Round(top * tex.Height));
             Start.X = Math.Clamp(Start.X, 0, Texture.Width);
             Start.Y = Math.Clamp(Start.Y, 0, Texture.Height);
 
