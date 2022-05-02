@@ -158,13 +158,6 @@ namespace Shuriken.ViewModels
 
             CSDNode rootNode = new();
             SaveScenes(rootNode, subImageList, Data1, spriteList);
-
-            // TODO: REMOVE HACK to use original Data2
-            for (int s = 0; s < xScenes.Count; s++)
-            {
-                rootNode.Scenes[s].AnimationData2List = xScenes[s].AnimationData2List;
-            }
-
             WorkFile.Resources[0].Content.CsdmProject.Root = rootNode;
 
             WorkFile.Save(path);
@@ -364,7 +357,7 @@ namespace Shuriken.ViewModels
                                     castAnimationSubData.Keyframes.Add(xKeyframe);
 
                                     Data8 data8 = new();
-                                    data8.Value = new System.Numerics.Vector3(0, 0, 0); // TODO:
+                                    data8.Value = new System.Numerics.Vector3(keyframe.Data8Value.X, keyframe.Data8Value.Y, keyframe.Data8Value.Z);
                                     data6.Data.Data.Add(data8);
                                 }
 

@@ -160,9 +160,12 @@ namespace Shuriken.Models
                                     Field00 = castAnimData.SubDataList[castAnimDataIndex].Field00,
                                 };
 
+                                int keyIndex = 0;
                                 foreach (var key in castAnimData.SubDataList[castAnimDataIndex].Keyframes)
                                 {
-                                    anim.Keyframes.Add(new Keyframe(key));
+                                    System.Numerics.Vector3 data8Value = scene.AnimationData2List[a].GroupList.GroupList[g].AnimationData2List.ListData[c].Data.SubData[castAnimDataIndex].Data.Data[keyIndex].Value;
+                                    anim.Keyframes.Add(new Keyframe(key, data8Value));
+                                    keyIndex++;
                                 }
 
                                 tracks.Add(anim);
