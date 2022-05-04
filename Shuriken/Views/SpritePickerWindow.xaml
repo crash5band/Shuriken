@@ -50,6 +50,17 @@
         </Grid>
         <ListView Name="SpriteList" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding ElementName=TexturesList, Path=SelectedItem.Sprites}" 
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="5">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                <ContentPresenter/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Border Background="LightGray" Width="{Binding ElementName=SpriteImg, Path=Tag.Width, Converter={StaticResource ImageSizeConverter}, Mode=OneWay}"
