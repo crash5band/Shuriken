@@ -9,7 +9,7 @@ namespace Shuriken.Models
 {
     public static class Project
     {
-        public static ObservableCollection<UIScene> Scenes { get; set; } = new ObservableCollection<UIScene>();
+        public static ObservableCollection<UISceneGroup> SceneGroups { get; set; } = new ObservableCollection<UISceneGroup>();
         public static ObservableCollection<TextureList> TextureLists { get; set; } = new ObservableCollection<TextureList>();
         public static Dictionary<int, UIFont> Fonts { get; set; } = new Dictionary<int, UIFont>();
         public static Dictionary<int, Sprite> Sprites { get; set; } = new Dictionary<int, Sprite>();
@@ -65,7 +65,7 @@ namespace Shuriken.Models
 
         public static void Clear()
         {
-            Scenes.Clear();
+            SceneGroups.Clear();
             Fonts.Clear();
             Sprites.Clear();
 

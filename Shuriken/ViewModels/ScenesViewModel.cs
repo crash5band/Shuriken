@@ -58,9 +58,9 @@ namespace Shuriken.ViewModels
 
         public void ChangeCastSprite(int index, int sprID)
         {
-            if (SelectedNode is UICast)
+            if (SelectedUIObject is UICast)
             {
-                var cast = (UICast)SelectedNode;
+                var cast = (UICast)SelectedUIObject;
                 cast.Sprites[index] = sprID;
             }
         }
@@ -111,26 +111,38 @@ namespace Shuriken.ViewModels
 
         public void RemoveSelectedGroup()
         {
-            if (SelectedNode is UICastGroup group)
+            if (SelectedUIObject is UICastGroup group)
                 SelectedScene.Groups.Remove(group);
         }
 
         public void AddCastToSelection()
         {
-            if (SelectedNode is ICastContainer container)
+            if (SelectedUIObject is ICastContainer container)
                 container.AddCast(new UICast());
         }
 
         public void RemoveSelectedCast()
         {
             if (ParentNode is ICastContainer container)
-                container.RemoveCast(SelectedNode as UICast);
+                container.RemoveCast(SelectedUIObject as UICast);
         }
 
+        public void CreateSceneGroup()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveSelecteSceneGroup()
+        {
+            throw new NotImplementedException();
+        }
+
+        public UISceneGroup SelectedSceneGroup { get; set; }
         public UIScene SelectedScene { get; set; }
         public object ParentNode { get; set; }
-        public object SelectedNode { get; set; }
-        public ObservableCollection<UIScene> Scenes => Project.Scenes;
+        public object SelectedUIObject { get; set; }
+        public ObservableCollection<UISceneGroup> SceneGroups => Project.SceneGroups;
+        public ObservableCollection<UIScene> Scenes => SelectedSceneGroup?.Scenes;
 
         public ScenesViewModel()
         {
@@ -150,9 +162,9 @@ namespace Shuriken.ViewModels
             CreateSceneCmd      = new RelayCommand(CreateScene, null);
             RemoveSceneCmd      = new RelayCommand(RemoveSelectedScene, () => SelectedScene != null);
             CreateGroupCmd      = new RelayCommand(AddGroupToSelection, () => SelectedScene != null);
-            RemoveGroupCmd      = new RelayCommand(RemoveSelectedGroup, () => SelectedNode is UICastGroup);
-            CreateCastCmd       = new RelayCommand(AddCastToSelection, () => SelectedNode is ICastContainer);
-            RemoveCastCmd       = new RelayCommand(RemoveSelectedCast, () => SelectedNode is UICast);
+            RemoveGroupCmd      = new RelayCommand(RemoveSelectedGroup, () => SelectedUIObject is UICastGroup);
+            CreateCastCmd       = new RelayCommand(AddCastToSelection, () => SelectedUIObject is ICastContainer);
+            RemoveCastCmd       = new RelayCommand(RemoveSelectedCast, () => SelectedUIObject is UICast);
             ChangeCastSpriteCmd = new RelayCommand<int>(SelectCastSprite, null);
         }
     }

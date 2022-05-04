@@ -16,7 +16,7 @@ namespace XNCPLib.XNCP
     {
         public uint Signature { get; set; }
         public uint Field1C { get; set; }
-        public NCPJChunck CsdmProject { get; set; }
+        public NCPJChunk CsdmProject { get; set; }
         public XTextureListChunk TextureList { get; set; }
         public OffsetChunk Offset { get; set; }
         public EndChunk End { get; set; }
@@ -70,7 +70,7 @@ namespace XNCPLib.XNCP
             reader.Seek(reader.GetOffsetOrigin() + nextChunkOffset, SeekOrigin.Begin);
             if (nextSignature != Utilities.Make4CCLE("NXTL"))
             {
-                CsdmProject = new NCPJChunck();
+                CsdmProject = new NCPJChunk();
                 CsdmProject.Read(reader);
             }
             else

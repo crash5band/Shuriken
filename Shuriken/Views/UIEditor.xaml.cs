@@ -73,10 +73,22 @@ namespace Shuriken.Views
             if (sv != null)
             {
                 sv.Tick(delta);
-                List<UIScene> sortedScenes = Project.Scenes.ToList();
-                sortedScenes.Sort();
+                UpdateSceneGroups(Project.SceneGroups, Project.Fonts, sv.Time);
+            }
+        }
 
-                UpdateScenes(sortedScenes, Project.Fonts, sv.Time);
+        private void UpdateSceneGroups(IEnumerable<UISceneGroup> groups, Dictionary<int, UIFont> fonts, float time)
+        {
+            foreach (var group in groups)
+            {
+                if (group.Visible)
+                {
+                    UpdateSceneGroups(group.Children, fonts, time);
+
+                    List<UIScene> sortedScenes = group.Scenes.ToList();
+                    sortedScenes.Sort();
+                    UpdateScenes(group.Scenes, fonts, time);
+                }
             }
         }
 
@@ -316,6 +328,9 @@ namespace Shuriken.Views
             {
                 int sprID = -1;
                 var font = Project.TryGetFont(lyr.FontID);
+                if (font == null)
+                    continue;
+
                 foreach (var mapping in font.Mappings)
                 {
                     if (mapping.Character == c)
@@ -388,6 +403,8 @@ namespace Shuriken.Views
                 color = new Color(cF.X, cF.Y, cF.Z, cF.W);
             }
 
+            scale.X = Math.Max(0, scale.X);
+            scale.Y = Math.Max(0, scale.Y);
             Vec2 pivot = GetPivot(lyr, scale, renderer.RenderWidth, renderer.RenderHeight);
 
             if (lyr.Visible && lyr.IsEnabled)
@@ -417,7 +434,7 @@ namespace Shuriken.Views
                     var childTransform = new CastTransform(position + posAdjust, zPosition, rotation, scale, color);
 
                     // Not correct, blb_gauge looks better when passing position and doesn't have field5c with value 2
-                    if (child.Field5C == 2)
+                    if (false)
                     {
                         UpdateCast(scene, child, childTransform, time, position);
                     }
@@ -441,7 +458,7 @@ namespace Shuriken.Views
             if (DataContext is ScenesViewModel vm)
             {
                 vm.SelectedScene = item == null ? null : item.DataContext as UIScene;
-                vm.SelectedNode = source.DataContext;
+                vm.SelectedUIObject = source.DataContext;
 
                 TreeViewItem parent = Utilities.GetParentTreeViewItem(source);
                 vm.ParentNode = parent == null ? null : parent.DataContext;
@@ -454,8 +471,15 @@ namespace Shuriken.Views
             if (tree.Items.Count < 1)
             {
                 if (DataContext is ScenesViewModel vm)
-                    vm.SelectedNode = vm.ParentNode = vm.SelectedScene = null;
+                    vm.SelectedUIObject = vm.ParentNode = vm.SelectedScene = null;
             }
+        }
+
+        private void NodesTreeViewSelectedItemChanged(object sender, RoutedEventArgs e)
+        {
+            var item = e.OriginalSource as TreeViewItem;
+            if (DataContext is ScenesViewModel vm)
+                vm.SelectedSceneGroup = item.DataContext as UISceneGroup;
         }
     }
 }

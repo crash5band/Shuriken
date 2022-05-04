@@ -39,80 +39,111 @@
             <!-- Scenes tree view-->
             <Grid Grid.Row="0" Grid.Column="0">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
                     <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="3*"/>
                 </Grid.RowDefinitions>
-                <TextBlock>
+
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0">
+                    <Run Text="&#xf542;" FontFamily="{StaticResource FontAwesome}"/>
+                    <Run Text="Scene Groups"/>
+                    </TextBlock>
+                    <TreeView Grid.Row="1" Name="SceneGroupsTreeView" TreeViewItem.Selected="NodesTreeViewSelectedItemChanged" ItemsSource="{Binding SceneGroups}">
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate DataType="{x:Type models:UISceneGroup}" ItemsSource="{Binding Children}">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                        </TreeView.Resources>
+                    </TreeView>
+                </Grid>
+
+                <GridSplitter Grid.Row="1" Height="5" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch" Margin="0 2.5"/>
+
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0">
                     <Run Text="&#xf008;" FontFamily="{StaticResource FontAwesome}"/>
                     <Run Text="Scenes"/>
-                </TextBlock>
-                <TreeView Grid.Row="1" Name="ScenesTreeView" TreeViewItem.Selected="ScenesTreeViewSelected" TreeView.SelectedItemChanged="SelectedItemChanged" ItemsSource="{Binding Scenes}">
-                    <TreeView.Resources>
-                        <HierarchicalDataTemplate DataType="{x:Type models:UIScene}" ItemsSource="{Binding Groups}">
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
-                                <TextBlock>
+                    </TextBlock>
+                    <TreeView Grid.Row="1" Name="ScenesTreeView" TreeViewItem.Selected="ScenesTreeViewSelected" TreeView.SelectedItemChanged="SelectedItemChanged" ItemsSource="{Binding SelectedSceneGroup.Scenes}">
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate DataType="{x:Type models:UIScene}" ItemsSource="{Binding Groups}">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
+                                    <TextBlock>
                                 <Run Text="&#xf61f; " FontFamily="{StaticResource FontAwesome}"/>
                                 <Run Text="{Binding Name}"/>
-                                </TextBlock>
-                                <StackPanel.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="New Group"/>
-                                        <MenuItem Header="Remove"/>
-                                    </ContextMenu>
-                                </StackPanel.ContextMenu>
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type models:UICastGroup}" ItemsSource="{Binding Casts}">
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
-                                <TextBlock>
+                                    </TextBlock>
+                                    <StackPanel.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="New Group"/>
+                                            <MenuItem Header="Remove"/>
+                                        </ContextMenu>
+                                    </StackPanel.ContextMenu>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                            <HierarchicalDataTemplate DataType="{x:Type models:UICastGroup}" ItemsSource="{Binding Casts}">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
+                                    <TextBlock>
                                 <Run Text="&#xf5fd; " FontFamily="{StaticResource FontAwesome}"/>
                                 <Run Text="{Binding Name}"/>
-                                </TextBlock>
-                                <StackPanel.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="New Cast"/>
-                                        <MenuItem Header="Remove"/>
-                                    </ContextMenu>
-                                </StackPanel.ContextMenu>
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type models:UICast}" ItemsSource="{Binding Children}">
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
-                                <TextBlock>
+                                    </TextBlock>
+                                    <StackPanel.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="New Cast"/>
+                                            <MenuItem Header="Remove"/>
+                                        </ContextMenu>
+                                    </StackPanel.ContextMenu>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                            <HierarchicalDataTemplate DataType="{x:Type models:UICast}" ItemsSource="{Binding Children}">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding Visible}" Margin="0 0 5 0"/>
+                                    <TextBlock>
                                 <Run Text="&#xf111; " FontFamily="{StaticResource FontAwesome}"/>
                                 <Run Text="{Binding Name}"/>
-                                </TextBlock>
-                                <StackPanel.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="New Cast"/>
-                                        <MenuItem Header="Remove"/>
-                                    </ContextMenu>
-                                </StackPanel.ContextMenu>
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-                    </TreeView.Resources>
-                </TreeView>
-                
-                <!-- creation / deletion buttons -->
-                <Grid Grid.Row="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Content="+C" Command="{Binding CreateCastCmd}"/>
-                    <Button Grid.Column="1" Content="-C" Command="{Binding RemoveCastCmd}"/>
-                    <Button Grid.Column="2" Content="+G" Command="{Binding CreateGroupCmd}"/>
-                    <Button Grid.Column="3" Content="-G" Command="{Binding RemoveGroupCmd}"/>
-                    <Button Grid.Column="4" Content="+S" Command="{Binding CreateSceneCmd}"/>
-                    <Button Grid.Column="5" Content="-S" Command="{Binding RemoveSceneCmd}"/>
+                                    </TextBlock>
+                                    <StackPanel.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="New Cast"/>
+                                            <MenuItem Header="Remove"/>
+                                        </ContextMenu>
+                                    </StackPanel.ContextMenu>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                        </TreeView.Resources>
+                    </TreeView>
+
+                    <!-- creation / deletion buttons -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="+C" Command="{Binding CreateCastCmd}"/>
+                        <Button Grid.Column="1" Content="-C" Command="{Binding RemoveCastCmd}"/>
+                        <Button Grid.Column="2" Content="+G" Command="{Binding CreateGroupCmd}"/>
+                        <Button Grid.Column="3" Content="-G" Command="{Binding RemoveGroupCmd}"/>
+                        <Button Grid.Column="4" Content="+S" Command="{Binding CreateSceneCmd}"/>
+                        <Button Grid.Column="5" Content="-S" Command="{Binding RemoveSceneCmd}"/>
+                    </Grid>
                 </Grid>
             </Grid>
 

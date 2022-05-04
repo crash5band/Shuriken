@@ -6,7 +6,7 @@ using XNCPLib.Extensions;
 
 namespace XNCPLib.XNCP
 {
-    public class NCPJChunck
+    public class NCPJChunk
     {
         public uint Signature { get; set; }
         public uint Field08 { get; set; }
@@ -16,7 +16,7 @@ namespace XNCPLib.XNCP
         public CSDNode Root { get; set; }
         public FontList Fonts { get; set; }
 
-        public NCPJChunck()
+        public NCPJChunk()
         {
             Root = new CSDNode();
             Fonts = new FontList();

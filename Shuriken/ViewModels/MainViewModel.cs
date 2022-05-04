@@ -24,6 +24,8 @@ namespace Shuriken.ViewModels
         public List<string> MissingTextures { get; set; }
         public ObservableCollection<ViewModelBase> Editors { get; set; }
 
+        private List<SubImage> ncpSubimages;
+
         // File Info
         public FAPCFile WorkFile { get; set; }
         public string WorkFilePath { get; set; }
@@ -41,6 +43,7 @@ namespace Shuriken.ViewModels
             };
 
             IsLoaded = false;
+            ncpSubimages = new List<SubImage>();
 #if DEBUG
             //LoadTestXNCP();
 #endif
@@ -55,6 +58,61 @@ namespace Shuriken.ViewModels
         /// Loads a Ninja Chao Project file for editing
         /// </summary>
         /// <param name="filename">The path of the file to load</param>
+        
+        void GetSubImages(CSDNode node)
+        {
+            foreach (var scene in node.Scenes)
+            {
+                if (ncpSubimages.Count > 0)
+                    return;
+
+                ncpSubimages = scene.SubImages;
+            }
+
+            foreach (var child in node.Children)
+            {
+                if (ncpSubimages.Count > 0)
+                    return;
+
+                GetSubImages(child);
+            }
+        }
+
+        private void ProcessSceneGroups(CSDNode node, UISceneGroup parent, TextureList texlist, string name)
+        {
+            UISceneGroup uiNode = new(name);
+            List<SceneID> xSceneIDs = node.SceneIDTable;
+            List<SceneID> xSceneIDSorted = xSceneIDs.OrderBy(o => o.Index).ToList();
+
+            // process node scenes
+            for (int s = 0; s < xSceneIDSorted.Count; ++s)
+                uiNode.Scenes.Add(new UIScene(node.Scenes[s], xSceneIDSorted[s].Name, texlist));
+
+            if (parent != null)
+                parent.Children.Add(uiNode);
+            else
+                Project.SceneGroups.Add(uiNode);
+
+            // process node children
+            foreach (var entry in node.NodeDictionaries)
+                ProcessSceneGroups(node.Children[(int)entry.Index], uiNode, texlist, entry.Name);
+        }
+
+        private void LoadSubimages(TextureList texList, List<SubImage> subimages)
+        {
+            foreach (var image in subimages)
+            {
+                int textureIndex = (int)image.TextureIndex;
+                if (textureIndex >= 0 && textureIndex < texList.Textures.Count)
+                {
+                    int id = Project.CreateSprite(texList.Textures[textureIndex], image.TopLeft.Y, image.TopLeft.X,
+                        image.BottomRight.Y, image.BottomRight.X);
+
+                    texList.Textures[textureIndex].Sprites.Add(id);
+                }
+            }
+        }
+
         public void Load(string filename)
         {
             WorkFile = new FAPCFile();
@@ -62,12 +120,11 @@ namespace Shuriken.ViewModels
 
             string root = Path.GetDirectoryName(Path.GetFullPath(filename));
 
-            List<Scene> xScenes = WorkFile.Resources[0].Content.CsdmProject.Root.Scenes;
-            List<SceneID> xSceneIDs = WorkFile.Resources[0].Content.CsdmProject.Root.SceneIDTable;
             List<XTexture> xTextures = WorkFile.Resources[1].Content.TextureList.Textures;
             FontList xFontList = WorkFile.Resources[0].Content.CsdmProject.Fonts;
 
             Clear();
+            ncpSubimages.Clear();
 
             TextureList texList = new TextureList("textures");
             foreach (XTexture texture in xTextures)
@@ -82,25 +139,8 @@ namespace Shuriken.ViewModels
             if (MissingTextures.Count > 0)
                 WarnMissingTextures();
 
-            if (xScenes.Count > 0)
-            {
-                // Hack: we load sprites from the first scene only since whatever tool sonic team uses
-                // seems to work the same way as SWIF:
-                // Sprites belong to textures and layers and fonts reference a specific sprite using the texutre index and sprite index.
-                int subImageIndex = 0;
-                foreach (SubImage subimage in xScenes[0].SubImages)
-                {
-                    int textureIndex = (int)subimage.TextureIndex;
-                    if (textureIndex >= 0 && textureIndex < texList.Textures.Count)
-                    {
-                        int id = Project.CreateSprite(texList.Textures[textureIndex], subimage.TopLeft.Y, subimage.TopLeft.X,
-                            subimage.BottomRight.Y, subimage.BottomRight.X);
-                        
-                        texList.Textures[textureIndex].Sprites.Add(id);
-                    }
-                    ++subImageIndex;
-                }
-            }
+            GetSubImages(WorkFile.Resources[0].Content.CsdmProject.Root);
+            LoadSubimages(texList, ncpSubimages);
 
             List<FontID> fontIDSorted = xFontList.FontIDTable.OrderBy(o => o.Index).ToList();
             for (int i = 0; i < xFontList.FontIDTable.Count; i++)
@@ -109,16 +149,12 @@ namespace Shuriken.ViewModels
                 UIFont font = Project.TryGetFont(id);
                 foreach (var mapping in xFontList.Fonts[i].CharacterMappings)
                 {
-                    var sprite = Utilities.FindSpriteIDFromNCPScene((int)mapping.SubImageIndex, xScenes[0].SubImages, texList.Textures);
+                    var sprite = Utilities.FindSpriteIDFromNCPScene((int)mapping.SubImageIndex, ncpSubimages, texList.Textures);
                     font.Mappings.Add(new Models.CharacterMapping(mapping.SourceCharacter, sprite));
                 }
             }
 
-            List<SceneID> xSceneIDSorted = xSceneIDs.OrderBy(o => o.Index).ToList();
-            for (int i = 0; i < xScenes.Count; i++)
-            {
-                Project.Scenes.Add(new UIScene(xScenes[i], xSceneIDSorted[i].Name, texList));
-            }
+            ProcessSceneGroups(WorkFile.Resources[0].Content.CsdmProject.Root, null, texList, WorkFile.Resources[0].Content.CsdmProject.ProjectName);
 
             Project.TextureLists.Add(texList);
 
@@ -126,19 +162,12 @@ namespace Shuriken.ViewModels
             IsLoaded = !MissingTextures.Any();
         }
 
-        // Very barebones save method which doesn't add anything into the original NCP file, and only changes what's already there
-        // It also *may* not save everything, but it's progress...
         public void Save(string path)
         {
             if (path == null) path = WorkFilePath;
             else WorkFilePath = path;
 
             // TODO: We should create a FACPFile from scratch instead of overwritting the working one
-
-            string root = Path.GetDirectoryName(Path.GetFullPath(WorkFilePath));
-
-            List<Scene> xScenes = WorkFile.Resources[0].Content.CsdmProject.Root.Scenes;
-            List<SceneID> xIDs = WorkFile.Resources[0].Content.CsdmProject.Root.SceneIDTable;
             List<XTexture> xTextures = WorkFile.Resources[1].Content.TextureList.Textures;
             FontList xFontList = WorkFile.Resources[0].Content.CsdmProject.Fonts;
 
@@ -157,10 +186,28 @@ namespace Shuriken.ViewModels
             }
 
             CSDNode rootNode = new();
-            SaveScenes(rootNode, subImageList, Data1, spriteList);
+            SaveNodes(rootNode, Project.SceneGroups[0]);
+
+            SaveScenes(rootNode, Project.SceneGroups[0], subImageList, Data1, spriteList);
             WorkFile.Resources[0].Content.CsdmProject.Root = rootNode;
 
             WorkFile.Save(path);
+        }
+
+        private void SaveNodes(CSDNode node, UISceneGroup group)
+        {
+            for (int i = 0; i < group.Children.Count; ++i)
+            {
+                NodeDictionary dictionary = new();
+                dictionary.Name = group.Children[i].Name;
+                dictionary.Index = (uint)i;
+
+                node.NodeDictionaries.Add(dictionary);
+                CSDNode newNode = new();
+                node.Children.Add(newNode);
+
+                SaveNodes(newNode, group.Children[i]);
+            }
         }
 
         private void BuildSubImageList(ref List<SubImage> subImages, ref List<Sprite> spriteList)
@@ -228,17 +275,15 @@ namespace Shuriken.ViewModels
             xFontList.FontIDTable = xFontList.FontIDTable.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
         }
 
-        private void SaveScenes(CSDNode xNode, List<SubImage> subImageList, List<System.Numerics.Vector2> Data1, List<Sprite> spriteList)
+        private void SaveScenes(CSDNode xNode, UISceneGroup uiSGroup, List<SubImage> subImageList, List<System.Numerics.Vector2> Data1, List<Sprite> spriteList)
         {
-            // TODO: sub nodes, sort sub node names
-
             xNode.Scenes.Clear();
             xNode.SceneIDTable.Clear();
 
             // Save individual scenes
-            for (int s = 0; s < Project.Scenes.Count; s++)
+            for (int s = 0; s < uiSGroup.Scenes.Count; s++)
             {
-                UIScene uiScene = Project.Scenes[s];
+                UIScene uiScene = uiSGroup.Scenes[s];
                 Scene xScene = new();
 
                 // Save scene parameters
@@ -381,8 +426,12 @@ namespace Shuriken.ViewModels
                 xSceneID.Name = uiScene.Name;
                 xSceneID.Index = (uint)s;
                 xNode.SceneIDTable.Add(xSceneID);
-
                 xNode.Scenes.Add(xScene);
+
+                // Sort node names
+                xNode.NodeDictionaries = xNode.NodeDictionaries.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
+                for (int n = 0; n < xNode.Children.Count; ++n)
+                    SaveScenes(xNode.Children[n], uiSGroup.Children[n], subImageList, Data1, spriteList);
             }
 
             // Sort scene names
