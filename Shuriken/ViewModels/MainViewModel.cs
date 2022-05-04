@@ -238,6 +238,7 @@ namespace Shuriken.ViewModels
             }
 
             // process group layers
+            Dictionary<int, int> trackIndexPerKey = new Dictionary<int, int>();
             for (int g = 0; g < uiScene.Groups.Count; ++g)
             {
                 for (int c = 0; c < scene.UICastGroups[g].CastCount; ++c)
@@ -327,7 +328,6 @@ namespace Shuriken.ViewModels
 
                 foreach (var entry in entryIndexMap)
                 {
-                    int trackIndex = 0;
                     int trackAnimIndex = 0;
                     XNCPLib.XNCP.Animation.AnimationKeyframeData keyframeData = scene.AnimationKeyframeDataList[entry.Value];
                     for (int c = 0; c < keyframeData.GroupAnimationDataList[g].CastCount; ++c)
@@ -346,9 +346,14 @@ namespace Shuriken.ViewModels
 
                                 if (tracks == null)
                                 {
-                                    tracks = uiScene.Animations[entry.Key].LayerAnimations[trackIndex++].Tracks.ToList();
+                                    if (!trackIndexPerKey.ContainsKey(entry.Key)) {
+                                        trackIndexPerKey.Add(entry.Key, 0);
+                                    }
+
+                                    tracks = uiScene.Animations[entry.Key].LayerAnimations[trackIndexPerKey[entry.Key]++].Tracks.ToList();
                                     trackAnimIndex = 0;
                                 }
+
                                 AnimationTrack anim = tracks[trackAnimIndex++];
 
                                 castAnimData.SubDataList[castAnimDataIndex].Field00 = anim.Field00;
