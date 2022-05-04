@@ -15,7 +15,7 @@ namespace XNCPLib.XNCP
     {
         public List<Scene> Scenes { get; set; }
         public List<SceneID> SceneIDTable { get; set; }
-        public List<CSDNode> NextNodes { get; set; }
+        public List<CSDNode> Children { get; set; }
         public List<NodeDictionary> NodeDictionaries { get; set; }
         private uint UnwrittenPosition { get; set; }
 
@@ -23,7 +23,7 @@ namespace XNCPLib.XNCP
         {
             Scenes = new List<Scene>();
             SceneIDTable = new List<SceneID>();
-            NextNodes = new List<CSDNode>();
+            Children = new List<CSDNode>();
             NodeDictionaries = new List<NodeDictionary>();
         }
 
@@ -74,7 +74,7 @@ namespace XNCPLib.XNCP
                 CSDNode node = new CSDNode();
                 node.Read(reader);
 
-                NextNodes.Add(node);
+                Children.Add(node);
             }
 
             reader.Seek(reader.GetOffsetOrigin() + nodeDictionaryOffset, SeekOrigin.Begin);
@@ -113,8 +113,8 @@ namespace XNCPLib.XNCP
                 writer.WriteUInt32((uint)(writer.Length + Scenes.Count * 0x4 - writer.GetOffsetOrigin()));
             }
 
-            writer.WriteUInt32((uint)NextNodes.Count);
-            if (NextNodes.Count == 0)
+            writer.WriteUInt32((uint)Children.Count);
+            if (Children.Count == 0)
             {
                 writer.WriteUInt32(0);
                 writer.WriteUInt32(0);
@@ -124,7 +124,7 @@ namespace XNCPLib.XNCP
                 offsetChunk.Add(writer);
                 writer.WriteUInt32((uint)(writer.Length + Scenes.Count * 0xC - writer.GetOffsetOrigin()));
                 offsetChunk.Add(writer);
-                writer.WriteUInt32((uint)(writer.Length + Scenes.Count * 0xC + NextNodes.Count * 0x18 - writer.GetOffsetOrigin()));
+                writer.WriteUInt32((uint)(writer.Length + Scenes.Count * 0xC + Children.Count * 0x18 - writer.GetOffsetOrigin()));
             }
 
             writer.Seek(0, SeekOrigin.End);
@@ -136,17 +136,17 @@ namespace XNCPLib.XNCP
                 Utilities.PadZeroBytes(writer, Scenes.Count * 0xC);
             }
             
-            if (NextNodes.Count > 0)
+            if (Children.Count > 0)
             {
                 // Allocate memory for NodeListOffsets
-                for (int i = 0; i < NextNodes.Count; i++)
+                for (int i = 0; i < Children.Count; i++)
                 {
-                    NextNodes[i].Write_Step0(writer);
+                    Children[i].Write_Step0(writer);
                     Utilities.PadZeroBytes(writer, 0x18);
                 }
 
                 // Allocate memory for NodeDictionaryOffsets
-                Utilities.PadZeroBytes(writer, NextNodes.Count * 0x8);
+                Utilities.PadZeroBytes(writer, Children.Count * 0x8);
             }
         }
 
@@ -182,14 +182,14 @@ namespace XNCPLib.XNCP
             }
 
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step1(writer, offsetChunk);
+                Children[i].Write_Step1(writer, offsetChunk);
                 UnwrittenPosition += 0x18;
             }
 
             // Fill NodeDictionaries
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x8;
@@ -216,9 +216,9 @@ namespace XNCPLib.XNCP
             }
 
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step2(writer, offsetChunk);
+                Children[i].Write_Step2(writer, offsetChunk);
             }
         }
 
@@ -231,9 +231,9 @@ namespace XNCPLib.XNCP
             }
 
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step3(writer, offsetChunk);
+                Children[i].Write_Step3(writer, offsetChunk);
             }
         }
 
@@ -246,9 +246,9 @@ namespace XNCPLib.XNCP
             }
 
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step4(writer, offsetChunk);
+                Children[i].Write_Step4(writer, offsetChunk);
             }
         }
 
@@ -261,9 +261,9 @@ namespace XNCPLib.XNCP
             }
 
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step5(writer, offsetChunk);
+                Children[i].Write_Step5(writer, offsetChunk);
             }
         }
 
@@ -276,9 +276,9 @@ namespace XNCPLib.XNCP
             }
 
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step6(writer, offsetChunk);
+                Children[i].Write_Step6(writer, offsetChunk);
             }
         }
 
@@ -291,9 +291,9 @@ namespace XNCPLib.XNCP
             }
 
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step7(writer, offsetChunk);
+                Children[i].Write_Step7(writer, offsetChunk);
             }
         }
 
@@ -306,9 +306,9 @@ namespace XNCPLib.XNCP
             }
 
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step8(writer, offsetChunk);
+                Children[i].Write_Step8(writer, offsetChunk);
             }
         }
 
@@ -321,9 +321,9 @@ namespace XNCPLib.XNCP
             }
 
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step9(writer, offsetChunk);
+                Children[i].Write_Step9(writer, offsetChunk);
             }
         }
 
@@ -336,9 +336,9 @@ namespace XNCPLib.XNCP
             }
 
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step10(writer, offsetChunk);
+                Children[i].Write_Step10(writer, offsetChunk);
             }
         }
 
@@ -351,9 +351,9 @@ namespace XNCPLib.XNCP
             }
 
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step11(writer, offsetChunk);
+                Children[i].Write_Step11(writer, offsetChunk);
             }
         }
 
@@ -367,18 +367,18 @@ namespace XNCPLib.XNCP
             }
 
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step12(writer, offsetChunk);
+                Children[i].Write_Step12(writer, offsetChunk);
             }
         }
 
         public void Write_Step14(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             // Continue NextNode steps
-            for (int i = 0; i < NextNodes.Count; ++i)
+            for (int i = 0; i < Children.Count; ++i)
             {
-                NextNodes[i].Write_Step13(writer, offsetChunk);
+                Children[i].Write_Step13(writer, offsetChunk);
                 // Finished
             }
         }
