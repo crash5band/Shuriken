@@ -258,6 +258,9 @@ namespace Shuriken.ViewModels
                     xScene.AnimationKeyframeDataList.Add(keyframeData);
 
                     AnimationData2 animationData2 = new();
+                    animationData2.GroupList = new();
+                    animationData2.GroupList.GroupList = new();
+                    animationData2.GroupList.Field00 = 0; // TODO:
                     xScene.AnimationData2List.Add(animationData2);
 
                     // Add animation names, NOTE: need to be sorted after
@@ -306,11 +309,6 @@ namespace Shuriken.ViewModels
                     // Take this oppotunatity to fill group cast keyframe data
                     for (int a = 0; a < xScene.AnimationKeyframeDataList.Count; a++)
                     {
-                        AnimationData2 animationData2 = xScene.AnimationData2List[a];
-                        animationData2.GroupList = new();
-                        animationData2.GroupList.GroupList = new();
-                        animationData2.GroupList.Field00 = 0; // TODO:
-
                         AnimationKeyframeData animationKeyframeData = xScene.AnimationKeyframeDataList[a];
                         AnimationGroup animation = uiScene.Animations[a];
 
@@ -369,6 +367,7 @@ namespace Shuriken.ViewModels
                             groupAnimationData.CastAnimationDataList.Add(castAnimationData);
                         }
 
+                        AnimationData2 animationData2 = xScene.AnimationData2List[a];
                         animationData2.GroupList.GroupList.Add(groupAnimationData2);
                         animationKeyframeData.GroupAnimationDataList.Add(groupAnimationData);
                     }
