@@ -154,10 +154,10 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <Label>Frame</Label>
-                        <TextBox Text="{Binding SelectedKey.Frame}" IsEnabled="{Binding KeySelected, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Text="{Binding SelectedKey.Frame, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding KeySelected}"/>
                         <Label>Value</Label>
-                        <TextBox Name="FrameValueText" Text="{Binding SelectedKey.KValue}" IsEnabled="{Binding KeySelected, UpdateSourceTrigger=PropertyChanged}" />
-                        <local:ColorControl x:Name="FrameValueColor" Value="{Binding SelectedKey.KValueColor, Mode=TwoWay}" IsEnabled="{Binding KeySelected, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Name="FrameValueText" Text="{Binding SelectedKey.KValue, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding KeySelected}" />
+                        <local:ColorControl x:Name="FrameValueColor" Value="{Binding SelectedKey.KValueColor, Mode=TwoWay}" IsEnabled="{Binding KeySelected}"/>
                     </StackPanel>
                 </ScrollViewer>
             </GroupBox>

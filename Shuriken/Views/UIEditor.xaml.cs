@@ -348,7 +348,7 @@ namespace Shuriken.Views
             return new Vec2(x, y);
         }
 
-        private void UpdateCast(UIScene scene, UICast lyr, CastTransform transform, float time)
+        private void UpdateCast(UIScene scene, UICast lyr, CastTransform transform, float time, Vec2 parentOrigin = null)
         {
             int sprID = GetSprite(scene, lyr, time);
 
@@ -374,6 +374,12 @@ namespace Shuriken.Views
 
             if ((lyr.Field34 & (1 << 11)) != 0)
                 scale.Y *= transform.Scale.Y;
+
+            if (parentOrigin != null)
+            {
+                position.X = parentOrigin.X + (position.X - parentOrigin.X) * scale.X;
+                position.Y = parentOrigin.Y + (position.Y - parentOrigin.Y) * scale.Y;
+            }
 
             // inherit color
             if ((lyr.Field34 & 8) != 0)
@@ -409,7 +415,16 @@ namespace Shuriken.Views
                     }
 
                     var childTransform = new CastTransform(position + posAdjust, zPosition, rotation, scale, color);
-                    UpdateCast(scene, child, childTransform, time);
+
+                    // Not correct, blb_gauge looks better when passing position and doesn't have field5c with value 2
+                    if (child.Field5C == 2)
+                    {
+                        UpdateCast(scene, child, childTransform, time, position);
+                    }
+                    else
+                    {
+                        UpdateCast(scene, child, childTransform, time);
+                    }
                 }
             }
         }
