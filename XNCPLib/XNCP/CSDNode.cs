@@ -97,7 +97,6 @@ namespace XNCPLib.XNCP
 
         public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
-            Debug.Assert((Scenes.Count == 0) ^ (NextNodes.Count == 0));
             writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
 
             writer.WriteUInt32((uint)Scenes.Count);
@@ -123,22 +122,23 @@ namespace XNCPLib.XNCP
             else
             {
                 offsetChunk.Add(writer);
-                writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+                writer.WriteUInt32((uint)(writer.Length + Scenes.Count * 0xC - writer.GetOffsetOrigin()));
                 offsetChunk.Add(writer);
-                writer.WriteUInt32((uint)(writer.Length + NextNodes.Count * 0x18 - writer.GetOffsetOrigin()));
+                writer.WriteUInt32((uint)(writer.Length + Scenes.Count * 0xC + NextNodes.Count * 0x18 - writer.GetOffsetOrigin()));
             }
+
+            writer.Seek(0, SeekOrigin.End);
+            UnwrittenPosition = (uint)writer.Position;
 
             if (Scenes.Count > 0)
             {
                 // Allocate memory for SceneOffsets and SceneIDOffsets
-                writer.Seek(0, SeekOrigin.End);
-                UnwrittenPosition = (uint)writer.Position;
                 Utilities.PadZeroBytes(writer, Scenes.Count * 0xC);
             }
-            else
+            
+            if (NextNodes.Count > 0)
             {
                 // Allocate memory for NodeListOffsets
-                writer.Seek(0, SeekOrigin.End);
                 for (int i = 0; i < NextNodes.Count; i++)
                 {
                     NextNodes[i].Write_Step0(writer);
@@ -146,7 +146,6 @@ namespace XNCPLib.XNCP
                 }
 
                 // Allocate memory for NodeDictionaryOffsets
-                UnwrittenPosition = (uint)writer.Position;
                 Utilities.PadZeroBytes(writer, NextNodes.Count * 0x8);
             }
         }
@@ -186,6 +185,7 @@ namespace XNCPLib.XNCP
             for (int i = 0; i < NextNodes.Count; ++i)
             {
                 NextNodes[i].Write_Step1(writer, offsetChunk);
+                UnwrittenPosition += 0x18;
             }
 
             // Fill NodeDictionaries
