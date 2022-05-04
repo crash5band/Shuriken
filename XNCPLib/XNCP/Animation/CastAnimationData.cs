@@ -14,8 +14,8 @@ namespace XNCPLib.XNCP.Animation
     public class CastAnimationData
     {
         public uint Flags { get; set; }
-        public uint DataOffset { get; set; }
         public List<CastAnimationSubData> SubDataList { get; set; }
+        private uint UnwrittenPosition { get; set; }
 
         public CastAnimationData()
         {
@@ -25,7 +25,7 @@ namespace XNCPLib.XNCP.Animation
         public void Read(BinaryObjectReader reader)
         {
             Flags = reader.ReadUInt32();
-            DataOffset = reader.ReadUInt32();
+            uint DataOffset = reader.ReadUInt32();
 
             if (DataOffset > 0)
             {
@@ -44,21 +44,36 @@ namespace XNCPLib.XNCP.Animation
             }
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
+            UnwrittenPosition = (uint)writer.Length;
             writer.WriteUInt32(Flags);
-            writer.WriteUInt32(DataOffset);
 
-            if (DataOffset > 0)
+            if (Flags != 0)
             {
-                writer.Seek(writer.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
-                uint count = Utilities.CountSetBits(Flags);
+                offsetChunk.Add(writer);
+                writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
-                for (int i = 0; i < count; ++i)
-                {
-                    writer.Seek(writer.GetOffsetOrigin() + DataOffset + (12 * i), SeekOrigin.Begin);
-                    SubDataList[i].Write(writer);
-                }
+                uint count = Utilities.CountSetBits(Flags);
+                writer.Seek(0, SeekOrigin.End);
+                Utilities.PadZeroBytes(writer, (int)count * 0xC);
+            }
+            else
+            {
+                writer.WriteUInt32(0);
+            }
+        }
+
+        public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk)
+        {
+            uint count = Utilities.CountSetBits(Flags);
+            for (int i = 0; i < count; ++i)
+            {
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0xC;
+
+                SubDataList[i].Write_Step0(writer, offsetChunk);
+                // Finished
             }
         }
     }
@@ -66,8 +81,6 @@ namespace XNCPLib.XNCP.Animation
     public class CastAnimationSubData
     {
         public uint Field00 { get; set; }
-        public uint KeyframeCount { get; set; }
-        public uint DataOffset { get; set; }
         public List<Keyframe> Keyframes { get; set; }
 
         public CastAnimationSubData()
@@ -78,8 +91,8 @@ namespace XNCPLib.XNCP.Animation
         public void Read(BinaryObjectReader reader)
         {
             Field00 = reader.ReadUInt32();
-            KeyframeCount = reader.ReadUInt32();
-            DataOffset = reader.ReadUInt32();
+            uint KeyframeCount = reader.ReadUInt32();
+            uint DataOffset = reader.ReadUInt32();
 
             Keyframes.Capacity = (int)KeyframeCount;
 
@@ -93,14 +106,15 @@ namespace XNCPLib.XNCP.Animation
             }
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
             writer.WriteUInt32(Field00);
-            writer.WriteUInt32(KeyframeCount);
-            writer.WriteUInt32(DataOffset);
+            writer.WriteUInt32((uint)Keyframes.Count);
+            offsetChunk.Add(writer);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
-            writer.Seek(writer.GetOffsetOrigin() + DataOffset, SeekOrigin.Begin);
-            for (int i = 0; i < KeyframeCount; ++i)
+            writer.Seek(0, SeekOrigin.End);
+            for (int i = 0; i < Keyframes.Count; ++i)
             {
                 Keyframes[i].Write(writer);
             }
@@ -109,62 +123,51 @@ namespace XNCPLib.XNCP.Animation
 
     public class CastAnimationData2List
     {
-        public uint DataOffset { get; set; }
         public List<CastAnimationData2> ListData { get; set; }
 
         public CastAnimationData2List()
         {
-            ListData = new List<CastAnimationData2>();
         }
     }
 
     public class CastAnimationData2
     {
-        public uint DataOffset { get; set; }
         public Data5 Data { get; set; }
 
         public CastAnimationData2()
         {
-            Data = new Data5();
         }
     }
 
     public class Data5
     {
-        public uint DataOffset { get; set; }
         public List<Data6> SubData { get; set; }
 
         public Data5()
         {
-            SubData = new List<Data6>();
         }
     }
 
     public class Data6
     {
-        public uint DataOffset { get; set; }
         public Data7 Data { get; set; }
 
         public Data6()
         {
-            Data = new Data7();
         }
     }
 
     public class Data7
     {
-        public uint DataOffset { get; set; }
         public List<Data8> Data { get; set; }
 
         public Data7()
         {
-            Data = new List<Data8>();
         }
     }
 
     public class Data8
     {
-        public uint ValueOffset { get; set; }
         public Vector3 Value { get; set; }
     }
 }

@@ -21,15 +21,11 @@ namespace XNCPLib.XNCP
         public Vector2 TopRight { get; set; }
         public Vector2 BottomRight { get; set; }
         public uint Field2C { get; set; }
-        public uint CastInfoOffset { get; set; }
         public uint Field34 { get; set; }
         public uint Field38 { get; set; }
         public uint Field3C { get; set; }
-        public uint CastMaterialInfoOffset { get; set; }
         public string FontCharacters{ get; set; }
-        public uint FontCharactersOffset { get; set; }
         public string FontName { get; set; }
-        public uint FontNameOffset { get; set; }
         public float FontSpacingAdjustment { get; set; }
         public uint Width { get; set; }
         public uint Height { get; set; }
@@ -45,9 +41,6 @@ namespace XNCPLib.XNCP
         public Cast()
         {
             Offset = new Vector2(0.0f, 0.0f);
-
-            CastInfoData = new CastInfo();
-            CastMaterialData = new CastMaterialInfo();
         }
 
         public void Read(BinaryObjectReader reader)
@@ -62,17 +55,23 @@ namespace XNCPLib.XNCP
             BottomRight = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 
             Field2C = reader.ReadUInt32();
-            CastInfoOffset = reader.ReadUInt32();
+            uint CastInfoOffset = reader.ReadUInt32();
             Field34 = reader.ReadUInt32();
             Field38 = reader.ReadUInt32();
             Field3C = reader.ReadUInt32();
-            CastMaterialInfoOffset = reader.ReadUInt32();
+            uint CastMaterialInfoOffset = reader.ReadUInt32();
 
-            FontCharactersOffset = reader.ReadUInt32();
-            FontCharacters = reader.ReadStringOffset(FontCharactersOffset);
+            uint FontCharactersOffset = reader.ReadUInt32();
+            if (FontCharactersOffset != 0)
+            {
+                FontCharacters = reader.ReadStringOffset(FontCharactersOffset);
+            }
 
-            FontNameOffset = reader.ReadUInt32();
-            FontName = reader.ReadStringOffset(FontNameOffset);
+            uint FontNameOffset = reader.ReadUInt32();
+            if (FontNameOffset != 0)
+            {
+                FontName = reader.ReadStringOffset(FontNameOffset);
+            }
 
             FontSpacingAdjustment = reader.ReadSingle();
             Width = reader.ReadUInt32();
@@ -90,18 +89,22 @@ namespace XNCPLib.XNCP
             if (CastInfoOffset != 0)
             {
                 reader.Seek(baseOffset + CastInfoOffset, SeekOrigin.Begin);
+                CastInfoData = new CastInfo();
                 CastInfoData.Read(reader);
             }
 
             if (CastMaterialInfoOffset != 0)
             {
                 reader.Seek(baseOffset + CastMaterialInfoOffset, SeekOrigin.Begin);
+                CastMaterialData = new CastMaterialInfo();
                 CastMaterialData.Read(reader);
             }
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
+            uint unwrittenPosition = (uint)writer.Position;
+
             writer.WriteUInt32(Field00);
             writer.WriteUInt32(Field04);
             writer.WriteUInt32(IsEnabled);
@@ -117,18 +120,81 @@ namespace XNCPLib.XNCP
             writer.WriteSingle(BottomRight.Y);
 
             writer.WriteUInt32(Field2C);
-            writer.WriteUInt32(CastInfoOffset);
+
+            // CastMaterialInfo goes before CastInfo...
+            if (CastInfoData != null)
+            {
+                offsetChunk.Add(writer);
+                writer.WriteUInt32((uint)(writer.Length + 0x80 - writer.GetOffsetOrigin()));
+            }
+            else
+            {
+                writer.WriteUInt32(0);
+            }
+
             writer.WriteUInt32(Field34);
             writer.WriteUInt32(Field38);
             writer.WriteUInt32(Field3C);
-            writer.WriteUInt32(CastMaterialInfoOffset);
 
-            writer.WriteUInt32(FontCharactersOffset);
-            writer.WriteStringOffset(FontCharactersOffset, FontCharacters);
+            if (CastMaterialData != null)
+            {
+                offsetChunk.Add(writer);
+                writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            }
+            else
+            {
+                writer.WriteUInt32(0);
+            }
+            unwrittenPosition += 0x44;
 
-            writer.WriteUInt32(FontNameOffset);
-            writer.WriteStringOffset(FontNameOffset, FontName);
+            // Fill CastMaterialInfo and CastInfo
+            writer.Seek(0, SeekOrigin.End);
+            if (CastMaterialData != null)
+            {
+                CastMaterialData.Write(writer);
+            }
+            if (CastInfoData != null)
+            {
+                CastInfoData.Write(writer);
+            }
 
+            writer.Seek(unwrittenPosition, SeekOrigin.Begin);
+            if (FontCharacters != null)
+            {
+                offsetChunk.Add(writer);
+                uint fontCharactersOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
+                writer.WriteUInt32(fontCharactersOffset);
+                writer.WriteStringOffset(fontCharactersOffset, FontCharacters);
+
+                // Align to 4 bytes if the name wasn't
+                writer.Seek(0, SeekOrigin.End);
+                writer.Align(4);
+            }
+            else
+            {
+                writer.WriteUInt32(0);
+            }
+            unwrittenPosition += 0x4;
+
+            writer.Seek(unwrittenPosition, SeekOrigin.Begin);
+            if (FontName != null)
+            {
+                offsetChunk.Add(writer);
+                uint fontNameOffset = (uint)(writer.Length - writer.GetOffsetOrigin());
+                writer.WriteUInt32(fontNameOffset);
+                writer.WriteStringOffset(fontNameOffset, FontName);
+
+                // Align to 4 bytes if the name wasn't
+                writer.Seek(0, SeekOrigin.End);
+                writer.Align(4);
+            }
+            else
+            {
+                writer.WriteUInt32(0);
+            }
+            unwrittenPosition += 0x4;
+
+            writer.Seek(unwrittenPosition, SeekOrigin.Begin);
             writer.WriteSingle(FontSpacingAdjustment);
             writer.WriteUInt32(Width);
             writer.WriteUInt32(Height);
@@ -139,21 +205,7 @@ namespace XNCPLib.XNCP
             writer.WriteSingle(Offset.Y);
             writer.WriteSingle(Field68);
             writer.WriteSingle(Field6C);
-            writer.WriteSingle(FontSpacingAdjustment);
-
-            long baseOffset = writer.GetOffsetOrigin();
-
-            if (CastInfoOffset != 0)
-            {
-                writer.Seek(baseOffset + CastInfoOffset, SeekOrigin.Begin);
-                CastInfoData.Write(writer);
-            }
-
-            if (CastMaterialInfoOffset != 0)
-            {
-                writer.Seek(baseOffset + CastMaterialInfoOffset, SeekOrigin.Begin);
-                CastMaterialData.Write(writer);
-            }
+            writer.WriteUInt32(Field70);
         }
     }
 }

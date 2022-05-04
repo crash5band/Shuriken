@@ -6,14 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Amicitia.IO.Binary;
 using XNCPLib.Extensions;
+using XNCPLib.Misc;
 
 namespace XNCPLib.XNCP.Animation
 {
     public class AnimationKeyframeData
     {
-        public uint GroupCount { get; set; }
-        public uint GroupDataOffset { get; set; }
         public List<GroupAnimationData> GroupAnimationDataList { get; set; }
+        private uint UnwrittenPosition { get; set; }
 
         public AnimationKeyframeData()
         {
@@ -22,14 +22,14 @@ namespace XNCPLib.XNCP.Animation
 
         public void Read(BinaryObjectReader reader)
         {
-            GroupCount = reader.ReadUInt32();
-            GroupDataOffset = reader.ReadUInt32();
+            uint GroupCount = reader.ReadUInt32();
+            uint groupDataOffset = reader.ReadUInt32();
 
             GroupAnimationDataList.Capacity = (int)GroupCount;
 
             for (int i = 0; i < GroupCount; ++i)
             {
-                reader.Seek(reader.GetOffsetOrigin() + GroupDataOffset + (8 * i), SeekOrigin.Begin);
+                reader.Seek(reader.GetOffsetOrigin() + groupDataOffset + (8 * i), SeekOrigin.Begin);
 
                 GroupAnimationData groupData = new GroupAnimationData();
                 groupData.Read(reader);
@@ -38,28 +38,55 @@ namespace XNCPLib.XNCP.Animation
             }
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
-            writer.WriteUInt32(GroupCount);
-            writer.WriteUInt32(GroupDataOffset);
+            writer.WriteUInt32((uint)GroupAnimationDataList.Count);
+            offsetChunk.Add(writer);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
 
-            for (int i = 0; i < GroupCount; ++i)
+            // Allocate memory for GroupAnimationDataList
+            UnwrittenPosition = (uint)writer.Length;
+            writer.Seek(0, SeekOrigin.End);
+            Utilities.PadZeroBytes(writer, GroupAnimationDataList.Count * 0x8);
+        }
+
+        public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk)
+        {
+            for (int i = 0; i < GroupAnimationDataList.Count; ++i)
             {
-                writer.Seek(writer.GetOffsetOrigin() + GroupDataOffset + (8 * i), SeekOrigin.Begin);
+                writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
+                UnwrittenPosition += 0x8;
 
-                GroupAnimationDataList[i].Write(writer);
+                GroupAnimationDataList[i].Write_Step0(writer, offsetChunk);
+            }
+        }
+
+        public void Write_Step2(BinaryObjectWriter writer, OffsetChunk offsetChunk)
+        {
+            // Continue GroupAnimationDataList steps
+            for (int i = 0; i < GroupAnimationDataList.Count; ++i)
+            {
+                GroupAnimationDataList[i].Write_Step1(writer, offsetChunk);
+            }
+        }
+
+        public void Write_Step3(BinaryObjectWriter writer, OffsetChunk offsetChunk)
+        {
+            // Continue GroupAnimationDataList steps
+            for (int i = 0; i < GroupAnimationDataList.Count; ++i)
+            {
+                GroupAnimationDataList[i].Write_Step2(writer, offsetChunk);
+                // Finished
             }
         }
     }
 
     public class AnimationData2
     {
-        public uint GroupAnimationData2ListOffset { get; set; }
         public GroupAnimationData2List GroupList { get; set; }
 
         public AnimationData2()
         {
-            GroupList = new GroupAnimationData2List();
         }
     }
 

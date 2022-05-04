@@ -11,7 +11,6 @@ namespace XNCPLib.XNCP.Animation
     public class AnimationDictionary
     {
         public string Name { get; set; }
-        public uint NameOffset { get; set; }
         public uint Index { get; set; }
 
         public AnimationDictionary()
@@ -21,15 +20,15 @@ namespace XNCPLib.XNCP.Animation
 
         public void Read(BinaryObjectReader reader)
         {
-            NameOffset = reader.ReadUInt32();
-            Name = reader.ReadStringOffset(NameOffset);
+            uint nameOffset = reader.ReadUInt32();
+            Name = reader.ReadStringOffset(nameOffset);
             Index = reader.ReadUInt32();
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public void Write(BinaryObjectWriter writer, uint nameOffset)
         {
-            writer.WriteUInt32(NameOffset);
-            writer.WriteStringOffset(NameOffset, Name);
+            writer.WriteUInt32(nameOffset);
+            writer.WriteStringOffset(nameOffset, Name);
             writer.WriteUInt32(Index);
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,19 +14,15 @@ namespace XNCPLib.XNCP
 {
     public class ChunkFile
     {
-        public InfoChunk Info { get; set; }
+        public uint Signature { get; set; }
+        public uint Field1C { get; set; }
         public NCPJChunck CsdmProject { get; set; }
         public XTextureListChunk TextureList { get; set; }
         public OffsetChunk Offset { get; set; }
         public EndChunk End { get; set; }
 
-        private uint NextSignature { get; set; }
-
         public ChunkFile()
         {
-            Info = new InfoChunk();
-            CsdmProject = new NCPJChunck();
-            TextureList = new XTextureListChunk();
             Offset = new OffsetChunk();
             End = new EndChunk();
         }
@@ -33,31 +30,56 @@ namespace XNCPLib.XNCP
         public void Read(BinaryObjectReader reader)
         {
             reader.PushOffsetOrigin();
-            Info = new InfoChunk();
-            Info.Read(reader);
+            Endianness endianPrev = reader.Endianness;
 
-            reader.Seek(reader.GetOffsetOrigin() + Info.NextChunkOffset, SeekOrigin.Begin);
+            //----------------------------------------------------------------
+            // Header
+            //----------------------------------------------------------------
+            // Header is always little endian
+            uint headerSize;
+            reader.Endianness = Endianness.Little;
+            {
+                Signature = reader.ReadUInt32();
+                headerSize = reader.ReadUInt32();
+            }
+            reader.Endianness = endianPrev;
+
+            uint headerStart = (uint)reader.Position;
+            uint chunkCount = reader.ReadUInt32(); // TODO: multiple chunk count
+            uint nextChunkOffset = reader.ReadUInt32();
+            uint chunkListSize = reader.ReadUInt32();
+            uint offsetChunkOffset = reader.ReadUInt32();
+            uint offsetChunkSize = reader.ReadUInt32();
+            Field1C = reader.ReadUInt32();
+            Debug.Assert(reader.Position - headerStart == headerSize);
+
+            //----------------------------------------------------------------
+            // NCPJChunk/XTextureListChunk
+            //----------------------------------------------------------------
+            reader.Seek(reader.GetOffsetOrigin() + nextChunkOffset, SeekOrigin.Begin);
 
             // check whether the next chunk is a NCPJChunk or XTextureListChunk.
             // signature check is always little endian.
-            bool bigEndian = reader.Endianness == Endianness.Big;
+            uint nextSignature;
             reader.Endianness = Endianness.Little;
-            NextSignature = reader.ReadUInt32();
-
-            if (bigEndian)
-                reader.Endianness = Endianness.Big;
-
-            reader.Seek(reader.GetOffsetOrigin() + Info.NextChunkOffset, SeekOrigin.Begin);
-            if (NextSignature != Utilities.Make4CCLE("NXTL"))
             {
+                nextSignature = reader.ReadUInt32();
+            }
+            reader.Endianness = endianPrev;
+
+            reader.Seek(reader.GetOffsetOrigin() + nextChunkOffset, SeekOrigin.Begin);
+            if (nextSignature != Utilities.Make4CCLE("NXTL"))
+            {
+                CsdmProject = new NCPJChunck();
                 CsdmProject.Read(reader);
             }
             else
             {
+                TextureList = new XTextureListChunk();
                 TextureList.Read(reader);
             }
 
-            reader.Seek(reader.GetOffsetOrigin() + Info.NextChunkOffset + Info.ChunkListSize, SeekOrigin.Begin);
+            reader.Seek(reader.GetOffsetOrigin() + offsetChunkOffset, SeekOrigin.Begin);
             Offset.Read(reader);
             End.Read(reader);
 
@@ -67,32 +89,75 @@ namespace XNCPLib.XNCP
         public void Write(BinaryObjectWriter writer)
         {
             writer.PushOffsetOrigin();
-            Info.Write(writer);
+            Endianness endianPrev = writer.Endianness;
 
-            writer.Seek(writer.GetOffsetOrigin() + Info.NextChunkOffset, SeekOrigin.Begin);
-
-            // signature is always little endian.
-            bool bigEndian = writer.Endianness == Endianness.Big;
+            //----------------------------------------------------------------
+            // Header
+            //----------------------------------------------------------------
+            // Header is always little endian
             writer.Endianness = Endianness.Little;
-            writer.WriteUInt32(NextSignature);
-
-            if (bigEndian)
             {
-                writer.Endianness = Endianness.Big;
+                writer.WriteUInt32(Signature);
+
+                // Skipped: header size
+                writer.Skip(4);
             }
+            writer.Endianness = endianPrev;
 
-            writer.Seek(writer.GetOffsetOrigin() + Info.NextChunkOffset, SeekOrigin.Begin);
-            if (NextSignature != Utilities.Make4CCLE("NXTL"))
+            uint headerInfoStart = (uint)writer.Position;
             {
-                CsdmProject.Write(writer);
+                writer.WriteUInt32(1); // TODO: multiple Chunk count
+
+                // Skipped: NextChunkOffset
+                writer.Skip(4);
+
+                // Skipped: ChunkListSize
+                writer.Skip(4);
+
+                // Skipped: OffsetChunkOffset
+                writer.Skip(4);
+
+                // Skipped: OffsetChunkSize
+                writer.Skip(4);
+
+                writer.WriteUInt32(Field1C);
+            }
+            uint headerInfoEnd = (uint)writer.Position;
+
+            // Go back and write header size
+            writer.Endianness = Endianness.Little;
+            {
+                writer.Seek(headerInfoStart - 4, SeekOrigin.Begin);
+                writer.WriteUInt32(headerInfoEnd - headerInfoStart);
+                writer.Seek(headerInfoEnd, SeekOrigin.Begin);
+            }
+            writer.Endianness = endianPrev;
+
+            // Go back and write NextChunkOffset
+            writer.Seek(headerInfoStart + 4, SeekOrigin.Begin);
+            writer.WriteUInt32(headerInfoEnd - (uint)writer.GetOffsetOrigin());
+            writer.Seek(headerInfoEnd, SeekOrigin.Begin);
+
+            //----------------------------------------------------------------
+            // NCPJChunk/XTextureListChunk
+            //----------------------------------------------------------------
+            Debug.Assert((CsdmProject == null) ^ (TextureList == null));
+            if (CsdmProject != null)
+            {
+                CsdmProject.Write(writer, Offset);
             }
             else
             {
-                TextureList.Write(writer);
+                TextureList.Write(writer, Offset);
             }
 
-            writer.Seek(writer.GetOffsetOrigin() + Info.NextChunkOffset + Info.ChunkListSize, SeekOrigin.Begin);
-            // We're still not writing some stuff here...
+            // Go back and write ChunkListSize, OffsetChunkOffset, OffsetChunkSize
+            writer.Seek(headerInfoStart + 8, SeekOrigin.Begin);
+            writer.WriteUInt32((uint)writer.Length - headerInfoEnd);
+            writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
+            writer.WriteUInt32((uint)Offset.OffsetLocations.Count * 0x4 + 0x10);
+            writer.Seek(0, SeekOrigin.End);
+
             Offset.Write(writer);
             End.Write(writer);
 
