@@ -78,24 +78,26 @@ namespace Shuriken.ViewModels
             }
         }
 
-        private void ProcessSceneGroups(CSDNode node, UISceneGroup parent, TextureList texlist, string name)
+        private void ProcessSceneGroups(CSDNode xNode, UISceneGroup parent, TextureList texlist, string name)
         {
-            UISceneGroup uiNode = new(name);
-            List<SceneID> xSceneIDs = node.SceneIDTable;
-            List<SceneID> xSceneIDSorted = xSceneIDs.OrderBy(o => o.Index).ToList();
+            UISceneGroup uiSceneGroup = new(name);
 
             // process node scenes
+            List<SceneID> xSceneIDs = xNode.SceneIDTable;
+            List<SceneID> xSceneIDSorted = xSceneIDs.OrderBy(o => o.Index).ToList();
             for (int s = 0; s < xSceneIDSorted.Count; ++s)
-                uiNode.Scenes.Add(new UIScene(node.Scenes[s], xSceneIDSorted[s].Name, texlist));
+                uiSceneGroup.Scenes.Add(new UIScene(xNode.Scenes[s], xSceneIDSorted[s].Name, texlist));
 
             if (parent != null)
-                parent.Children.Add(uiNode);
+                parent.Children.Add(uiSceneGroup);
             else
-                Project.SceneGroups.Add(uiNode);
+                Project.SceneGroups.Add(uiSceneGroup);
 
             // process node children
-            foreach (var entry in node.NodeDictionaries)
-                ProcessSceneGroups(node.Children[(int)entry.Index], uiNode, texlist, entry.Name);
+            List<NodeDictionary> xNodeIDs = xNode.NodeDictionaries;
+            List<NodeDictionary> xNodeIDSorted = xNodeIDs.OrderBy(o => o.Index).ToList();
+            for (int n = 0; n < xNodeIDSorted.Count; ++n)
+                ProcessSceneGroups(xNode.Children[n], uiSceneGroup, texlist, xNodeIDSorted[n].Name);
         }
 
         private void LoadSubimages(TextureList texList, List<SubImage> subimages)
@@ -186,28 +188,33 @@ namespace Shuriken.ViewModels
             }
 
             CSDNode rootNode = new();
-            SaveNodes(rootNode, Project.SceneGroups[0]);
-
-            SaveScenes(rootNode, Project.SceneGroups[0], subImageList, Data1, spriteList);
+            SaveNode(rootNode, Project.SceneGroups[0], subImageList, Data1, spriteList);
             WorkFile.Resources[0].Content.CsdmProject.Root = rootNode;
 
             WorkFile.Save(path);
         }
 
-        private void SaveNodes(CSDNode node, UISceneGroup group)
+        private void SaveNode(CSDNode xNode, UISceneGroup uiSceneGroup, List<SubImage> subImageList, List<System.Numerics.Vector2> Data1, List<Sprite> spriteList)
         {
-            for (int i = 0; i < group.Children.Count; ++i)
+            for (int s = 0; s < uiSceneGroup.Scenes.Count; ++s)
+            {
+                SaveScenes(xNode, uiSceneGroup, subImageList, Data1, spriteList);
+            }
+
+            for (int i = 0; i < uiSceneGroup.Children.Count; ++i)
             {
                 NodeDictionary dictionary = new();
-                dictionary.Name = group.Children[i].Name;
+                dictionary.Name = uiSceneGroup.Children[i].Name;
                 dictionary.Index = (uint)i;
+                xNode.NodeDictionaries.Add(dictionary);
 
-                node.NodeDictionaries.Add(dictionary);
                 CSDNode newNode = new();
-                node.Children.Add(newNode);
-
-                SaveNodes(newNode, group.Children[i]);
+                SaveNode(newNode, uiSceneGroup.Children[i], subImageList, Data1, spriteList);
+                xNode.Children.Add(newNode);
             }
+
+            // Sort node names
+            xNode.NodeDictionaries = xNode.NodeDictionaries.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
         }
 
         private void BuildSubImageList(ref List<SubImage> subImages, ref List<Sprite> spriteList)
@@ -427,11 +434,6 @@ namespace Shuriken.ViewModels
                 xSceneID.Index = (uint)s;
                 xNode.SceneIDTable.Add(xSceneID);
                 xNode.Scenes.Add(xScene);
-
-                // Sort node names
-                xNode.NodeDictionaries = xNode.NodeDictionaries.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
-                for (int n = 0; n < xNode.Children.Count; ++n)
-                    SaveScenes(xNode.Children[n], uiSGroup.Children[n], subImageList, Data1, spriteList);
             }
 
             // Sort scene names
