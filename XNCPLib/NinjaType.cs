@@ -10,7 +10,7 @@ namespace XNCPLib
     public enum NinjaType
     {
         [Description("Unknown")]
-        Unknown, 
+        Unknown,
 
         [Description("Sonic Generations")]
         BlueBlur,
@@ -19,7 +19,7 @@ namespace XNCPLib
         SWA,
 
         [Description("SONIC THE HEDGEHOG")]
-        SonicNext,
+        SonicNext
     }
 
     public class Filters
