@@ -130,7 +130,7 @@ namespace Shuriken.Models
                     }
                     else if (cast.Type == DrawType.Font)
                     {
-                        foreach (var font in Project.Fonts.Values)
+                        foreach (var font in Project.Fonts)
                         {
                             if (font.Name == scene.UICastGroups[g].Casts[c].FontName)
                                 cast.FontID = font.ID;

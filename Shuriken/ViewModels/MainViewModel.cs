@@ -255,10 +255,8 @@ namespace Shuriken.ViewModels
             xFontList.FontIDTable.Clear();
 
             TextureList texList = Project.TextureLists[0];
-            foreach (var entry in Project.Fonts)
+            foreach (var uiFont in Project.Fonts)
             {
-                UIFont uiFont = entry.Value;
-
                 // NOTE: need to sort by name after
                 FontID fontID = new();
                 fontID.Index = (uint)xFontList.FontIDTable.Count;

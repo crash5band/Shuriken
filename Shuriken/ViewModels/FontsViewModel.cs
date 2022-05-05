@@ -19,6 +19,7 @@ namespace Shuriken.ViewModels
         public RelayCommand CreateCharDefCommand { get; }
         public RelayCommand RemoveCharDefCmd { get; }
         public RelayCommand<CharacterMapping> ChangeMappingSpriteCmd { get; }
+        public ObservableCollection<UIFont> Fonts => Project.Fonts;
 
         public void CreateFont()
         {

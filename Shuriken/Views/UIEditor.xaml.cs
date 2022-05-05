@@ -77,7 +77,7 @@ namespace Shuriken.Views
             }
         }
 
-        private void UpdateSceneGroups(IEnumerable<UISceneGroup> groups, Dictionary<int, UIFont> fonts, float time)
+        private void UpdateSceneGroups(IEnumerable<UISceneGroup> groups, IEnumerable<UIFont> fonts, float time)
         {
             foreach (var group in groups)
             {
@@ -92,7 +92,7 @@ namespace Shuriken.Views
             }
         }
 
-        private void UpdateScenes(IEnumerable<UIScene> scenes, Dictionary<int, UIFont> fonts, float time)
+        private void UpdateScenes(IEnumerable<UIScene> scenes, IEnumerable<UIFont> fonts, float time)
         {
             renderer.ConfigureShader(renderer.shaderDictionary["basic"]);
             foreach (var scene in scenes)
