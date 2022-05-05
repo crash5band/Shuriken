@@ -13,13 +13,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Shuriken.Models;
+using System.ComponentModel;
 
 namespace Shuriken.Views
 {
     /// <summary>
     /// Interaction logic for SpritePickerWindow.xaml
     /// </summary>
-    public partial class SpritePickerWindow : Window
+    public partial class SpritePickerWindow : Window, INotifyPropertyChanged
     {
         public SpritePickerWindow(IEnumerable<TextureList> texCollection)
         {
@@ -34,15 +35,28 @@ namespace Shuriken.Views
             SelectedSpriteID = -1;
         }
 
+        public bool SelectionValid { get; set; }
+
         private void SelectClicked(object sender, EventArgs e)
         {
-            if (SpriteList.SelectedItem != null)
-            {
-                SelectedSpriteID = (int)SpriteList.SelectedItem;
-                DialogResult = true;
-            }
+            DialogResult = true;
         }
+        public int SelectedTexture { get; private set; }
         public int SelectedSpriteID { get; private set; }
         public ObservableCollection<TextureList> TextureLists { get; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void SpriteListSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SelectedSpriteID = SpriteList.SelectedItem == null ? -1 : (int)SpriteList.SelectedItem;
+            SelectionValid = SelectedSpriteID != -1;
+        }
+
+        private void TexturesListSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //SelectedSpriteID = -1;
+            //SelectionValid = false;
+        }
     }
 }

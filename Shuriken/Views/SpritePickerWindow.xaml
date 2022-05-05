@@ -37,7 +37,7 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <Label Grid.Row="2">Texture</Label>
-            <ListBox Grid.Row="3" Padding="5" Name="TexturesList" ItemsSource="{Binding ElementName=TextureListSelect, Path=SelectedItem.Textures}">
+            <ListBox SelectionChanged="TexturesListSelectionChanged" Grid.Row="3" Padding="5" Name="TexturesList" ItemsSource="{Binding ElementName=TextureListSelect, Path=SelectedItem.Textures}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:Texture}">
                         <StackPanel Orientation="Horizontal">
@@ -48,8 +48,9 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-        <ListView Name="SpriteList" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding ElementName=TexturesList, Path=SelectedItem.Sprites}" 
+        <ListView SelectionChanged="SpriteListSelectionChanged" Name="SpriteList" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding ElementName=TexturesList, Path=SelectedItem.Sprites}" 
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="5">
+            <!--
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Setter Property="Template">
@@ -61,6 +62,7 @@
                     </Setter>
                 </Style>
             </ListView.ItemContainerStyle>
+            -->
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Border Background="LightGray" Width="{Binding ElementName=SpriteImg, Path=Tag.Width, Converter={StaticResource ImageSizeConverter}, Mode=OneWay}"
@@ -84,7 +86,7 @@
         </ListView>
 
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5 5 10 5">
-            <Button Content="Select" MinWidth="75" Margin="0 0 2 0" IsDefault="True" Click="SelectClicked"/>
+            <Button Content="Select" MinWidth="75" Margin="0 0 2 0" IsDefault="True" Click="SelectClicked" IsEnabled="{Binding SelectionValid}"/>
             <Button Content="Cancel" MinWidth="75" Margin="2 0 0 0" IsCancel="True"/>
         </StackPanel>
     </Grid>
