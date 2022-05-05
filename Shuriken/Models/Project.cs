@@ -46,7 +46,7 @@ namespace Shuriken.Models
 
         public static int AppendFont(UIFont font)
         {
-            Fonts.Add(new UIFont("new_font", NextFontID));
+            Fonts.Add(new UIFont(font.Name, NextFontID));
             return NextFontID++;
         }
 
