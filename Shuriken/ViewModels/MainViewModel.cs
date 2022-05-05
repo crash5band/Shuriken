@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Collections.ObjectModel;
+using XNCPLib;
 using XNCPLib.XNCP;
 using XNCPLib.XNCP.Animation;
 using Shuriken.Models;
@@ -28,6 +29,7 @@ namespace Shuriken.ViewModels
 
         // File Info
         public FAPCFile WorkFile { get; set; }
+        public static NinjaType Type { get; set; }
         public string WorkFilePath { get; set; }
         public bool IsLoaded { get; set; }
         public MainViewModel()
@@ -117,16 +119,16 @@ namespace Shuriken.ViewModels
 
         public void Load(string filename)
         {
+            Clear();
+            ncpSubimages.Clear();
+
             WorkFile = new FAPCFile();
-            WorkFile.Load(filename);
+            WorkFile.Load(filename, Type);
 
             string root = Path.GetDirectoryName(Path.GetFullPath(filename));
 
             List<XTexture> xTextures = WorkFile.Resources[1].Content.TextureList.Textures;
             FontList xFontList = WorkFile.Resources[0].Content.CsdmProject.Fonts;
-
-            Clear();
-            ncpSubimages.Clear();
 
             TextureList texList = new TextureList("textures");
             foreach (XTexture texture in xTextures)
@@ -191,7 +193,7 @@ namespace Shuriken.ViewModels
             SaveNode(rootNode, Project.SceneGroups[0], subImageList, Data1, spriteList);
             WorkFile.Resources[0].Content.CsdmProject.Root = rootNode;
 
-            WorkFile.Save(path);
+            WorkFile.Save(path, Type);
         }
 
         private void SaveNode(CSDNode xNode, UISceneGroup uiSceneGroup, List<SubImage> subImageList, List<System.Numerics.Vector2> Data1, List<Sprite> spriteList)

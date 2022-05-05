@@ -104,7 +104,7 @@ namespace XNCPLib.XNCP
 
                 // Allocate memory for Cast data
                 writer.Seek(0, SeekOrigin.End);
-                Utilities.PadZeroBytes(writer, 0x74);
+                Utilities.PadZeroBytes(writer, FAPCFile.Type == NinjaType.SonicNext ? 0X50 : 0x74);
             }
 
             UnwrittenPosition = newUnwrittenPosition;
@@ -116,7 +116,7 @@ namespace XNCPLib.XNCP
             for (int i = 0; i < Casts.Count; ++i)
             {
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
-                UnwrittenPosition += 0x74;
+                UnwrittenPosition += (uint)(FAPCFile.Type == NinjaType.SonicNext ? 0X50 : 0x74);
 
                 Casts[i].Write_Step0(writer, offsetChunk);
                 // Finished

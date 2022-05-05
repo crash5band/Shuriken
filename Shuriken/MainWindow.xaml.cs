@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Shuriken.ViewModels;
 using System.Collections.ObjectModel;
+using XNCPLib;
 
 namespace Shuriken
 {
@@ -46,10 +47,12 @@ namespace Shuriken
         private void OpenMenu_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "Ninja Chao Project Files|*.xncp;*.yncp";
+            fileDialog.Filter = Filters.NinjaTypeFilter;
+            fileDialog.FilterIndex = (int)MainViewModel.Type;
 
             if (fileDialog.ShowDialog() == true)
             {
+                MainViewModel.Type = (NinjaType)fileDialog.FilterIndex;
                 vm.Load(fileDialog.FileName);
             }
         }
@@ -61,10 +64,12 @@ namespace Shuriken
         private void SaveAsMenu_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog fileDialog = new SaveFileDialog();
-            fileDialog.Filter = "Ninja Chao Project Files|*.xncp;*.yncp";
+            fileDialog.Filter = Filters.NinjaTypeFilter;
+            fileDialog.FilterIndex = (int)MainViewModel.Type;
 
             if (fileDialog.ShowDialog() == true)
             {
+                MainViewModel.Type = (NinjaType)fileDialog.FilterIndex;
                 vm.Save(fileDialog.FileName);
             }
         }
