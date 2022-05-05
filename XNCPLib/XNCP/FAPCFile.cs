@@ -31,6 +31,10 @@ namespace XNCPLib.XNCP
                 Debug.Assert(Type == NinjaType.SWA);
                 reader.Endianness = Endianness.Big;
             }
+            else
+            {
+                Debug.Assert(Type != NinjaType.SWA);
+            }
 
             Resources[0].Read(reader);
             Resources[1].Read(reader);
@@ -43,11 +47,14 @@ namespace XNCPLib.XNCP
             BinaryObjectWriter writer = new BinaryObjectWriter(filename, Endianness.Little, Encoding.UTF8);
             Type = type;
 
-            writer.WriteUInt32(Signature);
-            if (Signature == Utilities.Make4CCLE("CPAF"))
+            if (Type == NinjaType.SWA)
             {
-                Debug.Assert(Type == NinjaType.SWA);
+                writer.WriteUInt32(Utilities.Make4CCLE("CPAF"));
                 writer.Endianness = Endianness.Big;
+            }
+            else
+            {
+                writer.WriteUInt32(Utilities.Make4CCLE("FAPC"));
             }
 
             Resources[0].Write(writer);
