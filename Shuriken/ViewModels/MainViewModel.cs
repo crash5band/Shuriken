@@ -94,8 +94,10 @@ namespace Shuriken.ViewModels
                 Project.SceneGroups.Add(uiNode);
 
             // process node children
-            foreach (var entry in node.NodeDictionaries)
-                ProcessSceneGroups(node.Children[(int)entry.Index], uiNode, texlist, entry.Name);
+            List<NodeDictionary> xNodeIDs = node.NodeDictionaries;
+            List<NodeDictionary> xNodeIDSorted = xNodeIDs.OrderBy(o => o.Index).ToList();
+            for (int n = 0; n < xNodeIDSorted.Count; ++n)
+                ProcessSceneGroups(node.Children[n], uiNode, texlist, xNodeIDSorted[n].Name);
         }
 
         private void LoadSubimages(TextureList texList, List<SubImage> subimages)
@@ -186,28 +188,33 @@ namespace Shuriken.ViewModels
             }
 
             CSDNode rootNode = new();
-            SaveNodes(rootNode, Project.SceneGroups[0]);
-
-            SaveScenes(rootNode, Project.SceneGroups[0], subImageList, Data1, spriteList);
+            SaveNode(rootNode, Project.SceneGroups[0], subImageList, Data1, spriteList);
             WorkFile.Resources[0].Content.CsdmProject.Root = rootNode;
 
             WorkFile.Save(path);
         }
 
-        private void SaveNodes(CSDNode node, UISceneGroup group)
+        private void SaveNode(CSDNode node, UISceneGroup group, List<SubImage> subImageList, List<System.Numerics.Vector2> Data1, List<Sprite> spriteList)
         {
+            for (int s = 0; s < group.Scenes.Count; ++s)
+            {
+                SaveScenes(node, group, subImageList, Data1, spriteList);
+            }
+
             for (int i = 0; i < group.Children.Count; ++i)
             {
                 NodeDictionary dictionary = new();
                 dictionary.Name = group.Children[i].Name;
                 dictionary.Index = (uint)i;
-
                 node.NodeDictionaries.Add(dictionary);
-                CSDNode newNode = new();
-                node.Children.Add(newNode);
 
-                SaveNodes(newNode, group.Children[i]);
+                CSDNode newNode = new();
+                SaveNode(newNode, group.Children[i], subImageList, Data1, spriteList);
+                node.Children.Add(newNode);
             }
+
+            // Sort node names
+            node.NodeDictionaries = node.NodeDictionaries.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
         }
 
         private void BuildSubImageList(ref List<SubImage> subImages, ref List<Sprite> spriteList)
@@ -427,11 +434,6 @@ namespace Shuriken.ViewModels
                 xSceneID.Index = (uint)s;
                 xNode.SceneIDTable.Add(xSceneID);
                 xNode.Scenes.Add(xScene);
-
-                // Sort node names
-                xNode.NodeDictionaries = xNode.NodeDictionaries.OrderBy(o => o.Name, StringComparer.Ordinal).ToList();
-                for (int n = 0; n < xNode.Children.Count; ++n)
-                    SaveScenes(xNode.Children[n], uiSGroup.Children[n], subImageList, Data1, spriteList);
             }
 
             // Sort scene names
