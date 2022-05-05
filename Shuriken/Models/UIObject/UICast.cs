@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using XNCPLib;
 using XNCPLib.XNCP;
 using Shuriken.ViewModels;
 using System.ComponentModel;
@@ -121,6 +122,13 @@ namespace Shuriken.Models
             FontSpacingAdjustment = cast.FontSpacingAdjustment;
             Width = cast.Width;
             Height = cast.Height;
+
+            if (MainViewModel.Type == NinjaType.SonicNext)
+            {
+                Width = (uint)((BottomRight.X - BottomLeft.X) * 1280);
+                Height = (uint)((BottomLeft.Y - TopLeft.Y) * 720);
+            }
+
             Field58 = cast.Field58;
             Field5C = cast.Field5C;
 

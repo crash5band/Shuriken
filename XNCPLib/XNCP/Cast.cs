@@ -74,15 +74,19 @@ namespace XNCPLib.XNCP
             }
 
             FontSpacingAdjustment = reader.ReadSingle();
-            Width = reader.ReadUInt32();
-            Height = reader.ReadUInt32();
-            Field58 = reader.ReadUInt32();
-            Field5C = reader.ReadUInt32();
 
-            Offset = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-            Field68 = reader.ReadSingle();
-            Field6C = reader.ReadSingle();
-            Field70 = reader.ReadUInt32();
+            // SONIC THE HEDGEHOG XNCPs don't have these fields.
+            if (FAPCFile.Type != NinjaType.SonicNext)
+            {
+                Width = reader.ReadUInt32();
+                Height = reader.ReadUInt32();
+                Field58 = reader.ReadUInt32();
+                Field5C = reader.ReadUInt32();
+                Offset = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                Field68 = reader.ReadSingle();
+                Field6C = reader.ReadSingle();
+                Field70 = reader.ReadUInt32();
+            }
 
             long baseOffset = reader.GetOffsetOrigin();
 
@@ -196,16 +200,21 @@ namespace XNCPLib.XNCP
 
             writer.Seek(unwrittenPosition, SeekOrigin.Begin);
             writer.WriteSingle(FontSpacingAdjustment);
-            writer.WriteUInt32(Width);
-            writer.WriteUInt32(Height);
-            writer.WriteUInt32(Field58);
-            writer.WriteUInt32(Field5C);
 
-            writer.WriteSingle(Offset.X);
-            writer.WriteSingle(Offset.Y);
-            writer.WriteSingle(Field68);
-            writer.WriteSingle(Field6C);
-            writer.WriteUInt32(Field70);
+            // SONIC THE HEDGEHOG XNCPs don't have these fields.
+            if (FAPCFile.Type != NinjaType.SonicNext)
+            {
+                writer.WriteUInt32(Width);
+                writer.WriteUInt32(Height);
+                writer.WriteUInt32(Field58);
+                writer.WriteUInt32(Field5C);
+
+                writer.WriteSingle(Offset.X);
+                writer.WriteSingle(Offset.Y);
+                writer.WriteSingle(Field68);
+                writer.WriteSingle(Field6C);
+                writer.WriteUInt32(Field70);
+            }
         }
     }
 }
