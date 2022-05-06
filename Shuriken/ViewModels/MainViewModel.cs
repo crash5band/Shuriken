@@ -400,9 +400,9 @@ namespace Shuriken.ViewModels
                                     XNCPLib.XNCP.Animation.Keyframe xKeyframe = new();
                                     xKeyframe.Frame = keyframe.HasNoFrame ? 0xFFFFFFFF : (uint)keyframe.Frame;
                                     xKeyframe.Value = keyframe.KValue;
-                                    xKeyframe.Field08 = (uint)keyframe.Field08;
-                                    xKeyframe.Offset1 = keyframe.Offset1;
-                                    xKeyframe.Offset2 = keyframe.Offset2;
+                                    xKeyframe.Type = keyframe.Type;
+                                    xKeyframe.InTangent = keyframe.InTangent;
+                                    xKeyframe.OutTangent = keyframe.OutTangent;
                                     xKeyframe.Field14 = (uint)keyframe.Field14;
                                     castAnimationSubData.Keyframes.Add(xKeyframe);
 

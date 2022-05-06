@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -130,7 +131,7 @@ namespace Shuriken.Views
                     {
                         if (xPos.Enabled)
                         {
-                            result.X = xPos.GetValue(time);
+                            result.X = xPos.GetSingle(time);
                             hasX = true;
                         }
                     }
@@ -140,7 +141,7 @@ namespace Shuriken.Views
                     {
                         if (yPos.Enabled)
                         {
-                            result.Y = yPos.GetValue(time);
+                            result.Y = yPos.GetSingle(time);
                             hasY = true;
                         }
                     }
@@ -176,7 +177,7 @@ namespace Shuriken.Views
                     {
                         if (rotAnim.Enabled)
                         {
-                            result = rotAnim.GetValue(time);
+                            result = rotAnim.GetSingle(time);
                             hasRot = true;
                         }
                     }
@@ -202,7 +203,7 @@ namespace Shuriken.Views
                     {
                         if (sX.Enabled)
                         {
-                            result.X *= sX.GetValue(time);
+                            result.X *= sX.GetSingle(time);
                             hasSx = true;
                         }
                     }
@@ -212,7 +213,7 @@ namespace Shuriken.Views
                     {
                         if (sy.Enabled)
                         {
-                            result.Y *= sy.GetValue(time);
+                            result.Y *= sy.GetSingle(time);
                             hasSy = true;
                         }
                     }
@@ -243,7 +244,7 @@ namespace Shuriken.Views
                     {
                         if (sprAnim.Enabled)
                         {
-                            int i = (int)sprAnim.GetValue(time);
+                            int i = (int)sprAnim.GetSingle(time);
                             if (i > 0 && i < lyr.Sprites.Count)
                                 sprIndex = i;
                         }
@@ -268,7 +269,7 @@ namespace Shuriken.Views
                     {
                         if (clrAnim.Enabled)
                         {
-                            result = new Color(clrAnim.GetValue(time));
+                            result = clrAnim.GetColor(time);
                             hasClr = true;
                         }
                     }
@@ -297,7 +298,7 @@ namespace Shuriken.Views
                             if (clrAnim.Enabled)
                             {
                                 hasGradient[i] = true;
-                                results[i] = new Color(clrAnim.GetValue(time));
+                                results[i] = clrAnim.GetColor(time);
                             }
                         }
 
