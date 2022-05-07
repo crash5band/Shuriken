@@ -159,7 +159,7 @@ namespace Shuriken.Views
             return new Vec2(x, y);
         }
 
-        private void UpdateCast(UIScene scene, UICast lyr, CastTransform transform, float time, Vec2 parentOrigin = null)
+        private void UpdateCast(UIScene scene, UICast lyr, CastTransform transform, float time)
         {
             bool hideFlag = lyr.HideFlag != 0;
             var position = new Vec2(lyr.Translation.X, lyr.Translation.Y);
@@ -241,6 +241,11 @@ namespace Shuriken.Views
             if (hideFlag)
                 return;
 
+            // Inherit position scale
+            // TODO: Is this handled through flags?
+            position.X *= transform.Scale.X;
+            position.Y *= transform.Scale.Y;
+
             position += lyr.Offset;
             position.X *= renderer.RenderWidth;
             position.Y *= renderer.RenderHeight;
@@ -254,18 +259,12 @@ namespace Shuriken.Views
 
             rotation += transform.Rotation;
 
-            // inherit scale
-            if ((lyr.Field34 & (1 << 10)) != 0) 
+            // Inherit scale
+            if ((lyr.Field34 & 0x400) != 0) 
                 scale.X *= transform.Scale.X;
 
-            if ((lyr.Field34 & (1 << 11)) != 0) 
+            if ((lyr.Field34 & 0x800) != 0) 
                 scale.Y *= transform.Scale.Y;
-
-            if (parentOrigin != null)
-            {
-                position.X = parentOrigin.X + (position.X - parentOrigin.X) * scale.X;
-                position.Y = parentOrigin.Y + (position.Y - parentOrigin.Y) * scale.Y;
-            }
 
             // inherit color
             if ((lyr.Field34 & 8) != 0)
@@ -291,29 +290,10 @@ namespace Shuriken.Views
                     DrawCastFont(lyr, position, pivot, rotation, scale, tl.ToFloats(), bl.ToFloats(), tr.ToFloats(), br.ToFloats());
                 }
 
-                foreach (var child in lyr.Children)
-                {
-                    Vec2 posAdjust = new Vec2();
+                var childTransform = new CastTransform(position, lyr.ZTranslation, rotation, scale, color);
 
-                    // continue from area of parent cast?
-                    if ((child.Flags & 1) == 0)
-                    {
-                        posAdjust.X = ((lyr.Anchor.X * scale.X) - lyr.Anchor.X) * renderer.RenderWidth;
-                        posAdjust.Y = ((lyr.Anchor.Y * scale.Y) - lyr.Anchor.Y) * renderer.RenderHeight;
-                    }
-
-                    var childTransform = new CastTransform(position + posAdjust, lyr.ZTranslation, rotation, scale, color);
-
-                    // Not correct, blb_gauge looks better when passing position and doesn't have field5c with value 2
-                    if (false)
-                    {
-                        UpdateCast(scene, child, childTransform, time, position);
-                    }
-                    else
-                    {
-                        UpdateCast(scene, child, childTransform, time);
-                    }
-                }
+                foreach (var child in lyr.Children) 
+                    UpdateCast(scene, child, childTransform, time);
             }
         }
 
