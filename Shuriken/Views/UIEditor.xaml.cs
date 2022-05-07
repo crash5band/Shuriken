@@ -270,8 +270,6 @@ namespace Shuriken.Views
                 color = new Color(cF.X, cF.Y, cF.Z, cF.W);
             }
 
-            scale.X = Math.Max(0, scale.X);
-            scale.Y = Math.Max(0, scale.Y);
             Vec2 pivot = GetPivot(lyr, scale, renderer.RenderWidth, renderer.RenderHeight);
 
             if (lyr.Visible && lyr.IsEnabled)
