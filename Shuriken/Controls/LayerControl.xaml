@@ -132,8 +132,8 @@
                         <Label>Flags</Label>
                         <TextBox Text="{Binding Flags, UpdateSourceTrigger=PropertyChanged}"/>
                         
-                        <Label>Field3C</Label>
-                        <TextBox Text="{Binding Field3C, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label>SubImageCount</Label>
+                        <TextBox Text="{Binding SubImageCount, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>Field4C</Label>
                         <TextBox Text="{Binding Field4C, UpdateSourceTrigger=PropertyChanged}"/>
@@ -160,10 +160,10 @@
                 <Border>
                     <StackPanel>
                         <Label>InfoField00</Label>
-                        <TextBox Text="{Binding InfoField00, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Text="{Binding HideFlag, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>InfoField18</Label>
-                        <TextBox Text="{Binding InfoField18, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Text="{Binding DefaultSprite, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>InfoField30</Label>
                         <TextBox Text="{Binding InfoField30, UpdateSourceTrigger=PropertyChanged}"/>

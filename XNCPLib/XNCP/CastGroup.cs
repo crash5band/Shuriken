@@ -12,7 +12,7 @@ namespace XNCPLib.XNCP
 {
     public class CastGroup
     {
-        public uint Field08 { get; set; }
+        public uint RootCastIndex { get; set; }
         public List<Cast> Casts { get; set; }
         public List<CastHierarchyTreeNode> CastHierarchyTree { get; set; }
         private uint UnwrittenPosition { get; set; }
@@ -30,7 +30,7 @@ namespace XNCPLib.XNCP
             List<uint> CastOffsets = new List<uint>((int)CastCount);
 
             uint CastTableOffset = reader.ReadUInt32();
-            Field08 = reader.ReadUInt32();
+            RootCastIndex = reader.ReadUInt32();
             uint CastHierarchyTreeOffset = reader.ReadUInt32();
 
             long baseOffset = reader.GetOffsetOrigin();
@@ -73,7 +73,7 @@ namespace XNCPLib.XNCP
             Utilities.PadZeroBytes(writer, Casts.Count * 0x4);
 
             writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
-            writer.WriteUInt32(Field08);
+            writer.WriteUInt32(RootCastIndex);
             offsetChunk.Add(writer);
             writer.WriteUInt32((uint)(writer.Length - writer.GetOffsetOrigin()));
             UnwrittenPosition += 0x8;

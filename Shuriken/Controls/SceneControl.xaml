@@ -31,7 +31,7 @@
                         <Label>Name</Label>
                         <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <Label>Field00</Label>
+                        <Label>Version</Label>
                         <TextBox Text="{Binding Field00, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label>ZIndex</Label>
