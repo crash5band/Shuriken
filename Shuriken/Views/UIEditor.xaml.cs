@@ -139,7 +139,7 @@ namespace Shuriken.Views
                     Vec2 sprPos = new Vec2(pos.X + xOffset - (lyr.Width * 0.5f * sz.X), pos.Y);
 
                     renderer.DrawSprite(new Vec3(sprPos.X, sprPos.Y, lyr.ZTranslation), pivot, rot,
-                        new Vec3(sz.X * spr.Width, sz.Y * spr.Height, 1.0f), spr, lyr.Flags, lyr.Color.ToFloats(),
+                        new Vec3(sz.X * spr.Width, sz.Y * spr.Height, 1.0f), spr, spr, 0, lyr.Flags, lyr.Color.ToFloats(),
                         tl, bl, tr, br, lyr.ZIndex);
 
                     xOffset += sprStep + (lyr.FontSpacingAdjustment * renderer.RenderWidth);
@@ -160,7 +160,7 @@ namespace Shuriken.Views
             var position = new Vec2(lyr.Translation.X, lyr.Translation.Y);
             float rotation = lyr.Rotation;
             var scale = new Vec3(lyr.Scale.X, lyr.Scale.Y, lyr.Scale.Z);
-            int sprID = lyr.Sprites[Math.Max(0, Math.Min(lyr.Sprites.Count - 1, (int)lyr.DefaultSprite))];
+            float sprID = lyr.DefaultSprite;
             var color = lyr.Color;
             var tl = lyr.GradientTopLeft;
             var bl = lyr.GradientBottomLeft;
@@ -207,7 +207,7 @@ namespace Shuriken.Views
                             break;
 
                         case AnimationType.SubImage:
-                            sprID = lyr.Sprites[Math.Max(0, Math.Min(lyr.Sprites.Count - 1, (int)track.GetSingle(time)))];
+                            sprID = track.GetSingle(time);
                             break;
 
                         case AnimationType.Color:
@@ -276,10 +276,15 @@ namespace Shuriken.Views
 
             if (lyr.Visible && lyr.IsEnabled)
             {
-                var spr = Project.TryGetSprite(sprID);
+                var spr = Project.TryGetSprite(lyr.Sprites[Math.Max(0, Math.Min(lyr.Sprites.Count - 1, (int)sprID))]);
+                var nextSpr = Project.TryGetSprite(lyr.Sprites[Math.Max(0, Math.Min(lyr.Sprites.Count - 1, (int)sprID + 1))]);
+
+                spr ??= nextSpr;
+                nextSpr ??= spr;
+
                 if (lyr.Type == DrawType.Sprite && spr != null)
                 {
-                    renderer.DrawSprite(new Vec3(position.X, position.Y, lyr.ZTranslation), pivot, rotation, new Vec3(lyr.Width, lyr.Height, 1.0f) * scale, spr,
+                    renderer.DrawSprite(new Vec3(position.X, position.Y, lyr.ZTranslation), pivot, rotation, new Vec3(lyr.Width, lyr.Height, 1.0f) * scale, spr, nextSpr, sprID % 1,
                         lyr.Flags, color.ToFloats(), tl.ToFloats(), bl.ToFloats(), tr.ToFloats(), br.ToFloats(), lyr.ZIndex);
                 }
                 else if (lyr.Type == DrawType.Font)

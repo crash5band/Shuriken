@@ -272,7 +272,10 @@ namespace Shuriken.Rendering
         /// <param name="br">The bottom-right tint gradient</param>
         /// <param name="bl">The bottom-left tint gradient</param>
         /// <param name="index">The draw index of the quad. A higher index indactes the quad is drawn on top of a quad with a lower index.</param>
-        public void DrawSprite(Vector3 pos, Vector2 pivot, float rot, Vector3 sz, Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 bl, Vector4 tr, Vector4 br, int index)
+        public void DrawSprite(
+            Vector3 pos, Vector2 pivot, float rot, Vector3 sz, 
+            Models.Sprite spr, Models.Sprite nextSpr, float sprFactor, uint flags, 
+            Vector4 col, Vector4 tl, Vector4 bl, Vector4 tr, Vector4 br, int index)
         {
             bool additive = (flags & 1) != 0;
             bool mirrorX = (flags & 1024) != 0;
@@ -280,9 +283,9 @@ namespace Shuriken.Rendering
             Matrix4x4 mat = CreateModelMatrix(pos, pivot, rot, sz);
 
             GetUVCoords(
-                new Vector2(spr.Start.X, spr.Start.Y),
-                new Vector2(spr.Width, spr.Height),
-                spr.Texture.Width, 
+                new Vector2(LerpSpriteFactor(spr.Start.X, nextSpr.Start.X), LerpSpriteFactor(spr.Start.Y, nextSpr.Start.Y)),
+                new Vector2(LerpSpriteFactor(spr.Width, nextSpr.Width), LerpSpriteFactor(spr.Height, nextSpr.Height)),
+                spr.Texture.Width, // Assumes both sprites are in the same texture
                 spr.Texture.Height,
                 mirrorX,
                 mirrorY,
@@ -290,9 +293,14 @@ namespace Shuriken.Rendering
                 out var uv1,
                 out var uv2,
                 out var uv3
-                );
-            
-            quads.Add(new Quad(mat, uv0, uv1, uv2, uv3, col, tl, tr, bl, br, spr, index, additive));
+            );
+
+            quads.Add(new Quad(mat, uv0, uv1, uv2, uv3, col, tl, tr, bl, br, spr.Texture, index, additive));
+
+            float LerpSpriteFactor(float a, float b)
+            {
+                return (1.0f - sprFactor) * a + sprFactor * b;
+            }
         }
 
         /// <summary>
@@ -315,14 +323,14 @@ namespace Shuriken.Rendering
             
             foreach (var quad in quads)
             {
-                int id = quad.Sprite.Texture.GlTex.ID;
+                int id = quad.Texture.GlTex.ID;
 
                 if (id != TexID || Additive != quad.Additive || NumVertices >= MaxVertices)
                 {
                     EndBatch();
                     BeginBatch();
 
-                    quad.Sprite.Texture.GlTex.Bind();
+                    quad.Texture.GlTex.Bind();
 
                     Additive = quad.Additive;
                     TexID = id;
