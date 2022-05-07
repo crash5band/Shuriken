@@ -257,7 +257,9 @@ namespace Shuriken.Views
             if ((lyr.Field34 & 0x200) != 0)
                 position.Y += transform.Position.Y;
 
-            rotation += transform.Rotation;
+            // Inherit rotation
+            if ((lyr.Field34 & 0x2) != 0)
+                rotation += transform.Rotation;
 
             // Inherit scale
             if ((lyr.Field34 & 0x400) != 0) 
