@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using XNCPLib.XNCP.Animation;
 
 namespace Shuriken.Models.Animation
 {
@@ -32,9 +33,9 @@ namespace Shuriken.Models.Animation
 
         public Color KValueColor { get; set; }
 
-        public int Field08 { get; set; }
-        public float Offset1 { get; set; }
-        public float Offset2 { get; set; }
+        public KeyframeType Type { get; set; }
+        public float InTangent { get; set; }
+        public float OutTangent { get; set; }
         public int Field14 { get; set; }
         public Vector3 Data8Value { get; set; }
 
@@ -44,9 +45,9 @@ namespace Shuriken.Models.Animation
             Frame = 0;
             KValue = 0.0f;
             KValueColor = new Color();
-            Field08 = 0;
-            Offset1 = 0.0f;
-            Offset2 = 0.0f;
+            Type = 0;
+            InTangent = 0.0f;
+            OutTangent = 0.0f;
             Field14 = 0;
             Data8Value = new Vector3(0, 0, 0);
         }
@@ -56,9 +57,9 @@ namespace Shuriken.Models.Animation
             Frame = (int)k.Frame;
             KValue = k.Value;
             KValueColor = new Color(k.Value);
-            Field08 = (int)k.Field08;
-            Offset1 = k.Offset1;
-            Offset2 = k.Offset2;
+            Type = k.Type;
+            InTangent = k.InTangent;
+            OutTangent = k.OutTangent;
             Field14 = (int)k.Field14;
             Data8Value = new Vector3(data8Value.X, data8Value.Y, data8Value.Z);
         }
@@ -67,9 +68,9 @@ namespace Shuriken.Models.Animation
         {
             Frame = k.Frame;
             KValue = k.KValue;
-            Field08 = k.Field08;
-            Offset1 = k.Offset1;
-            Offset2 = k.Offset2;
+            Type = k.Type;
+            InTangent = k.InTangent;
+            OutTangent = k.OutTangent;
             Field14 = k.Field14;
             Data8Value = k.Data8Value;
         }

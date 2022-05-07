@@ -26,20 +26,20 @@ namespace Shuriken.Models
 
         private void CreateTexture(string filename)
         {
-            ScratchImage img = TexHelper.Instance.LoadFromDDSFile(filename, DDS_FLAGS.NONE);
-            if (!TexHelper.Instance.IsCompressed(img.GetImage(0).Format))
-            {
-                img = img.Compress(DXGI_FORMAT.BC3_UNORM, TEX_COMPRESS_FLAGS.DEFAULT, 0.5f);
-            }
+            var img = TexHelper.Instance.LoadFromDDSFile(filename, DDS_FLAGS.NONE);
 
-            CreateBitmap(img.Decompress(DXGI_FORMAT.B8G8R8A8_UNORM));
+            if (TexHelper.Instance.IsCompressed(img.GetMetadata().Format))
+                img = img.Decompress(DXGI_FORMAT.B8G8R8A8_UNORM);
 
-            img = img.Decompress(DXGI_FORMAT.R8G8B8A8_UNORM).FlipRotate(TEX_FR_FLAGS.FLIP_VERTICAL);
+            else if (img.GetMetadata().Format != DXGI_FORMAT.B8G8R8A8_UNORM)
+                img = img.Convert(DXGI_FORMAT.B8G8R8A8_UNORM, TEX_FILTER_FLAGS.DEFAULT, 0.5f);
 
             Width = img.GetImage(0).Width;
             Height = img.GetImage(0).Height;
 
-            GlTex = new GLTexture(img.GetImage(0).Pixels, Width, Height);
+            GlTex = new GLTexture(img.FlipRotate(TEX_FR_FLAGS.FLIP_VERTICAL).GetImage(0).Pixels, Width, Height);
+
+            CreateBitmap(img);
 
             img.Dispose();
         }

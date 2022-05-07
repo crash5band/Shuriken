@@ -46,7 +46,7 @@ namespace Shuriken.Models
         public uint Field2C { get; set; }
         public uint Field34 { get; set; }
         public uint Flags { get; set; }
-        public uint Field3C { get; set; }
+        public uint SubImageCount { get; set; }
 
         public int FontID { get; set; }
         public string FontCharacters { get; set; }
@@ -61,14 +61,14 @@ namespace Shuriken.Models
         public float Field68 { get; set; }
         public float Field6C { get; set; }
         public uint Field70 { get; set; }
-        public int InfoField00 { get; set; }
+        public int HideFlag { get; set; }
 
         public Vector2 Translation { get; set; }
         public float ZTranslation { get; set; }
         public float Rotation { get; set; }
         public Vector3 Scale { get; set; }
 
-        public float InfoField18 { get; set; }
+        public float DefaultSprite { get; set; }
         public Color Color { get ; set; }
         public Color GradientTopLeft { get; set; }
         public Color GradientBottomLeft { get; set; }
@@ -81,7 +81,6 @@ namespace Shuriken.Models
 
         public bool Visible { get; set; }
         public int ZIndex { get; set; }
-        public int DefaultSprite { get; set; }
 
         public ObservableCollection<int> Sprites { get; set; }
         public ObservableCollection<UICast> Children { get; set; }
@@ -114,7 +113,7 @@ namespace Shuriken.Models
             Field2C = cast.Field2C;
             Field34 = cast.Field34;
             Flags = cast.Field38;
-            Field3C = cast.Field3C;
+            SubImageCount = cast.SubImageCount;
 
             FontID = -1;
             FontCharacters = cast.FontCharacters;
@@ -138,11 +137,11 @@ namespace Shuriken.Models
             Field6C = cast.Field6C;
             Field70 = cast.Field70;
 
-            InfoField00 = cast.CastInfoData.Field00;
+            HideFlag = cast.CastInfoData.HideFlag;
             Translation = new Vector2(cast.CastInfoData.Translation);
             Rotation = cast.CastInfoData.Rotation;
             Scale = new Vector3(cast.CastInfoData.Scale.X, cast.CastInfoData.Scale.Y, 1.0f);
-            InfoField18 = cast.CastInfoData.Field18;
+            DefaultSprite = cast.CastInfoData.SubImage;
             Color = new Color(cast.CastInfoData.Color);
             GradientTopLeft = new Color(cast.CastInfoData.GradientTopLeft);
             GradientBottomLeft = new Color(cast.CastInfoData.GradientBottomLeft);
@@ -153,8 +152,6 @@ namespace Shuriken.Models
             InfoField38 = cast.CastInfoData.Field38;
 
             Sprites = new ObservableCollection<int>(Enumerable.Repeat(-1, 32).ToList());
-
-            DefaultSprite = 0;
         }
 
         public UICast()
@@ -170,7 +167,7 @@ namespace Shuriken.Models
             Field2C = 0;
             Field34 = 0;
             Flags = 0;
-            Field3C = 0;
+            SubImageCount = 0;
 
             FontID = -1;
             FontCharacters = "";
@@ -192,11 +189,11 @@ namespace Shuriken.Models
             Field6C = 0;
             Field70 = 0;
 
-            InfoField00 = 0;
+            HideFlag = 0;
             Translation = new Vector2();
             Rotation = 0;
             Scale = new Vector3(1.0f, 1.0f, 1.0f);
-            InfoField18 = 0;
+            DefaultSprite = 0;
             Color = new Color(255, 255, 255, 255);
             GradientTopLeft = new Color(255, 255, 255, 255);
             GradientBottomLeft = new Color(255, 255, 255, 255);
@@ -229,7 +226,7 @@ namespace Shuriken.Models
             Field2C = c.Field2C;
             Field34 = c.Field34;
             Flags = c.Flags;
-            Field3C = c.Field3C;
+            SubImageCount = c.SubImageCount;
 
             FontID = -1;
             FontCharacters = c.FontCharacters;
@@ -246,11 +243,11 @@ namespace Shuriken.Models
             Field6C = c.Field6C;
             Field70 = c.Field70;
 
-            InfoField00 = c.InfoField00;
+            HideFlag = c.HideFlag;
             Translation = new Vector2(c.Translation);
             Rotation = c.Rotation;
             Scale = new Vector3(c.Scale);
-            InfoField18 = c.InfoField18;
+            DefaultSprite = c.DefaultSprite;
             Color = new Color(c.Color);
             GradientTopLeft = new Color(c.GradientTopLeft);
             GradientBottomLeft = new Color(c.GradientBottomLeft);

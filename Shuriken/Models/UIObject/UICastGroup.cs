@@ -23,7 +23,7 @@ namespace Shuriken.Models
             }
         }
 
-        public uint Field08 { get; set; }
+        public uint RootCastIndex { get; set; }
         public bool Visible { get; set; }
 
         public ObservableCollection<UICast> Casts { get; set; }
@@ -42,7 +42,7 @@ namespace Shuriken.Models
         public UICastGroup(CastGroup castGroup, string name = "Group")
         {
             Name = name;
-            Field08 = castGroup.Field08;
+            RootCastIndex = castGroup.RootCastIndex;
             Visible = true;
             Casts = new ObservableCollection<UICast>();
         }
@@ -57,7 +57,7 @@ namespace Shuriken.Models
         public UICastGroup(UICastGroup g)
         {
             Name = g.name;
-            Field08 = g.Field08;
+            RootCastIndex = g.RootCastIndex;
             Visible = true;
 
             Casts = new ObservableCollection<UICast>(g.Casts);

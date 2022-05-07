@@ -38,7 +38,7 @@ namespace XNCPLib.XNCP
 
     public class Scene
     {
-        public uint Field00 { get; set; }
+        public uint Version { get; set; }
         public float ZIndex { get; set; }
         public float AnimationFramerate { get; set; }
         public uint Field0C { get; set; }
@@ -68,7 +68,7 @@ namespace XNCPLib.XNCP
 
         public void Read(BinaryObjectReader reader)
         {
-            Field00 = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
             ZIndex = reader.ReadSingle();
             AnimationFramerate = reader.ReadSingle();
             Field0C = reader.ReadUInt32();
@@ -273,7 +273,7 @@ namespace XNCPLib.XNCP
         {
             UnwrittenPosition = (uint)writer.Position;
 
-            writer.WriteUInt32(Field00);
+            writer.WriteUInt32(Version);
             writer.WriteSingle(ZIndex);
             writer.WriteSingle(AnimationFramerate);
             writer.WriteUInt32(Field0C);

@@ -158,6 +158,8 @@
                         <Label>Value</Label>
                         <TextBox Name="FrameValueText" Text="{Binding SelectedKey.KValue, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding KeySelected}" />
                         <local:ColorControl x:Name="FrameValueColor" Value="{Binding SelectedKey.KValueColor, Mode=TwoWay}" IsEnabled="{Binding KeySelected}"/>
+                        <Label>Data8</Label>
+                        <local:Vector3Control x:Name="Data8Value" Value="{Binding SelectedKey.Data8Value, Mode=TwoWay}"/>
                     </StackPanel>
                 </ScrollViewer>
             </GroupBox>

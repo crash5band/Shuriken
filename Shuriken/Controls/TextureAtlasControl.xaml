@@ -16,7 +16,20 @@
         <ScrollViewer HorizontalScrollBarVisibility="Auto">
             <Canvas Grid.Row="0" x:Name="SelectionBorder" MouseDown="GridMouseDown" MouseUp="GridMouseUp" MouseMove="GridMouseMove"
                     Width="{Binding ElementName=TexImage, Path=ActualWidth}" Height="{Binding ElementName=TexImage, Path=ActualHeight}">
-                <Border BorderBrush="Gray" BorderThickness="1">
+                <Canvas.Background>
+                    <DrawingBrush TileMode="Tile" Viewport="0,0,24,24" ViewportUnits="Absolute">
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <GeometryDrawing Geometry="M0,0 L2,0 2,2, 0,2Z" Brush="LightGray"/>
+                                <GeometryDrawing Geometry="M0,1 L2,1 2,2, 1,2 1,0 0,0Z" Brush="DarkGray"/>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Canvas.Background>
+                <Border BorderBrush="Gray" BorderThickness="0">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="12" ShadowDepth="3" Direction="-45" Color="#333" Opacity="0.5"/>
+                    </Border.Effect>
                     <Image x:Name="TexImage" Source="{Binding Texture.ImageSource}" HorizontalAlignment="Stretch"/>
                 </Border>
                 <Rectangle x:Name="SelectionRectangle" Visibility="Visible" Stroke="#333" StrokeThickness="1" StrokeDashArray="2, 1"

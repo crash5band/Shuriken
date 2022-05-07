@@ -11,7 +11,7 @@ namespace Shuriken.Models
     {
         public static ObservableCollection<UISceneGroup> SceneGroups { get; set; } = new ObservableCollection<UISceneGroup>();
         public static ObservableCollection<TextureList> TextureLists { get; set; } = new ObservableCollection<TextureList>();
-        public static Dictionary<int, UIFont> Fonts { get; set; } = new Dictionary<int, UIFont>();
+        public static ObservableCollection<UIFont> Fonts { get; set; } = new ObservableCollection<UIFont>();
         public static Dictionary<int, Sprite> Sprites { get; set; } = new Dictionary<int, Sprite>();
 
         private static int NextSpriteID = 1;
@@ -37,13 +37,16 @@ namespace Shuriken.Models
 
         public static UIFont TryGetFont(int id)
         {
-            Fonts.TryGetValue(id, out UIFont font);
-            return font;
+            foreach (var font in Fonts)
+                if (font.ID == id)
+                    return font;
+
+            return null;
         }
 
         public static int AppendFont(UIFont font)
         {
-            Fonts.Add(NextFontID, font);
+            Fonts.Add(new UIFont(font.Name, NextFontID));
             return NextFontID++;
         }
 
@@ -55,7 +58,9 @@ namespace Shuriken.Models
 
         public static void RemoveFont(int id)
         {
-            Fonts.Remove(id);
+            var font = TryGetFont(id);
+            if (font != null)
+                Fonts.Remove(font);
         }
 
         public static void RemoveSprite(int id)

@@ -12,7 +12,7 @@ namespace Shuriken.Models
 {
     public class UIFont : INotifyPropertyChanged
     {
-        public readonly int ID;
+        public int ID { get; private set; }
 
         private string name;
         public string Name
