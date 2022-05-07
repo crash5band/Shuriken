@@ -9,7 +9,7 @@ namespace Shuriken.Models.Animation
     public enum AnimationType : uint
     {
         None        = 0,
-        Unknown     = 1,
+        HideFlag     = 1,
         XPosition   = 2,
         YPosition   = 4,
         Rotation    = 8,

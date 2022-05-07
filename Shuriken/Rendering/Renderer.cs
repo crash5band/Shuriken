@@ -150,7 +150,6 @@ namespace Shuriken.Rendering
 
         private void Flush()
         {
-            ConfigureShader(shaderDictionary["basic"]);
             GL.DrawElements(PrimitiveType.Triangles, NumIndices, DrawElementsType.UnsignedInt, 0);
         }
 
@@ -164,7 +163,8 @@ namespace Shuriken.Rendering
         /// <param name="flipX">Whether the X coordinates of the sprite are flipped.</param>
         /// <param name="flipY">Whether the Y coordinates of the sprite are flipped.</param>
         /// <returns></returns>
-        public Vector2[] GetUVCoords(Vector2 sprStart, Vector2 sprSize, float texWidth, float texHeight, bool flipX, bool flipY)
+        public void GetUVCoords(Vector2 sprStart, Vector2 sprSize, float texWidth, float texHeight, bool flipX,
+            bool flipY, out Vector2 uv0, out Vector2 uv1, out Vector2 uv2, out Vector2 uv3)
         {
             // Order: top-right, bottom-right, bottom-left, top-left
             Vector2 start = new Vector2(sprStart.X, sprStart.Y);
@@ -175,13 +175,10 @@ namespace Shuriken.Rendering
             float top = 1 - (start.Y / texHeight);
             float bottom = 1 - (end.Y / texHeight);
 
-            return new Vector2[4]
-            {
-                new Vector2(flipX ? left : right, flipY ? bottom : top),
-                new Vector2(flipX ? left : right, flipY ? top : bottom),
-                new Vector2(flipX ? right : left, flipY ? top : bottom),
-                new Vector2(flipX ? right : left, flipY ? bottom : top)
-            };
+            uv0 = new Vector2(flipX ? left : right, flipY ? bottom : top);
+            uv1 = new Vector2(flipX ? left : right, flipY ? top : bottom);
+            uv2 = new Vector2(flipX ? right : left, flipY ? top : bottom);
+            uv3 = new Vector2(flipX ? right : left, flipY ? bottom : top);
         }
 
         /// <summary>
@@ -193,22 +190,22 @@ namespace Shuriken.Rendering
             int offset = 0;
             buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], q.M);
             buffer[BufferPos + offset].Color = q.Color * q.TopRight;
-            buffer[BufferPos + offset].UV = q.UVCoords[offset];
+            buffer[BufferPos + offset].UV = q.UV0;
             ++offset;
 
             buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], q.M);
             buffer[BufferPos + offset].Color = q.Color * q.BottomRight;
-            buffer[BufferPos + offset].UV = q.UVCoords[offset];
+            buffer[BufferPos + offset].UV = q.UV1;
             ++offset;
 
             buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], q.M);
             buffer[BufferPos + offset].Color = q.Color * q.BottomLeft;
-            buffer[BufferPos + offset].UV = q.UVCoords[offset];
+            buffer[BufferPos + offset].UV = q.UV2;
             ++offset;
 
             buffer[BufferPos + offset].Position = Vector4.Transform(vPos[offset], q.M);
             buffer[BufferPos + offset].Color = q.Color * q.TopLeft;
-            buffer[BufferPos + offset].UV = q.UVCoords[offset];
+            buffer[BufferPos + offset].UV = q.UV3;
 
             BufferPos += 4;
             NumIndices += 6;
@@ -235,7 +232,7 @@ namespace Shuriken.Rendering
             model = Matrix4x4.Multiply(model, Matrix4x4.CreateScale(size.X, size.Y, size.Z));
             model = Matrix4x4.Multiply(model, Matrix4x4.CreateTranslation(pivot.X, pivot.Y, 0.0f));
             model = Matrix4x4.Multiply(model, Matrix4x4.CreateRotationZ(Utilities.ToRadians(rotation)));
-            model = Matrix4x4.Multiply(model, Matrix4x4.CreateTranslation(position.X, position.Y, position.Z + 0.1f));
+            model = Matrix4x4.Multiply(model, Matrix4x4.CreateTranslation(position.X, -position.Y, position.Z + 0.1f));
 
             return model;
         }
@@ -255,15 +252,26 @@ namespace Shuriken.Rendering
         /// <param name="br">The bottom-right tint gradient</param>
         /// <param name="bl">The bottom-left tint gradient</param>
         /// <param name="index">The draw index of the quad. A higher index indactes the quad is drawn on top of a quad with a lower index.</param>
-        public void DrawSprite(Vector3 pos, Vector2 pivot, float rot, Vector3 sz, Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 tr, Vector4 br, Vector4 bl, int index)
+        public void DrawSprite(Vector3 pos, Vector2 pivot, float rot, Vector3 sz, Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 bl, Vector4 tr, Vector4 br, int index)
         {
             bool mirrorX = (flags & 1024) != 0;
             bool mirrorY = (flags & 2048) != 0;
             Matrix4x4 mat = CreateModelMatrix(pos, pivot, rot, sz);
-            Vector2[] uvCoords = GetUVCoords(new Vector2(spr.Start.X, spr.Start.Y), new Vector2(spr.Width, spr.Height),
-                spr.Texture.Width, spr.Texture.Height, mirrorX, mirrorY);
+
+            GetUVCoords(
+                new Vector2(spr.Start.X, spr.Start.Y),
+                new Vector2(spr.Width, spr.Height),
+                spr.Texture.Width, 
+                spr.Texture.Height,
+                mirrorX,
+                mirrorY,
+                out var uv0,
+                out var uv1,
+                out var uv2,
+                out var uv3
+                );
             
-            quads.Add(new Quad(mat, uvCoords, col, tl, tr, bl, br, spr, index));
+            quads.Add(new Quad(mat, uv0, uv1, uv2, uv3, col, tl, tr, bl, br, spr, index));
         }
 
         /// <summary>
