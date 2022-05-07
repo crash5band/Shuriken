@@ -21,9 +21,10 @@ namespace Shuriken.Rendering
         public Vector4 BottomLeft;
         public Vector4 TopLeft;
         public int Order;
-
+        public bool Additive;
+        
         public Quad(Matrix4x4 m, Vector2 uv0, Vector2 uv1, Vector2 uv2, Vector2 uv3, Vector4 color, 
-            Vector4 tl, Vector4 tr, Vector4 bl, Vector4 br, Models.Sprite spr, int order)
+            Vector4 tl, Vector4 tr, Vector4 bl, Vector4 br, Models.Sprite spr, int order, bool additive)
         {
             M = m;
             UV0 = uv0;
@@ -37,6 +38,7 @@ namespace Shuriken.Rendering
             TopLeft = tl;
             Sprite = spr;
             Order = order;
+            Additive = additive;
         }
 
         public int CompareTo(Quad q)

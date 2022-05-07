@@ -145,7 +145,7 @@ namespace Shuriken.Views
 
                     renderer.DrawSprite(new Vec3(sprPos.X, sprPos.Y, lyr.ZTranslation), pivot, rot,
                         new Vec3(sz.X * spr.Width, sz.Y * spr.Height, 1.0f), spr, lyr.Flags, lyr.Color.ToFloats(),
-                        tl, bl, tr, br, lyr.ZIndex);
+                        tl, bl, tr, br, lyr.ZIndex, (lyr.Flags & 1) != 0);
 
                     xOffset += sprStep + (lyr.FontSpacingAdjustment * renderer.RenderWidth);
                 }
@@ -284,7 +284,7 @@ namespace Shuriken.Views
                 if (lyr.Type == DrawType.Sprite && spr != null)
                 {
                     renderer.DrawSprite(new Vec3(position.X, position.Y, lyr.ZTranslation), pivot, rotation, new Vec3(lyr.Width, lyr.Height, 1.0f) * scale, spr,
-                        lyr.Flags, color.ToFloats(), tl.ToFloats(), bl.ToFloats(), tr.ToFloats(), br.ToFloats(), lyr.ZIndex);
+                        lyr.Flags, color.ToFloats(), tl.ToFloats(), bl.ToFloats(), tr.ToFloats(), br.ToFloats(), lyr.ZIndex, (lyr.Flags & 1) != 0);
                 }
                 else if (lyr.Type == DrawType.Font)
                 {

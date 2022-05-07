@@ -14,17 +14,19 @@ namespace Shuriken.Rendering
     {
         public readonly string shadersDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Shaders");
 
-        uint vao;
-        uint vbo;
-        uint ebo;
-        uint[] indices;
+        private uint vao;
+        private uint vbo;
+        private uint ebo;
+        private uint[] indices;
         public Dictionary<string, ShaderProgram> shaderDictionary;
 
-        Vertex[] buffer;
-        Vector4[] vPos;
-        List<Quad> quads;
+        private Vertex[] buffer;
+        private Vector4[] vPos;
+        private List<Quad> quads;
 
-        Camera camera;
+        private Camera camera;
+
+        private bool additive;
 
         public readonly int MaxVertices = 10000;
         public int MaxQuads => MaxVertices / 4;
@@ -38,6 +40,20 @@ namespace Shuriken.Rendering
         public bool BatchStarted { get; private set; }
         public int RenderWidth { get; set; }
         public int RenderHeight { get; set; }
+
+        public bool Additive
+        {
+            get => additive;
+            set
+            {
+                additive = value;
+
+                if (additive)
+                    GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
+                else
+                    GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            }
+        }
 
         public Renderer(int width, int height)
         {
@@ -120,6 +136,7 @@ namespace Shuriken.Rendering
         {
             NumIndices = 0;
             NumVertices = 0;
+            Additive = false;
         }
 
         /// <summary>
@@ -252,7 +269,7 @@ namespace Shuriken.Rendering
         /// <param name="br">The bottom-right tint gradient</param>
         /// <param name="bl">The bottom-left tint gradient</param>
         /// <param name="index">The draw index of the quad. A higher index indactes the quad is drawn on top of a quad with a lower index.</param>
-        public void DrawSprite(Vector3 pos, Vector2 pivot, float rot, Vector3 sz, Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 bl, Vector4 tr, Vector4 br, int index)
+        public void DrawSprite(Vector3 pos, Vector2 pivot, float rot, Vector3 sz, Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 bl, Vector4 tr, Vector4 br, int index, bool additive)
         {
             bool mirrorX = (flags & 1024) != 0;
             bool mirrorY = (flags & 2048) != 0;
@@ -271,7 +288,7 @@ namespace Shuriken.Rendering
                 out var uv3
                 );
             
-            quads.Add(new Quad(mat, uv0, uv1, uv2, uv3, col, tl, tr, bl, br, spr, index));
+            quads.Add(new Quad(mat, uv0, uv1, uv2, uv3, col, tl, tr, bl, br, spr, index, additive));
         }
 
         /// <summary>
@@ -294,19 +311,17 @@ namespace Shuriken.Rendering
             foreach (var quad in quads)
             {
                 int id = quad.Sprite.Texture.GlTex.ID;
-                if (id != TexID)
+                if (id != TexID || Additive != quad.Additive || NumVertices + 4 > MaxVertices)
                 {
                     EndBatch();
                     BeginBatch();
+
                     quad.Sprite.Texture.GlTex.Bind();
+
+                    Additive = quad.Additive;
                     TexID = id;
                 }
 
-                if (NumVertices + 4 > MaxVertices)
-                {
-                    EndBatch();
-                    BeginBatch();
-                }
                 PushQuadBuffer(quad);
             }
 
