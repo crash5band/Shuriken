@@ -155,12 +155,15 @@ namespace Shuriken.Rendering
         /// </summary>
         public void EndBatch()
         {
-            GL.BindVertexArray(vao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
-            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, BufferPos * 4 * 10, buffer);
+            if (BufferPos > 0)
+            {
+                GL.BindVertexArray(vao);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
+                GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, BufferPos * 4 * 10, buffer);
+                Flush();
+            }
 
-            Flush();
             TexID = 0;
             BatchStarted = false;
         }
@@ -309,10 +312,12 @@ namespace Shuriken.Rendering
         public void End()
         {
             quads.Sort();
+            
             foreach (var quad in quads)
             {
                 int id = quad.Sprite.Texture.GlTex.ID;
-                if (id != TexID || Additive != quad.Additive || NumVertices + 4 > MaxVertices)
+
+                if (id != TexID || Additive != quad.Additive || NumVertices >= MaxVertices)
                 {
                     EndBatch();
                     BeginBatch();
