@@ -56,13 +56,8 @@ namespace Shuriken.Models
             A = (byte)(a * 255);
         }
 
-        public Color(float col)
+        public Color(float col) : this((uint)BitConverter.SingleToInt32Bits(col))
         {
-            byte[] bytes = BitConverter.GetBytes(col);
-            R = bytes[3];
-            G = bytes[2];
-            B = bytes[1];
-            A = bytes[0];
         }
 
         public Color(Color c)
@@ -82,12 +77,12 @@ namespace Shuriken.Models
 
         public uint ToUint()
         {
-            return BitConverter.ToUInt32(new byte[] { A, B, G, R });
+            return (uint)(R << 24 | G << 16 | B << 8 | A);
         }
 
         public float ToFloat()
         {
-            return BitConverter.ToSingle(new byte[] { A, B, G, R });
+            return BitConverter.Int32BitsToSingle((int)ToUint());
         }
 
         public override string ToString()

@@ -294,7 +294,7 @@ namespace Shuriken.ViewModels
                 Scene xScene = new();
 
                 // Save scene parameters
-                xScene.Field00 = uiScene.Field00;
+                xScene.Version = uiScene.Field00;
                 xScene.ZIndex = uiScene.ZIndex;
                 xScene.AnimationFramerate = uiScene.AnimationFramerate;
                 xScene.Field0C = uiScene.Field0C;
@@ -336,7 +336,7 @@ namespace Shuriken.ViewModels
                     CastGroup xCastGroup = new();
                     UICastGroup uiCastGroup = uiScene.Groups[g];
 
-                    xCastGroup.Field08 = uiCastGroup.Field08;
+                    xCastGroup.RootCastIndex = uiCastGroup.RootCastIndex;
                     SaveCasts(uiCastGroup.CastsOrderedByIndex, xCastGroup, spriteList);
 
                     // Save the hierarchy tree for the current group
@@ -400,9 +400,9 @@ namespace Shuriken.ViewModels
                                     XNCPLib.XNCP.Animation.Keyframe xKeyframe = new();
                                     xKeyframe.Frame = keyframe.HasNoFrame ? 0xFFFFFFFF : (uint)keyframe.Frame;
                                     xKeyframe.Value = keyframe.KValue;
-                                    xKeyframe.Field08 = (uint)keyframe.Field08;
-                                    xKeyframe.Offset1 = keyframe.Offset1;
-                                    xKeyframe.Offset2 = keyframe.Offset2;
+                                    xKeyframe.Type = keyframe.Type;
+                                    xKeyframe.InTangent = keyframe.InTangent;
+                                    xKeyframe.OutTangent = keyframe.OutTangent;
                                     xKeyframe.Field14 = (uint)keyframe.Field14;
                                     castAnimationSubData.Keyframes.Add(xKeyframe);
 
@@ -485,7 +485,7 @@ namespace Shuriken.ViewModels
                 xCast.Field2C = uiCast.Field2C;
                 xCast.Field34 = uiCast.Field34;
                 xCast.Field38 = uiCast.Flags;
-                xCast.Field3C = uiCast.Field3C;
+                xCast.SubImageCount = uiCast.SubImageCount;
 
                 xCast.FontCharacters = uiCast.FontCharacters;
                 if (uiCast.Type == DrawType.Font)
@@ -511,11 +511,11 @@ namespace Shuriken.ViewModels
 
                 // Cast Info
                 xCast.CastInfoData = new();
-                xCast.CastInfoData.Field00 = uiCast.InfoField00;
+                xCast.CastInfoData.HideFlag = uiCast.HideFlag;
                 xCast.CastInfoData.Translation = new Vector2(uiCast.Translation);
                 xCast.CastInfoData.Rotation = uiCast.Rotation;
                 xCast.CastInfoData.Scale = new(uiCast.Scale.X, uiCast.Scale.Y);
-                xCast.CastInfoData.Field18 = uiCast.InfoField18;
+                xCast.CastInfoData.SubImage = uiCast.DefaultSprite;
                 xCast.CastInfoData.Color = uiCast.Color.ToUint();
                 xCast.CastInfoData.GradientTopLeft = uiCast.GradientTopLeft.ToUint();
                 xCast.CastInfoData.GradientBottomLeft = uiCast.GradientBottomLeft.ToUint();

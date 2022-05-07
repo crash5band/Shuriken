@@ -23,7 +23,7 @@ namespace XNCPLib.XNCP
         public uint Field2C { get; set; }
         public uint Field34 { get; set; }
         public uint Field38 { get; set; }
-        public uint Field3C { get; set; }
+        public uint SubImageCount { get; set; }
         public string FontCharacters{ get; set; }
         public string FontName { get; set; }
         public float FontSpacingAdjustment { get; set; }
@@ -58,7 +58,7 @@ namespace XNCPLib.XNCP
             uint CastInfoOffset = reader.ReadUInt32();
             Field34 = reader.ReadUInt32();
             Field38 = reader.ReadUInt32();
-            Field3C = reader.ReadUInt32();
+            SubImageCount = reader.ReadUInt32();
             uint CastMaterialInfoOffset = reader.ReadUInt32();
 
             uint FontCharactersOffset = reader.ReadUInt32();
@@ -138,7 +138,7 @@ namespace XNCPLib.XNCP
 
             writer.WriteUInt32(Field34);
             writer.WriteUInt32(Field38);
-            writer.WriteUInt32(Field3C);
+            writer.WriteUInt32(SubImageCount);
 
             if (CastMaterialData != null)
             {

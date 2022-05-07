@@ -41,7 +41,7 @@ namespace Shuriken.Models
         public UIScene(Scene scene, string sceneName, TextureList texList)
         {
             Name = sceneName;
-            Field00 = scene.Field00;
+            Field00 = scene.Version;
             ZIndex = scene.ZIndex;
             Field0C = scene.Field0C;
             Field10 = scene.Field10;
@@ -96,7 +96,7 @@ namespace Shuriken.Models
                 Groups.Add(new UICastGroup
                 {
                     Name = "Group_" + g,
-                    Field08 = scene.UICastGroups[g].Field08
+                    RootCastIndex = scene.UICastGroups[g].RootCastIndex
                 });
             }
 

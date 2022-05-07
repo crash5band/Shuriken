@@ -10,11 +10,11 @@ namespace XNCPLib.XNCP
 {
     public class CastInfo
     {
-        public int Field00 { get; set; }
+        public int HideFlag { get; set; }
         public Vector2 Translation { get; set; }
         public float Rotation { get; set; }
         public Vector2 Scale { get; set; }
-        public float Field18 { get; set; }
+        public float SubImage { get; set; }
         public uint Color { get; set; }
         public uint GradientTopLeft { get; set; }
         public uint GradientBottomLeft { get; set; }
@@ -31,11 +31,11 @@ namespace XNCPLib.XNCP
 
         public void Read(BinaryObjectReader reader)
         {
-            Field00     = reader.ReadInt32();
+            HideFlag     = reader.ReadInt32();
             Translation = new Vector2(reader.ReadSingle(), reader.ReadSingle());
             Rotation    = reader.ReadSingle();
             Scale       = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-            Field18     = reader.ReadSingle();
+            SubImage     = reader.ReadSingle();
 
             Color               = reader.ReadUInt32();
             GradientTopLeft     = reader.ReadUInt32();
@@ -50,13 +50,13 @@ namespace XNCPLib.XNCP
 
         public void Write(BinaryObjectWriter writer)
         {
-            writer.WriteInt32(Field00);
+            writer.WriteInt32(HideFlag);
             writer.WriteSingle(Translation.X);
             writer.WriteSingle(Translation.Y);
             writer.WriteSingle(Rotation);
             writer.WriteSingle(Scale.X);
             writer.WriteSingle(Scale.Y);
-            writer.WriteSingle(Field18);
+            writer.WriteSingle(SubImage);
 
             writer.WriteUInt32(Color);
             writer.WriteUInt32(GradientTopLeft);

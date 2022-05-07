@@ -7,22 +7,29 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.XNCP.Animation
 {
+    public enum KeyframeType
+    {
+        Const = 0,
+        Linear = 1,
+        Hermite = 2
+    }
+
     public class Keyframe
     {
         public uint Frame { get; set; }
         public float Value { get; set; }
-        public uint Field08 { get; set; }
-        public float Offset1 { get; set; }
-        public float Offset2 { get; set; }
+        public KeyframeType Type { get; set; }
+        public float InTangent { get; set; }
+        public float OutTangent { get; set; }
         public uint Field14 { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {
             Frame = reader.ReadUInt32();
             Value = reader.ReadSingle();
-            Field08 = reader.ReadUInt32();
-            Offset1 = reader.ReadSingle();
-            Offset2 = reader.ReadSingle();
+            Type = (KeyframeType)reader.ReadUInt32();
+            InTangent = reader.ReadSingle();
+            OutTangent = reader.ReadSingle();
             Field14 = reader.ReadUInt32();
         }
 
@@ -30,9 +37,9 @@ namespace XNCPLib.XNCP.Animation
         {
             writer.WriteUInt32(Frame);
             writer.WriteSingle(Value);
-            writer.WriteUInt32(Field08);
-            writer.WriteSingle(Offset1);
-            writer.WriteSingle(Offset2);
+            writer.WriteUInt32((uint)Type);
+            writer.WriteSingle(InTangent);
+            writer.WriteSingle(OutTangent);
             writer.WriteUInt32(Field14);
         }
     }

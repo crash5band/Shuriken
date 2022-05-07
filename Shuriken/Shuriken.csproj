@@ -2,12 +2,11 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows10.0.22000.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <RootNamespace>Shuriken</RootNamespace>
     <UseWPF>true</UseWPF>
     <Version>0.2.0</Version>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,7 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="DirectXTexNet" Version="1.0.3" />
-    <PackageReference Include="OpenTK" Version="4.6.7" />
+    <PackageReference Include="OpenTK" Version="4.7.2" />
     <PackageReference Include="OpenTK.GLWpfControl" Version="4.1.0" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" />
   </ItemGroup>
