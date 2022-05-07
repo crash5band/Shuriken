@@ -155,12 +155,15 @@ namespace Shuriken.Rendering
         /// </summary>
         public void EndBatch()
         {
-            GL.BindVertexArray(vao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
-            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, BufferPos * 4 * 10, buffer);
+            if (BufferPos > 0)
+            {
+                GL.BindVertexArray(vao);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
+                GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, BufferPos * 4 * 10, buffer);
+                Flush();
+            }
 
-            Flush();
             TexID = 0;
             BatchStarted = false;
         }
@@ -269,8 +272,9 @@ namespace Shuriken.Rendering
         /// <param name="br">The bottom-right tint gradient</param>
         /// <param name="bl">The bottom-left tint gradient</param>
         /// <param name="index">The draw index of the quad. A higher index indactes the quad is drawn on top of a quad with a lower index.</param>
-        public void DrawSprite(Vector3 pos, Vector2 pivot, float rot, Vector3 sz, Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 bl, Vector4 tr, Vector4 br, int index, bool additive)
+        public void DrawSprite(Vector3 pos, Vector2 pivot, float rot, Vector3 sz, Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 bl, Vector4 tr, Vector4 br, int index)
         {
+            bool additive = (flags & 1) != 0;
             bool mirrorX = (flags & 1024) != 0;
             bool mirrorY = (flags & 2048) != 0;
             Matrix4x4 mat = CreateModelMatrix(pos, pivot, rot, sz);
@@ -308,10 +312,12 @@ namespace Shuriken.Rendering
         public void End()
         {
             quads.Sort();
+            
             foreach (var quad in quads)
             {
                 int id = quad.Sprite.Texture.GlTex.ID;
-                if (id != TexID || Additive != quad.Additive || NumVertices + 4 > MaxVertices)
+
+                if (id != TexID || Additive != quad.Additive || NumVertices >= MaxVertices)
                 {
                     EndBatch();
                     BeginBatch();

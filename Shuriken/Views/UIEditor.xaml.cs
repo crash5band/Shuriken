@@ -56,41 +56,36 @@ namespace Shuriken.Views
 
         private void glControlRender(TimeSpan obj)
         {
-            /*
-            System.Windows.Media.Brush brush = Application.Current.TryFindResource("RegionBrush") as System.Windows.Media.Brush;
-            Color clearColor = new Color();
-            if (brush != null)
-            {
-                clearColor = (Color)colorConverter.ConvertBack(brush, typeof(Color), null, CultureInfo.InvariantCulture);
-            }
+            var sv = DataContext as ScenesViewModel;
+            if (sv == null) 
+                return;
 
-            GL.ClearColor(clearColor.R / 255.0f, clearColor.G / 255.0f, clearColor.B / 255.0f, 1.0f);
-            */
             GL.ClearColor(0.2f, 0.2f, 0.2f, 1.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            float delta = obj.Milliseconds / 1000.0f * 60.0f;
-            var sv = DataContext as ScenesViewModel;
-            if (sv != null)
-            {
-                sv.Tick(delta);
-                renderer.ConfigureShader(renderer.shaderDictionary["basic"]);
-                UpdateSceneGroups(Project.SceneGroups, Project.Fonts, sv.Time);
-            }
+            float deltaTime = obj.Milliseconds / 1000.0f * 60.0f;
+
+            sv.Tick(deltaTime);
+            renderer.ConfigureShader(renderer.shaderDictionary["basic"]);
+
+            UpdateSceneGroups(Project.SceneGroups, Project.Fonts, sv.Time);
+
+            GL.Finish();
         }
 
         private void UpdateSceneGroups(IEnumerable<UISceneGroup> groups, IEnumerable<UIFont> fonts, float time)
         {
             foreach (var group in groups)
             {
-                if (group.Visible)
-                {
-                    UpdateSceneGroups(group.Children, fonts, time);
+                if (!group.Visible) 
+                    continue;
 
-                    List<UIScene> sortedScenes = group.Scenes.ToList();
-                    sortedScenes.Sort();
-                    UpdateScenes(group.Scenes, fonts, time);
-                }
+                UpdateSceneGroups(group.Children, fonts, time);
+
+                List<UIScene> sortedScenes = group.Scenes.ToList();
+                sortedScenes.Sort();
+
+                UpdateScenes(group.Scenes, fonts, time);
             }
         }
 
@@ -107,10 +102,10 @@ namespace Shuriken.Views
                         continue;
 
                     renderer.Start();
-                    foreach (var lyr in group.Casts)
-                    {
+
+                    foreach (var lyr in group.Casts) 
                         UpdateCast(scene, lyr, new CastTransform(), time);
-                    }
+
                     renderer.End();
                 }
             }
@@ -145,7 +140,7 @@ namespace Shuriken.Views
 
                     renderer.DrawSprite(new Vec3(sprPos.X, sprPos.Y, lyr.ZTranslation), pivot, rot,
                         new Vec3(sz.X * spr.Width, sz.Y * spr.Height, 1.0f), spr, lyr.Flags, lyr.Color.ToFloats(),
-                        tl, bl, tr, br, lyr.ZIndex, (lyr.Flags & 1) != 0);
+                        tl, bl, tr, br, lyr.ZIndex);
 
                     xOffset += sprStep + (lyr.FontSpacingAdjustment * renderer.RenderWidth);
                 }
@@ -285,7 +280,7 @@ namespace Shuriken.Views
                 if (lyr.Type == DrawType.Sprite && spr != null)
                 {
                     renderer.DrawSprite(new Vec3(position.X, position.Y, lyr.ZTranslation), pivot, rotation, new Vec3(lyr.Width, lyr.Height, 1.0f) * scale, spr,
-                        lyr.Flags, color.ToFloats(), tl.ToFloats(), bl.ToFloats(), tr.ToFloats(), br.ToFloats(), lyr.ZIndex, (lyr.Flags & 1) != 0);
+                        lyr.Flags, color.ToFloats(), tl.ToFloats(), bl.ToFloats(), tr.ToFloats(), br.ToFloats(), lyr.ZIndex);
                 }
                 else if (lyr.Type == DrawType.Font)
                 {
