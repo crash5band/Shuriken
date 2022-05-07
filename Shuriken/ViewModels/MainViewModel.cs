@@ -46,21 +46,8 @@ namespace Shuriken.ViewModels
 
             IsLoaded = false;
             ncpSubimages = new List<SubImage>();
-#if DEBUG
-            //LoadTestXNCP();
-#endif
         }
 
-        public void LoadTestXNCP()
-        {
-            Load("Test/ui_gameplay.xncp");
-        }
-
-        /// <summary>
-        /// Loads a Ninja Chao Project file for editing
-        /// </summary>
-        /// <param name="filename">The path of the file to load</param>
-        
         void GetSubImages(CSDNode node)
         {
             foreach (var scene in node.Scenes)
@@ -117,6 +104,10 @@ namespace Shuriken.ViewModels
             }
         }
 
+        /// <summary>
+        /// Loads a Ninja Chao Project file for editing
+        /// </summary>
+        /// <param name="filename">The path of the file to load</param>
         public void Load(string filename)
         {
             Clear();

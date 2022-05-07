@@ -30,8 +30,8 @@
                     <Label>Name</Label>
                     <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <Label>Field08</Label>
-                    <TextBox Text="{Binding Field08, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label>Root Cast</Label>
+                    <TextBox Text="{Binding RootCastIndex, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
             </Border>
         </Expander>

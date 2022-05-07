@@ -31,7 +31,7 @@
     </UserControl.Resources>
     <ScrollViewer>
         <StackPanel>
-            <Expander Header="Layer" IsExpanded="True">
+            <Expander Header="Cast" IsExpanded="True">
                 <Border>
                     <StackPanel>
                         <Label>Name</Label>
@@ -45,6 +45,9 @@
                               SelectedValue="{Binding Type}" SelectedValuePath="Value" DisplayMemberPath="Description"/>
 
                         <CheckBox Content="Enabled" IsChecked="{Binding IsEnabled}" HorizontalAlignment="Left" Margin="5 10"/>
+
+                        <Label>Hide Flag</Label>
+                        <TextBox Text="{Binding HideFlag, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </Border>
             </Expander>
@@ -113,10 +116,13 @@
                     <StackPanel>
                         <Label>Font</Label>
                         <ComboBox ItemsSource="{Binding Source={x:Static models:Project.Fonts}}"
-                                  DisplayMemberPath="Value.Name" SelectedValuePath="Key" SelectedValue="{Binding FontID}"/>
+                                  DisplayMemberPath="Name" SelectedValuePath="ID" SelectedValue="{Binding FontID}"/>
 
                         <Label>Font Characters</Label>
                         <TextBox Text="{Binding FontCharacters, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <Label>Font Character Spacing</Label>
+                        <TextBox Text="{Binding FontSpacingAdjustment, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </Border>
             </Expander>
@@ -149,22 +155,12 @@
 
                         <Label>Field6C</Label>
                         <TextBox Text="{Binding Field6C, UpdateSourceTrigger=PropertyChanged}"/>
-
-                        <Label>FontSpacingCorrection</Label>
-                        <TextBox Text="{Binding FontSpacingCorrection, UpdateSourceTrigger=PropertyChanged}"/>
-
                     </StackPanel>
                 </Border>
             </Expander>
             <Expander Header="Unknown InfoField" IsExpanded="True">
                 <Border>
                     <StackPanel>
-                        <Label>InfoField00</Label>
-                        <TextBox Text="{Binding HideFlag, UpdateSourceTrigger=PropertyChanged}"/>
-
-                        <Label>InfoField18</Label>
-                        <TextBox Text="{Binding DefaultSprite, UpdateSourceTrigger=PropertyChanged}"/>
-
                         <Label>InfoField30</Label>
                         <TextBox Text="{Binding InfoField30, UpdateSourceTrigger=PropertyChanged}"/>
 
@@ -179,7 +175,9 @@
             <Expander Header="Sprites" IsExpanded="True">
                 <Border>
                     <StackPanel>
+                        <Label>Default Sprite</Label>
                         <TextBox Text="{Binding DefaultSprite, UpdateSourceTrigger=PropertyChanged}"/>
+
                         <ListView Name="SpriteList" ItemsSource="{Binding Sprites}" Height="100">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
