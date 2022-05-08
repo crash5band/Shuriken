@@ -56,41 +56,36 @@ namespace Shuriken.Views
 
         private void glControlRender(TimeSpan obj)
         {
-            /*
-            System.Windows.Media.Brush brush = Application.Current.TryFindResource("RegionBrush") as System.Windows.Media.Brush;
-            Color clearColor = new Color();
-            if (brush != null)
-            {
-                clearColor = (Color)colorConverter.ConvertBack(brush, typeof(Color), null, CultureInfo.InvariantCulture);
-            }
+            var sv = DataContext as ScenesViewModel;
+            if (sv == null) 
+                return;
 
-            GL.ClearColor(clearColor.R / 255.0f, clearColor.G / 255.0f, clearColor.B / 255.0f, 1.0f);
-            */
             GL.ClearColor(0.2f, 0.2f, 0.2f, 1.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            float delta = obj.Milliseconds / 1000.0f * 60.0f;
-            var sv = DataContext as ScenesViewModel;
-            if (sv != null)
-            {
-                sv.Tick(delta);
-                renderer.ConfigureShader(renderer.shaderDictionary["basic"]);
-                UpdateSceneGroups(Project.SceneGroups, Project.Fonts, sv.Time);
-            }
+            float deltaTime = obj.Milliseconds / 1000.0f * 60.0f;
+
+            sv.Tick(deltaTime);
+            renderer.ConfigureShader(renderer.shaderDictionary["basic"]);
+
+            UpdateSceneGroups(Project.SceneGroups, Project.Fonts, sv.Time);
+
+            GL.Finish();
         }
 
         private void UpdateSceneGroups(IEnumerable<UISceneGroup> groups, IEnumerable<UIFont> fonts, float time)
         {
             foreach (var group in groups)
             {
-                if (group.Visible)
-                {
-                    UpdateSceneGroups(group.Children, fonts, time);
+                if (!group.Visible) 
+                    continue;
 
-                    List<UIScene> sortedScenes = group.Scenes.ToList();
-                    sortedScenes.Sort();
-                    UpdateScenes(group.Scenes, fonts, time);
-                }
+                UpdateSceneGroups(group.Children, fonts, time);
+
+                List<UIScene> sortedScenes = group.Scenes.ToList();
+                sortedScenes.Sort();
+
+                UpdateScenes(group.Scenes, fonts, time);
             }
         }
 
@@ -107,10 +102,10 @@ namespace Shuriken.Views
                         continue;
 
                     renderer.Start();
-                    foreach (var lyr in group.Casts)
-                    {
+
+                    foreach (var lyr in group.Casts) 
                         UpdateCast(scene, lyr, new CastTransform(), time);
-                    }
+
                     renderer.End();
                 }
             }
@@ -145,7 +140,7 @@ namespace Shuriken.Views
 
                     renderer.DrawSprite(new Vec3(sprPos.X, sprPos.Y, lyr.ZTranslation), pivot, rot,
                         new Vec3(sz.X * spr.Width, sz.Y * spr.Height, 1.0f), spr, lyr.Flags, lyr.Color.ToFloats(),
-                        tl, bl, tr, br, lyr.ZIndex, (lyr.Flags & 1) != 0);
+                        tl, bl, tr, br, lyr.ZIndex);
 
                     xOffset += sprStep + (lyr.FontSpacingAdjustment * renderer.RenderWidth);
                 }
@@ -159,7 +154,7 @@ namespace Shuriken.Views
             return new Vec2(x, y);
         }
 
-        private void UpdateCast(UIScene scene, UICast lyr, CastTransform transform, float time, Vec2 parentOrigin = null)
+        private void UpdateCast(UIScene scene, UICast lyr, CastTransform transform, float time)
         {
             bool hideFlag = lyr.HideFlag != 0;
             var position = new Vec2(lyr.Translation.X, lyr.Translation.Y);
@@ -241,6 +236,11 @@ namespace Shuriken.Views
             if (hideFlag)
                 return;
 
+            // Inherit position scale
+            // TODO: Is this handled through flags?
+            position.X *= transform.Scale.X;
+            position.Y *= transform.Scale.Y;
+
             position += lyr.Offset;
             position.X *= renderer.RenderWidth;
             position.Y *= renderer.RenderHeight;
@@ -252,20 +252,16 @@ namespace Shuriken.Views
             if ((lyr.Field34 & 0x200) != 0)
                 position.Y += transform.Position.Y;
 
-            rotation += transform.Rotation;
+            // Inherit rotation
+            if ((lyr.Field34 & 0x2) != 0)
+                rotation += transform.Rotation;
 
-            // inherit scale
-            if ((lyr.Field34 & (1 << 10)) != 0) 
+            // Inherit scale
+            if ((lyr.Field34 & 0x400) != 0) 
                 scale.X *= transform.Scale.X;
 
-            if ((lyr.Field34 & (1 << 11)) != 0) 
+            if ((lyr.Field34 & 0x800) != 0) 
                 scale.Y *= transform.Scale.Y;
-
-            if (parentOrigin != null)
-            {
-                position.X = parentOrigin.X + (position.X - parentOrigin.X) * scale.X;
-                position.Y = parentOrigin.Y + (position.Y - parentOrigin.Y) * scale.Y;
-            }
 
             // inherit color
             if ((lyr.Field34 & 8) != 0)
@@ -284,36 +280,17 @@ namespace Shuriken.Views
                 if (lyr.Type == DrawType.Sprite && spr != null)
                 {
                     renderer.DrawSprite(new Vec3(position.X, position.Y, lyr.ZTranslation), pivot, rotation, new Vec3(lyr.Width, lyr.Height, 1.0f) * scale, spr,
-                        lyr.Flags, color.ToFloats(), tl.ToFloats(), bl.ToFloats(), tr.ToFloats(), br.ToFloats(), lyr.ZIndex, (lyr.Flags & 1) != 0);
+                        lyr.Flags, color.ToFloats(), tl.ToFloats(), bl.ToFloats(), tr.ToFloats(), br.ToFloats(), lyr.ZIndex);
                 }
                 else if (lyr.Type == DrawType.Font)
                 {
                     DrawCastFont(lyr, position, pivot, rotation, scale, tl.ToFloats(), bl.ToFloats(), tr.ToFloats(), br.ToFloats());
                 }
 
-                foreach (var child in lyr.Children)
-                {
-                    Vec2 posAdjust = new Vec2();
+                var childTransform = new CastTransform(position, lyr.ZTranslation, rotation, scale, color);
 
-                    // continue from area of parent cast?
-                    if ((child.Flags & 1) == 0)
-                    {
-                        posAdjust.X = ((lyr.Anchor.X * scale.X) - lyr.Anchor.X) * renderer.RenderWidth;
-                        posAdjust.Y = ((lyr.Anchor.Y * scale.Y) - lyr.Anchor.Y) * renderer.RenderHeight;
-                    }
-
-                    var childTransform = new CastTransform(position + posAdjust, lyr.ZTranslation, rotation, scale, color);
-
-                    // Not correct, blb_gauge looks better when passing position and doesn't have field5c with value 2
-                    if (false)
-                    {
-                        UpdateCast(scene, child, childTransform, time, position);
-                    }
-                    else
-                    {
-                        UpdateCast(scene, child, childTransform, time);
-                    }
-                }
+                foreach (var child in lyr.Children) 
+                    UpdateCast(scene, child, childTransform, time);
             }
         }
 
