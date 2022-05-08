@@ -23,7 +23,7 @@ namespace XNCPLib.XNCP
             CastHierarchyTree = new List<CastHierarchyTreeNode>();
         }
 
-        public void Read(BinaryObjectReader reader)
+        public void Read(BinaryObjectReader reader, uint version)
         {
             uint CastCount = reader.ReadUInt32();
             Casts.Capacity = (int)CastCount;
@@ -46,7 +46,7 @@ namespace XNCPLib.XNCP
                 reader.Seek(baseOffset + CastOffsets[i], SeekOrigin.Begin);
 
                 Cast cast = new Cast();
-                cast.Read(reader);
+                cast.Read(reader, version);
 
                 Casts.Add(cast);
             }
@@ -58,7 +58,7 @@ namespace XNCPLib.XNCP
             }
         }
 
-        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk, uint version)
         {
             UnwrittenPosition = (uint)writer.Position;
 
@@ -89,7 +89,7 @@ namespace XNCPLib.XNCP
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk)
+        public void Write_Step1(BinaryObjectWriter writer, OffsetChunk offsetChunk, uint version)
         {
             uint newUnwrittenPosition = (uint)writer.Length;
 
@@ -104,21 +104,21 @@ namespace XNCPLib.XNCP
 
                 // Allocate memory for Cast data
                 writer.Seek(0, SeekOrigin.End);
-                Utilities.PadZeroBytes(writer, FAPCFile.Type == NinjaType.SonicNext ? 0X50 : 0x74);
+                Utilities.PadZeroBytes(writer, version < 3 ? 0x50 : 0x74);
             }
 
             UnwrittenPosition = newUnwrittenPosition;
         }
 
-        public void Write_Step2(BinaryObjectWriter writer, OffsetChunk offsetChunk)
+        public void Write_Step2(BinaryObjectWriter writer, OffsetChunk offsetChunk, uint version)
         {
             // Fill Cast data
             for (int i = 0; i < Casts.Count; ++i)
             {
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
-                UnwrittenPosition += (uint)(FAPCFile.Type == NinjaType.SonicNext ? 0X50 : 0x74);
+                UnwrittenPosition += (uint)(version < 3 ? 0x50 : 0x74);
 
-                Casts[i].Write_Step0(writer, offsetChunk);
+                Casts[i].Write_Step0(writer, offsetChunk, version);
                 // Finished
             }
         }

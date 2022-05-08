@@ -27,6 +27,8 @@ namespace Shuriken.Rendering
         private Camera camera;
 
         private bool additive;
+        private int textureId = -1;
+        private ShaderProgram shader;
 
         public readonly int MaxVertices = 10000;
         public int MaxQuads => MaxVertices / 4;
@@ -36,7 +38,6 @@ namespace Shuriken.Rendering
         public int NumQuads => quads.Count;
         public int NumIndices { get; private set; }
         public int BufferPos { get; private set; }
-        public int TexID { get; set; }
         public bool BatchStarted { get; private set; }
         public int RenderWidth { get; set; }
         public int RenderHeight { get; set; }
@@ -47,11 +48,17 @@ namespace Shuriken.Rendering
             set
             {
                 additive = value;
+                GL.BlendFunc(BlendingFactor.SrcAlpha, additive ? BlendingFactor.One : BlendingFactor.OneMinusSrcAlpha);
+            }
+        }
 
-                if (additive)
-                    GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
-                else
-                    GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        public int TextureId
+        {
+            get => textureId;
+            set
+            {
+                textureId = value;
+                shader.SetBool("hasTexture", textureId != -1);
             }
         }
 
@@ -136,7 +143,6 @@ namespace Shuriken.Rendering
         {
             NumIndices = 0;
             NumVertices = 0;
-            Additive = false;
         }
 
         /// <summary>
@@ -164,7 +170,6 @@ namespace Shuriken.Rendering
                 Flush();
             }
 
-            TexID = 0;
             BatchStarted = false;
         }
 
@@ -231,8 +236,9 @@ namespace Shuriken.Rendering
             NumIndices += 6;
         }
 
-        public void ConfigureShader(ShaderProgram shader)
+        public void SetShader(ShaderProgram param)
         {
+            shader = param;
             shader.Use();
             shader.SetMatrix4("view", camera.GetViewMatrix());
             shader.SetMatrix4("projection", camera.GetProjectionMatrix((float)RenderWidth / RenderHeight, 40));
@@ -272,27 +278,45 @@ namespace Shuriken.Rendering
         /// <param name="br">The bottom-right tint gradient</param>
         /// <param name="bl">The bottom-left tint gradient</param>
         /// <param name="index">The draw index of the quad. A higher index indactes the quad is drawn on top of a quad with a lower index.</param>
-        public void DrawSprite(Vector3 pos, Vector2 pivot, float rot, Vector3 sz, Models.Sprite spr, uint flags, Vector4 col, Vector4 tl, Vector4 bl, Vector4 tr, Vector4 br, int index)
+        public void DrawSprite(
+            Vector3 pos, Vector2 pivot, float rot, Vector3 sz, 
+            Models.Sprite spr, Models.Sprite nextSpr, float sprFactor, uint flags, 
+            Vector4 col, Vector4 tl, Vector4 bl, Vector4 tr, Vector4 br, int index)
         {
             bool additive = (flags & 1) != 0;
             bool mirrorX = (flags & 1024) != 0;
             bool mirrorY = (flags & 2048) != 0;
             Matrix4x4 mat = CreateModelMatrix(pos, pivot, rot, sz);
 
-            GetUVCoords(
-                new Vector2(spr.Start.X, spr.Start.Y),
-                new Vector2(spr.Width, spr.Height),
-                spr.Texture.Width, 
-                spr.Texture.Height,
-                mirrorX,
-                mirrorY,
-                out var uv0,
-                out var uv1,
-                out var uv2,
-                out var uv3
+            var uv0 = new Vector2(); 
+            var uv1 = new Vector2(); 
+            var uv2 = new Vector2(); 
+            var uv3 = new Vector2(); 
+
+            if (spr != null && nextSpr != null)
+            {
+                GetUVCoords(
+                    new Vector2(
+                        (1.0f - sprFactor) * spr.Start.X + sprFactor * nextSpr.Start.X,
+                        (1.0f - sprFactor) * spr.Start.Y + sprFactor * nextSpr.Start.Y),
+                    
+                    new Vector2(
+                        (1.0f - sprFactor) * spr.Width + sprFactor * nextSpr.Width,
+                        (1.0f - sprFactor) * spr.Height + sprFactor * nextSpr.Height),
+                    
+                    spr.Texture.Width,
+                    spr.Texture.Height,
+                    
+                    mirrorX,
+                    mirrorY,
+                    out uv0,
+                    out uv1,
+                    out uv2,
+                    out uv3
                 );
-            
-            quads.Add(new Quad(mat, uv0, uv1, uv2, uv3, col, tl, tr, bl, br, spr, index, additive));
+            }
+
+            quads.Add(new Quad(mat, uv0, uv1, uv2, uv3, col, tl, tr, bl, br, spr?.Texture, index, additive));
         }
 
         /// <summary>
@@ -315,17 +339,17 @@ namespace Shuriken.Rendering
             
             foreach (var quad in quads)
             {
-                int id = quad.Sprite.Texture.GlTex.ID;
+                int id = quad.Texture?.GlTex?.ID ?? -1;
 
-                if (id != TexID || Additive != quad.Additive || NumVertices >= MaxVertices)
+                if (id != TextureId || Additive != quad.Additive || NumVertices >= MaxVertices)
                 {
                     EndBatch();
                     BeginBatch();
 
-                    quad.Sprite.Texture.GlTex.Bind();
+                    quad.Texture?.GlTex?.Bind();
 
                     Additive = quad.Additive;
-                    TexID = id;
+                    TextureId = id;
                 }
 
                 PushQuadBuffer(quad);

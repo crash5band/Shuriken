@@ -43,7 +43,7 @@ namespace XNCPLib.XNCP
             Offset = new Vector2(0.0f, 0.0f);
         }
 
-        public void Read(BinaryObjectReader reader)
+        public void Read(BinaryObjectReader reader, uint version)
         {
             Field00 = reader.ReadUInt32();
             Field04 = reader.ReadUInt32();
@@ -75,8 +75,8 @@ namespace XNCPLib.XNCP
 
             FontSpacingAdjustment = reader.ReadSingle();
 
-            // SONIC THE HEDGEHOG XNCPs don't have these fields.
-            if (FAPCFile.Type != NinjaType.SonicNext)
+            // Version 2 XNCPs don't have these fields.
+            if (version >= 3)
             {
                 Width = reader.ReadUInt32();
                 Height = reader.ReadUInt32();
@@ -86,6 +86,11 @@ namespace XNCPLib.XNCP
                 Field68 = reader.ReadSingle();
                 Field6C = reader.ReadSingle();
                 Field70 = reader.ReadUInt32();
+            }
+            else
+            {
+                Width = (uint)((BottomRight.X - BottomLeft.X) * 1280);
+                Height = (uint)((BottomLeft.Y - TopLeft.Y) * 720);
             }
 
             long baseOffset = reader.GetOffsetOrigin();
@@ -105,7 +110,7 @@ namespace XNCPLib.XNCP
             }
         }
 
-        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk)
+        public void Write_Step0(BinaryObjectWriter writer, OffsetChunk offsetChunk, uint version)
         {
             uint unwrittenPosition = (uint)writer.Position;
 
@@ -201,8 +206,8 @@ namespace XNCPLib.XNCP
             writer.Seek(unwrittenPosition, SeekOrigin.Begin);
             writer.WriteSingle(FontSpacingAdjustment);
 
-            // SONIC THE HEDGEHOG XNCPs don't have these fields.
-            if (FAPCFile.Type != NinjaType.SonicNext)
+            // Version 2 XNCPs don't have these fields.
+            if (version >= 3)
             {
                 writer.WriteUInt32(Width);
                 writer.WriteUInt32(Height);

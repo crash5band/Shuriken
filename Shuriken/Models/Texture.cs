@@ -24,10 +24,8 @@ namespace Shuriken.Models
         internal GLTexture GlTex { get; private set; }
         public ObservableCollection<int> Sprites { get; set; }
 
-        private void CreateTexture(string filename)
+        private void CreateTexture(ScratchImage img)
         {
-            var img = TexHelper.Instance.LoadFromDDSFile(filename, DDS_FLAGS.NONE);
-
             if (TexHelper.Instance.IsCompressed(img.GetMetadata().Format))
                 img = img.Decompress(DXGI_FORMAT.B8G8R8A8_UNORM);
 
@@ -44,6 +42,17 @@ namespace Shuriken.Models
             img.Dispose();
         }
 
+        private unsafe void CreateTexture(byte[] bytes)
+        {
+            fixed (byte* pBytes = bytes)
+                CreateTexture(TexHelper.Instance.LoadFromDDSMemory((IntPtr)pBytes, bytes.Length, DDS_FLAGS.NONE));
+        }
+
+        private void CreateTexture(string filename)
+        {
+            CreateTexture(TexHelper.Instance.LoadFromDDSFile(filename, DDS_FLAGS.NONE));
+        }
+
         private void CreateBitmap(ScratchImage img)
         {
             var bmp = BitmapConverter.FromTextureImage(img, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -53,14 +62,19 @@ namespace Shuriken.Models
             bmp.Dispose();
         }
 
-        public Texture(string filename)
+        public Texture(string filename) : this()
         {
             FullName = filename;
             Name = Path.GetFileNameWithoutExtension(filename);
             CreateTexture(filename);
-
-            Sprites = new ObservableCollection<int>();
         }
+
+        public Texture(string name, byte[] bytes) : this()
+        {
+            FullName = name;
+            Name = name;
+            CreateTexture(bytes);
+        }            
 
         public Texture()
         {

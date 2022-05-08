@@ -81,6 +81,11 @@ namespace Shuriken.Rendering
             GL.UniformMatrix4(GL.GetUniformLocation(ID, name), true, ref mat);
         }
 
+        public void SetBool(string name, bool value)
+        {
+            GL.Uniform1(GL.GetUniformLocation(ID, name), value ? 1 : 0);
+        }
+
         public void Use()
         {
             GL.UseProgram(ID);
