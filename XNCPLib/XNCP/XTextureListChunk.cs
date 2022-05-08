@@ -40,15 +40,32 @@ namespace XNCPLib.XNCP
             uint listOffset = reader.ReadUInt32();
             Field0C = reader.ReadUInt32();
             uint textureCount = reader.ReadUInt32();
-            uint dataOffset = reader.ReadUInt32();
+            uint texturesOffset = reader.ReadUInt32();
+            uint dataOffset = texturesOffset > 24 ? reader.ReadUInt32() : 0;
 
-            reader.Seek(reader.GetOffsetOrigin() + dataOffset, SeekOrigin.Begin);
+            reader.Seek(reader.GetOffsetOrigin() + texturesOffset, SeekOrigin.Begin);
             for (int i = 0; i < textureCount; ++i)
             {
                 XTexture texture = new XTexture();
                 texture.Read(reader);
 
+                if (string.IsNullOrEmpty(texture.Name))
+                    texture.Name = $"Texture_{i}";
+
                 Textures.Add(texture);
+            }
+
+            if (dataOffset > 0)
+            {
+                for (int i = 0; i < textureCount; ++i)
+                {
+                    reader.Seek(reader.GetOffsetOrigin() + dataOffset + i * 8, SeekOrigin.Begin);
+                    int length = reader.ReadInt32();
+                    uint offset = reader.ReadUInt32();
+
+                    reader.Seek(reader.GetOffsetOrigin() + offset, SeekOrigin.Begin);
+                    Textures[i].Data = reader.ReadArray<byte>(length);
+                }
             }
             
             reader.PopOffsetOrigin();

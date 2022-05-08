@@ -124,11 +124,17 @@ namespace Shuriken.ViewModels
             TextureList texList = new TextureList("textures");
             foreach (XTexture texture in xTextures)
             {
-                string texPath = Path.Combine(root, texture.Name);
-                if (File.Exists(texPath))
-                    texList.Textures.Add(new Texture(texPath));
+                if (texture.Data != null)
+                    texList.Textures.Add(new Texture(texture.Name, texture.Data));
+
                 else
-                    MissingTextures.Add(texture.Name);
+                {
+                    string texPath = Path.Combine(root, texture.Name);
+                    if (File.Exists(texPath))
+                        texList.Textures.Add(new Texture(texPath));
+                    else
+                        MissingTextures.Add(texture.Name);
+                }
             }
 
             if (MissingTextures.Count > 0)
