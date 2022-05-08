@@ -29,7 +29,6 @@ namespace Shuriken.ViewModels
 
         // File Info
         public FAPCFile WorkFile { get; set; }
-        public static NinjaType Type { get; set; }
         public string WorkFilePath { get; set; }
         public bool IsLoaded { get; set; }
         public MainViewModel()
@@ -114,7 +113,7 @@ namespace Shuriken.ViewModels
             ncpSubimages.Clear();
 
             WorkFile = new FAPCFile();
-            WorkFile.Load(filename, Type);
+            WorkFile.Load(filename);
 
             string root = Path.GetDirectoryName(Path.GetFullPath(filename));
 
@@ -124,11 +123,17 @@ namespace Shuriken.ViewModels
             TextureList texList = new TextureList("textures");
             foreach (XTexture texture in xTextures)
             {
-                string texPath = Path.Combine(root, texture.Name);
-                if (File.Exists(texPath))
-                    texList.Textures.Add(new Texture(texPath));
+                if (texture.Data != null)
+                    texList.Textures.Add(new Texture(texture.Name, texture.Data));
+
                 else
-                    MissingTextures.Add(texture.Name);
+                {
+                    string texPath = Path.Combine(root, texture.Name);
+                    if (File.Exists(texPath))
+                        texList.Textures.Add(new Texture(texPath));
+                    else
+                        MissingTextures.Add(texture.Name);
+                }
             }
 
             if (MissingTextures.Count > 0)
@@ -184,7 +189,7 @@ namespace Shuriken.ViewModels
             SaveNode(rootNode, Project.SceneGroups[0], subImageList, Data1, spriteList);
             WorkFile.Resources[0].Content.CsdmProject.Root = rootNode;
 
-            WorkFile.Save(path, Type);
+            WorkFile.Save(path);
         }
 
         private void SaveNode(CSDNode xNode, UISceneGroup uiSceneGroup, List<SubImage> subImageList, List<System.Numerics.Vector2> Data1, List<Sprite> spriteList)

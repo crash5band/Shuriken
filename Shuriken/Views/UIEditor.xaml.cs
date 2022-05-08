@@ -1,11 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Globalization;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +12,7 @@ using Shuriken.Misc;
 using OpenTK.Windowing.Common;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Wpf;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Shuriken.Views
 {
@@ -66,7 +62,7 @@ namespace Shuriken.Views
             float deltaTime = obj.Milliseconds / 1000.0f * 60.0f;
 
             sv.Tick(deltaTime);
-            renderer.ConfigureShader(renderer.shaderDictionary["basic"]);
+            renderer.SetShader(renderer.shaderDictionary["basic"]);
 
             UpdateSceneGroups(Project.SceneGroups, Project.Fonts, sv.Time);
 
@@ -111,62 +107,19 @@ namespace Shuriken.Views
             }
         }
 
-        private void DrawCastFont(UICast lyr, Vec2 pos, Vec2 pivot, float rot, Vec3 sz, Vector4 tl, Vector4 bl, Vector4 tr, Vector4 br)
-        {
-            float xOffset = 0.0f;
-            foreach (var c in lyr.FontCharacters)
-            {
-                int sprID = -1;
-                var font = Project.TryGetFont(lyr.FontID);
-                if (font == null)
-                    continue;
-
-                foreach (var mapping in font.Mappings)
-                {
-                    if (mapping.Character == c)
-                    {
-                        sprID = mapping.Sprite;
-                        break;
-                    }
-                }
-
-                var spr = Project.TryGetSprite(sprID);
-                if (spr != null)
-                {
-                    float sprStep = spr.Width * 0.5f * sz.X;
-
-                    xOffset += sprStep;
-                    Vec2 sprPos = new Vec2(pos.X + xOffset - (lyr.Width * 0.5f * sz.X), pos.Y);
-
-                    renderer.DrawSprite(new Vec3(sprPos.X, sprPos.Y, lyr.ZTranslation), pivot, rot,
-                        new Vec3(sz.X * spr.Width, sz.Y * spr.Height, 1.0f), spr, lyr.Flags, lyr.Color.ToFloats(),
-                        tl, bl, tr, br, lyr.ZIndex);
-
-                    xOffset += sprStep + (lyr.FontSpacingAdjustment * renderer.RenderWidth);
-                }
-            }
-        }
-
-        private Vec2 GetPivot(UICast lyr, Vec3 scale, int width, int height)
-        {
-            float x = lyr.Anchor.X * scale.X * width * 0.5f;
-            float y = lyr.Anchor.Y * scale.Y * height * 0.5f;
-            return new Vec2(x, y);
-        }
-
         private void UpdateCast(UIScene scene, UICast lyr, CastTransform transform, float time)
         {
             bool hideFlag = lyr.HideFlag != 0;
             var position = new Vec2(lyr.Translation.X, lyr.Translation.Y);
             float rotation = lyr.Rotation;
-            var scale = new Vec3(lyr.Scale.X, lyr.Scale.Y, lyr.Scale.Z);
-            int sprID = lyr.Sprites[Math.Max(0, Math.Min(lyr.Sprites.Count - 1, (int)lyr.DefaultSprite))];
+            var scale = new Vec2(lyr.Scale.X, lyr.Scale.Y);
+            float sprID = lyr.DefaultSprite;
             var color = lyr.Color;
-            var tl = lyr.GradientTopLeft;
-            var bl = lyr.GradientBottomLeft;
-            var tr = lyr.GradientTopRight;
-            var br = lyr.GradientBottomRight;
-
+            var gradientTopLeft = lyr.GradientTopLeft;
+            var gradientBottomLeft = lyr.GradientBottomLeft;
+            var gradientTopRight = lyr.GradientTopRight;
+            var gradientBottomRight = lyr.GradientBottomRight;
+            
             foreach (var animation in scene.Animations)
             {
                 if (!animation.Enabled)
@@ -207,7 +160,7 @@ namespace Shuriken.Views
                             break;
 
                         case AnimationType.SubImage:
-                            sprID = lyr.Sprites[Math.Max(0, Math.Min(lyr.Sprites.Count - 1, (int)track.GetSingle(time)))];
+                            sprID = track.GetSingle(time);
                             break;
 
                         case AnimationType.Color:
@@ -215,19 +168,19 @@ namespace Shuriken.Views
                             break;
                         
                         case AnimationType.GradientTL:
-                            tl = track.GetColor(time);
+                            gradientTopLeft = track.GetColor(time);
                             break;
                         
                         case AnimationType.GradientBL:
-                            bl = track.GetColor(time);
+                            gradientBottomLeft = track.GetColor(time);
                             break;
 
                         case AnimationType.GradientTR:
-                            tr = track.GetColor(time);
+                            gradientTopRight = track.GetColor(time);
                             break;
 
                         case AnimationType.GradientBR:
-                            br = track.GetColor(time);
+                            gradientBottomRight = track.GetColor(time);
                             break;
                     }
                 }
@@ -241,9 +194,15 @@ namespace Shuriken.Views
             position.X *= transform.Scale.X;
             position.Y *= transform.Scale.Y;
 
+            // Rotate through parent transform
+            float angle = Utilities.ToRadians(transform.Rotation);
+            float rotatedX = position.X * MathF.Cos(angle) * scene.AspectRatio + position.Y * MathF.Sin(angle);
+            float rotatedY = position.Y * MathF.Cos(angle) - position.X * MathF.Sin(angle) * scene.AspectRatio;
+
+            position.X = rotatedX / scene.AspectRatio;
+            position.Y = rotatedY;
+
             position += lyr.Offset;
-            position.X *= renderer.RenderWidth;
-            position.Y *= renderer.RenderHeight;
 
             // Inherit position
             if ((lyr.Field34 & 0x100) != 0)
@@ -270,24 +229,67 @@ namespace Shuriken.Views
                 color = new Color(cF.X, cF.Y, cF.Z, cF.W);
             }
 
-            scale.X = Math.Max(0, scale.X);
-            scale.Y = Math.Max(0, scale.Y);
-            Vec2 pivot = GetPivot(lyr, scale, renderer.RenderWidth, renderer.RenderHeight);
-
             if (lyr.Visible && lyr.IsEnabled)
             {
-                var spr = Project.TryGetSprite(sprID);
-                if (lyr.Type == DrawType.Sprite && spr != null)
+                if (lyr.Type == DrawType.Sprite)
                 {
-                    renderer.DrawSprite(new Vec3(position.X, position.Y, lyr.ZTranslation), pivot, rotation, new Vec3(lyr.Width, lyr.Height, 1.0f) * scale, spr,
-                        lyr.Flags, color.ToFloats(), tl.ToFloats(), bl.ToFloats(), tr.ToFloats(), br.ToFloats(), lyr.ZIndex);
+                    var spr = sprID >= 0 ? Project.TryGetSprite(lyr.Sprites[Math.Min(lyr.Sprites.Count - 1, (int)sprID)]) : null;
+                    var nextSpr = sprID >= 0 ? Project.TryGetSprite(lyr.Sprites[Math.Min(lyr.Sprites.Count - 1, (int)sprID + 1)]) : null;
+
+                    spr ??= nextSpr;
+                    nextSpr ??= spr;
+
+                    renderer.DrawSprite(
+                        lyr.TopLeft, lyr.BottomLeft, lyr.TopRight, lyr.BottomRight,
+                        position, Utilities.ToRadians(rotation), scale, scene.AspectRatio, spr, nextSpr, sprID % 1, color,
+                        gradientTopLeft, gradientBottomLeft, gradientTopRight, gradientBottomRight,
+                        lyr.ZIndex, lyr.Flags);
                 }
                 else if (lyr.Type == DrawType.Font)
                 {
-                    DrawCastFont(lyr, position, pivot, rotation, scale, tl.ToFloats(), bl.ToFloats(), tr.ToFloats(), br.ToFloats());
+                    float xOffset = 0.0f;
+
+                    for (var i = 0; i < lyr.FontCharacters.Length; i++)
+                    {
+                        var font = Project.TryGetFont(lyr.FontID);
+                        if (font == null)
+                            continue;
+
+                        Sprite spr = null;
+
+                        foreach (var mapping in font.Mappings)
+                        {
+                            if (mapping.Character != lyr.FontCharacters[i]) 
+                                continue;
+                            
+                            spr = Project.TryGetSprite(mapping.Sprite);
+                            break;
+                        }
+
+                        if (spr == null)
+                            continue;
+
+                        float width = spr.Dimensions.X / renderer.Width;
+                        float height = spr.Dimensions.Y / renderer.Height;
+
+                        var begin = (Vector2)lyr.TopLeft;
+                        var end = begin + new Vector2(width, height);
+
+                        renderer.DrawSprite(
+                            new Vector2(begin.X + xOffset, begin.Y),
+                            new Vector2(begin.X + xOffset, end.Y),
+                            new Vector2(end.X + xOffset, begin.Y),
+                            new Vector2(end.X + xOffset, end.Y),
+                            position, Utilities.ToRadians(rotation), scale, scene.AspectRatio, spr, spr, 0, color,
+                            gradientTopLeft, gradientBottomLeft, gradientTopRight, gradientBottomRight,
+                            lyr.ZIndex, lyr.Flags
+                        );
+
+                        xOffset += width + lyr.FontSpacingAdjustment;
+                    }
                 }
 
-                var childTransform = new CastTransform(position, lyr.ZTranslation, rotation, scale, color);
+                var childTransform = new CastTransform(position, rotation, scale, color);
 
                 foreach (var child in lyr.Children) 
                     UpdateCast(scene, child, childTransform, time);
