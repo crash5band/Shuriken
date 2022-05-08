@@ -163,7 +163,7 @@ namespace XNCPLib.XNCP
 
                 // Allocate memory for Scene data
                 writer.Seek(0, SeekOrigin.End);
-                Utilities.PadZeroBytes(writer, FAPCFile.Type == NinjaType.SonicNext ? 0x48 : 0x4C);
+                Utilities.PadZeroBytes(writer, Scenes[f].Version < 3 ? 0x48 : 0x4C);
             }
 
             // Fill SceneIDOffsets data
@@ -212,7 +212,7 @@ namespace XNCPLib.XNCP
             {
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 Scenes[i].Write_Step0(writer, offsetChunk);
-                UnwrittenPosition += (uint)(FAPCFile.Type == NinjaType.SonicNext ? 0x48 : 0x4C);
+                UnwrittenPosition += (uint)(Scenes[i].Version < 3 ? 0x48 : 0x4C);
             }
 
             // Continue NextNode steps

@@ -122,12 +122,6 @@ namespace Shuriken.Models
             Width = cast.Width;
             Height = cast.Height;
 
-            if (MainViewModel.Type == NinjaType.SonicNext)
-            {
-                Width = (uint)((BottomRight.X - BottomLeft.X) * 1280);
-                Height = (uint)((BottomLeft.Y - TopLeft.Y) * 720);
-            }
-
             Field58 = cast.Field58;
             Field5C = cast.Field5C;
 
