@@ -66,7 +66,7 @@ namespace Shuriken.Views
             float deltaTime = obj.Milliseconds / 1000.0f * 60.0f;
 
             sv.Tick(deltaTime);
-            renderer.ConfigureShader(renderer.shaderDictionary["basic"]);
+            renderer.SetShader(renderer.shaderDictionary["basic"]);
 
             UpdateSceneGroups(Project.SceneGroups, Project.Fonts, sv.Time);
 
@@ -274,13 +274,13 @@ namespace Shuriken.Views
 
             if (lyr.Visible && lyr.IsEnabled)
             {
-                var spr = Project.TryGetSprite(lyr.Sprites[Math.Max(0, Math.Min(lyr.Sprites.Count - 1, (int)sprID))]);
-                var nextSpr = Project.TryGetSprite(lyr.Sprites[Math.Max(0, Math.Min(lyr.Sprites.Count - 1, (int)sprID + 1))]);
+                var spr = sprID >= 0 ? Project.TryGetSprite(lyr.Sprites[Math.Min(lyr.Sprites.Count - 1, (int)sprID)]) : null;
+                var nextSpr = sprID >= 0 ? Project.TryGetSprite(lyr.Sprites[Math.Min(lyr.Sprites.Count - 1, (int)sprID + 1)]) : null;
 
                 spr ??= nextSpr;
                 nextSpr ??= spr;
 
-                if (lyr.Type == DrawType.Sprite && spr != null)
+                if (lyr.Type == DrawType.Sprite)
                 {
                     renderer.DrawSprite(new Vec3(position.X, position.Y, lyr.ZTranslation), pivot, rotation, new Vec3(lyr.Width, lyr.Height, 1.0f) * scale, spr, nextSpr, sprID % 1,
                         lyr.Flags, color.ToFloats(), tl.ToFloats(), bl.ToFloats(), tr.ToFloats(), br.ToFloats(), lyr.ZIndex);
