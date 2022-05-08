@@ -13,8 +13,7 @@ namespace XNCPLib.XNCP
     {
         public uint Signature { get; set; }
         public FAPCEmbeddedRes[] Resources { get; set; }
-        public static NinjaType Type { get; set; }
-        public static Encoding Encoding
+        public Encoding Encoding
         {
             get
             {
@@ -22,6 +21,7 @@ namespace XNCPLib.XNCP
                 return Encoding.GetEncoding("shift-jis");
             }
         }
+        public static NinjaType Type { get; set; }
 
         public FAPCFile()
         {
