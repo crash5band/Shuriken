@@ -89,5 +89,10 @@ namespace Shuriken.Models
         {
             return $"<{R}, {G}, {B}, {A}>";
         }
+
+        public static implicit operator Vector4(Color v)
+        {
+            return v.ToFloats();
+        }
     }
 }
