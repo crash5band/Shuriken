@@ -14,6 +14,14 @@ namespace XNCPLib.XNCP
         public uint Signature { get; set; }
         public FAPCEmbeddedRes[] Resources { get; set; }
         public static NinjaType Type { get; set; }
+        public static Encoding Encoding
+        {
+            get
+            {
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                return Encoding.GetEncoding("shift-jis");
+            }
+        }
 
         public FAPCFile()
         {
@@ -22,7 +30,7 @@ namespace XNCPLib.XNCP
 
         public void Load(string filename, NinjaType type)
         {
-            BinaryObjectReader reader = new BinaryObjectReader(filename, Endianness.Little, Encoding.UTF8);
+            BinaryObjectReader reader = new BinaryObjectReader(filename, Endianness.Little, Encoding);
             Type = type;
 
             Signature = reader.ReadUInt32();
@@ -40,7 +48,7 @@ namespace XNCPLib.XNCP
 
         public void Save(string filename, NinjaType type)
         {
-            BinaryObjectWriter writer = new BinaryObjectWriter(filename, Endianness.Little, Encoding.UTF8);
+            BinaryObjectWriter writer = new BinaryObjectWriter(filename, Endianness.Little, Encoding);
             Type = type;
 
             writer.WriteUInt32(Signature);
