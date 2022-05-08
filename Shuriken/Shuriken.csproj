@@ -35,6 +35,10 @@
     </Resource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Misc\Extensions\" />
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(ProjectDir)Fonts&quot; &quot;$(OutDir)Fonts\&quot; /S /Y&#xD;&#xA;xcopy &quot;$(ProjectDir)Shaders&quot; &quot;$(OutDir)Shaders\&quot; /S /Y" />
   </Target>
