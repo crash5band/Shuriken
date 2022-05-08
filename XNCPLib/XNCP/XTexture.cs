@@ -12,6 +12,7 @@ namespace XNCPLib.XNCP
     {
         public string Name { get; set; }
         public uint Field04 { get; set; }
+        public byte[] Data { get; set; }
 
         public XTexture()
         {

@@ -23,7 +23,9 @@ namespace Shuriken
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {
+    {   
+        private static readonly string filters = "All files (*.xncp;*.yncp)|*.xncp;*.yncp|CSD Project (*.xncp)|*.xncp|CSD Project (*.yncp)|*.yncp";
+
         private MainViewModel vm;
 
         public MainWindow()
@@ -36,6 +38,7 @@ namespace Shuriken
 
             editorSelect.SelectedIndex = 0;
         }
+
         private void NewClick(object sender, RoutedEventArgs e)
         {
             if (DataContext is MainViewModel vm)
@@ -47,12 +50,10 @@ namespace Shuriken
         private void OpenMenu_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Filter = Filters.NinjaTypeFilter;
-            fileDialog.FilterIndex = (int)MainViewModel.Type;
+            fileDialog.Filter = filters;
 
             if (fileDialog.ShowDialog() == true)
             {
-                MainViewModel.Type = (NinjaType)fileDialog.FilterIndex;
                 vm.Load(fileDialog.FileName);
             }
         }
@@ -64,12 +65,10 @@ namespace Shuriken
         private void SaveAsMenu_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog fileDialog = new SaveFileDialog();
-            fileDialog.Filter = Filters.NinjaTypeFilter;
-            fileDialog.FilterIndex = (int)MainViewModel.Type;
+            fileDialog.Filter = filters;
 
             if (fileDialog.ShowDialog() == true)
             {
-                MainViewModel.Type = (NinjaType)fileDialog.FilterIndex;
                 vm.Save(fileDialog.FileName);
             }
         }

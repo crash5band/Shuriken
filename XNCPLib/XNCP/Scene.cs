@@ -109,7 +109,7 @@ namespace XNCPLib.XNCP
             {
                 reader.Seek(baseOffset + CastGroupTableOffset + (16 * i), SeekOrigin.Begin);
                 CastGroup group = new CastGroup();
-                group.Read(reader);
+                group.Read(reader, Version);
 
                 UICastGroups.Add(group);
             }
@@ -151,8 +151,8 @@ namespace XNCPLib.XNCP
                 AnimationFrameDataList.Add(frameData);
             }
 
-            // SONIC THE HEDGEHOG XNCPs don't have a second animation data chunk.
-            if (FAPCFile.Type == NinjaType.SonicNext) return;
+            // Version 2 XNCPs don't have a second animation data chunk.
+            if (Version < 3) return;
 
             for (int a = 0; a < AnimationCount; ++a)
             {
@@ -347,7 +347,7 @@ namespace XNCPLib.XNCP
             writer.Seek(0, SeekOrigin.End);
             Utilities.PadZeroBytes(writer, AnimationDictionaries.Count * 0x8);
 
-            if (FAPCFile.Type != NinjaType.SonicNext)
+            if (Version >= 3)
             {
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 offsetChunk.Add(writer);
@@ -370,7 +370,7 @@ namespace XNCPLib.XNCP
                 writer.Seek(UnwrittenPosition, SeekOrigin.Begin);
                 UnwrittenPosition += 0x10;
 
-                UICastGroups[i].Write_Step0(writer, offsetChunk);
+                UICastGroups[i].Write_Step0(writer, offsetChunk, Version);
             }
 
             // Fill CastIDOffsets data
@@ -421,8 +421,8 @@ namespace XNCPLib.XNCP
                 AnimationFrameDataList[i].Write(writer);
             }
 
-            // SONIC THE HEDGEHOG XNCPs don't have a second animation data chunk.
-            if (FAPCFile.Type == NinjaType.SonicNext) return;
+            // Version 2 XNCPs don't have a second animation data chunk.
+            if (Version < 3) return;
 
             // AnimationData2
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -455,7 +455,7 @@ namespace XNCPLib.XNCP
             // Continue UICastGroups steps
             for (int i = 0; i < UICastGroups.Count; ++i)
             {
-                UICastGroups[i].Write_Step1(writer, offsetChunk);
+                UICastGroups[i].Write_Step1(writer, offsetChunk, Version);
             }
 
             // Continue AnimationKeyFrame steps
@@ -464,8 +464,8 @@ namespace XNCPLib.XNCP
                 AnimationKeyframeDataList[i].Write_Step1(writer, offsetChunk);
             }
 
-            // SONIC THE HEDGEHOG XNCPs don't have a second animation data chunk.
-            if (FAPCFile.Type == NinjaType.SonicNext) return;
+            // Version 2 XNCPs don't have a second animation data chunk.
+            if (Version < 3) return;
 
             // Fill GroupAnimationData2List data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -505,7 +505,7 @@ namespace XNCPLib.XNCP
             // Continue UICastGroups steps
             for (int i = 0; i < UICastGroups.Count; ++i)
             {
-                UICastGroups[i].Write_Step2(writer, offsetChunk);
+                UICastGroups[i].Write_Step2(writer, offsetChunk, Version);
                 // Finished
             }
 
@@ -515,8 +515,8 @@ namespace XNCPLib.XNCP
                 AnimationKeyframeDataList[i].Write_Step2(writer, offsetChunk);
             }
 
-            // SONIC THE HEDGEHOG XNCPs don't have a second animation data chunk.
-            if (FAPCFile.Type == NinjaType.SonicNext) return;
+            // Version 2 XNCPs don't have a second animation data chunk.
+            if (Version < 3) return;
 
             // Fill GroupAnimationData2 data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -562,8 +562,8 @@ namespace XNCPLib.XNCP
                 // Finished
             }
 
-            // SONIC THE HEDGEHOG XNCPs don't have a second animation data chunk.
-            if (FAPCFile.Type == NinjaType.SonicNext) return;
+            // Version 2 XNCPs don't have a second animation data chunk.
+            if (Version < 3) return;
 
             // Fill CastAnimationData2List data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -608,8 +608,8 @@ namespace XNCPLib.XNCP
 
         public void Write_Step5(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
-            // SONIC THE HEDGEHOG XNCPs don't have a second animation data chunk.
-            if (FAPCFile.Type == NinjaType.SonicNext) return;
+            // Version 2 XNCPs don't have a second animation data chunk.
+            if (Version < 3) return;
 
             // Fill CastAnimationData2 data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -657,8 +657,8 @@ namespace XNCPLib.XNCP
 
         public void Write_Step6(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
-            // SONIC THE HEDGEHOG XNCPs don't have a second animation data chunk.
-            if (FAPCFile.Type == NinjaType.SonicNext) return;
+            // Version 2 XNCPs don't have a second animation data chunk.
+            if (Version < 3) return;
 
             // Fill Data5 data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -714,8 +714,8 @@ namespace XNCPLib.XNCP
 
         public void Write_Step7(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
-            // SONIC THE HEDGEHOG XNCPs don't have a second animation data chunk.
-            if (FAPCFile.Type == NinjaType.SonicNext) return;
+            // Version 2 XNCPs don't have a second animation data chunk.
+            if (Version < 3) return;
 
             // Fill Data6 data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -774,8 +774,8 @@ namespace XNCPLib.XNCP
 
         public void Write_Step8(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
-            // SONIC THE HEDGEHOG XNCPs don't have a second animation data chunk.
-            if (FAPCFile.Type == NinjaType.SonicNext) return;
+            // Version 2 XNCPs don't have a second animation data chunk.
+            if (Version < 3) return;
 
             // Fill Data7 data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -841,8 +841,8 @@ namespace XNCPLib.XNCP
         
         public void Write_Step9(BinaryObjectWriter writer, OffsetChunk offsetChunk)
         {
-            // SONIC THE HEDGEHOG XNCPs don't have a second animation data chunk.
-            if (FAPCFile.Type == NinjaType.SonicNext) return;
+            // Version 2 XNCPs don't have a second animation data chunk.
+            if (Version < 3) return;
 
             // Fill Data8 data
             uint newUnwrittenPosition = (uint)writer.Length;
@@ -903,8 +903,8 @@ namespace XNCPLib.XNCP
         
         public void Write_Step10(BinaryObjectWriter writer)
         {
-            // SONIC THE HEDGEHOG XNCPs don't have a second animation data chunk.
-            if (FAPCFile.Type == NinjaType.SonicNext) return;
+            // Version 2 XNCPs don't have a second animation data chunk.
+            if (Version < 3) return;
 
             // Fill final Vector3 data
             for (int a = 0; a < AnimationDictionaries.Count; ++a)

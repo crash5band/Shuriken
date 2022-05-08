@@ -15,7 +15,7 @@ namespace Shuriken.Rendering
         public Vector2 UV1;
         public Vector2 UV2;
         public Vector2 UV3;
-        public Models.Sprite Sprite;
+        public Models.Texture Texture;
         public Vector4 TopRight;
         public Vector4 BottomRight;
         public Vector4 BottomLeft;
@@ -24,7 +24,7 @@ namespace Shuriken.Rendering
         public bool Additive;
         
         public Quad(Matrix4x4 m, Vector2 uv0, Vector2 uv1, Vector2 uv2, Vector2 uv3, Vector4 color, 
-            Vector4 tl, Vector4 tr, Vector4 bl, Vector4 br, Models.Sprite spr, int order, bool additive)
+            Vector4 tl, Vector4 tr, Vector4 bl, Vector4 br, Models.Texture texture, int order, bool additive)
         {
             M = m;
             UV0 = uv0;
@@ -36,7 +36,7 @@ namespace Shuriken.Rendering
             BottomRight = br;
             BottomLeft = bl;
             TopLeft = tl;
-            Sprite = spr;
+            Texture = texture;
             Order = order;
             Additive = additive;
         }

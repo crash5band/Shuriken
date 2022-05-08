@@ -5,18 +5,13 @@ in vec4 color;
 
 out vec4 fragColor;
 
-struct Material
-{
-    sampler2D diffuse0;
-    sampler2D diffuse1;
-    float blend;
-};
-
-uniform Material material;
-uniform int blendMode;
+uniform sampler2D tex;
+uniform bool hasTexture;
 
 void main()
 {
-    vec4 texColor = texture(material.diffuse0, uv1) * color;
-    fragColor = texColor;
+    fragColor = color;
+    
+    if (hasTexture)
+        fragColor *= texture(tex, uv1);
 }
