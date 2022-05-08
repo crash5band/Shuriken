@@ -13,6 +13,14 @@ namespace XNCPLib.XNCP
     {
         public uint Signature { get; set; }
         public FAPCEmbeddedRes[] Resources { get; set; }
+        public Encoding Encoding
+        {
+            get
+            {
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                return Encoding.GetEncoding("shift-jis");
+            }
+        }
 
         public FAPCFile()
         {
@@ -21,7 +29,7 @@ namespace XNCPLib.XNCP
 
         public void Load(string filename)
         {
-            BinaryObjectReader reader = new BinaryObjectReader(filename, Endianness.Little, Encoding.UTF8);
+            BinaryObjectReader reader = new BinaryObjectReader(filename, Endianness.Little, Encoding);
 
             Signature = reader.ReadUInt32();
             if (Signature == Utilities.Make4CCLE("CPAF")) 
@@ -35,7 +43,7 @@ namespace XNCPLib.XNCP
 
         public void Save(string filename)
         {
-            BinaryObjectWriter writer = new BinaryObjectWriter(filename, Endianness.Little, Encoding.UTF8);
+            BinaryObjectWriter writer = new BinaryObjectWriter(filename, Endianness.Little, Encoding);
 
             writer.WriteUInt32(Signature);
             if (Signature == Utilities.Make4CCLE("CPAF")) 
