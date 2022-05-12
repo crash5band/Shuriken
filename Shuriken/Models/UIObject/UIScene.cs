@@ -192,7 +192,7 @@ namespace Shuriken.Models
 
         private void CreateHierarchyTree(int group, List<CastHierarchyTreeNode> tree, List<UICast> lyrs)
         {
-            int next = 0;
+            int next = (int)Groups[group].RootCastIndex;
             while (next != -1)
             {
                 Groups[group].Casts.Add(lyrs[next]);
