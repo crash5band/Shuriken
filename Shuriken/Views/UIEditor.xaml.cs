@@ -119,7 +119,7 @@ namespace Shuriken.Views
             var gradientBottomLeft = lyr.GradientBottomLeft;
             var gradientTopRight = lyr.GradientTopRight;
             var gradientBottomRight = lyr.GradientBottomRight;
-            
+
             foreach (var animation in scene.Animations)
             {
                 if (!animation.Enabled)
@@ -222,8 +222,8 @@ namespace Shuriken.Views
             if ((lyr.Field34 & 0x800) != 0) 
                 scale.Y *= transform.Scale.Y;
 
-            // inherit color
-            if ((lyr.Field34 & 8) != 0)
+            // Inherit color
+            if ((lyr.Field34 & 0x8) != 0)
             {
                 Vector4 cF = Vector4.Multiply(color.ToFloats(), transform.Color.ToFloats());
                 color = new Color(cF.X, cF.Y, cF.Z, cF.W);
