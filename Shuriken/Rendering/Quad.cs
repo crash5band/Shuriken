@@ -11,5 +11,6 @@ namespace Shuriken.Rendering
         public Texture Texture;
         public int ZIndex;
         public bool Additive;
+        public bool LinearFiltering;
     }
 }

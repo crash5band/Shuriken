@@ -28,6 +28,7 @@ namespace Shuriken.Rendering
         private List<Quad> quads;
 
         private bool additive;
+        private bool linearFiltering = true;
         private int textureId = -1;
         private ShaderProgram shader;
 
@@ -52,6 +53,22 @@ namespace Shuriken.Rendering
                 GL.BlendFunc(BlendingFactor.SrcAlpha, additive ? BlendingFactor.One : BlendingFactor.OneMinusSrcAlpha);
             }
         }
+
+        public bool LinearFiltering
+        {
+            get => linearFiltering;
+            set
+            {
+                linearFiltering = value;
+
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+                    linearFiltering ? (int)TextureMinFilter.Linear : (int)TextureMinFilter.Nearest);
+
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
+                    linearFiltering ? (int)TextureMagFilter.Linear : (int)TextureMagFilter.Nearest);
+            }
+        }
+
 
         public int TextureId
         {
@@ -234,7 +251,8 @@ namespace Shuriken.Rendering
             quad.BottomRight.Color = color * gradientBottomRight;
             quad.ZIndex = zIndex;
             quad.Additive = (flags & 0x1) != 0;
-            
+            quad.LinearFiltering = (flags & 0x1000) != 0;
+
             quads.Add(quad);
         }
 
@@ -266,7 +284,7 @@ namespace Shuriken.Rendering
             {
                 int id = quad.Texture?.GlTex?.ID ?? -1;
 
-                if (id != TextureId || Additive != quad.Additive || NumVertices >= MaxVertices)
+                if (id != TextureId || Additive != quad.Additive || LinearFiltering != quad.LinearFiltering || NumVertices >= MaxVertices)
                 {
                     EndBatch();
                     BeginBatch();
@@ -275,6 +293,7 @@ namespace Shuriken.Rendering
 
                     TextureId = id;
                     Additive = quad.Additive;
+                    LinearFiltering = quad.LinearFiltering;
                 }
 
                 PushQuad(quad);
