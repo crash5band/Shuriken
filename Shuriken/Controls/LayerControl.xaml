@@ -13,6 +13,7 @@
              d:DataContext="{d:DesignInstance Type=models:UICast}"
              d:DesignWidth="300">
     <UserControl.Resources>
+        <converters:EqualityToVisibilityConverter x:Key="Eq2Visibility"/>
         <Style TargetType="Label">
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="VerticalContentAlignment" Value="Bottom"/>
@@ -111,7 +112,7 @@
                     </StackPanel>
                 </Border>
             </Expander>
-            <Expander Header="Font" IsExpanded="True">
+            <Expander Header="Font" IsExpanded="True" Visibility="{Binding Type, Converter={StaticResource Eq2Visibility}, ConverterParameter={x:Static models:DrawType.Font}, Mode=OneWay}">
                 <Border>
                     <StackPanel>
                         <Label>Font</Label>
@@ -172,7 +173,7 @@
                     </StackPanel>
                 </Border>
             </Expander>
-            <Expander Header="Sprites" IsExpanded="True">
+            <Expander Header="Sprites" IsExpanded="True" Visibility="{Binding Type, Converter={StaticResource Eq2Visibility}, ConverterParameter={x:Static models:DrawType.Sprite}, Mode=OneWay}">
                 <Border>
                     <StackPanel>
                         <Label>Default Sprite</Label>
