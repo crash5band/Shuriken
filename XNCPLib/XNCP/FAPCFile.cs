@@ -45,9 +45,17 @@ namespace XNCPLib.XNCP
         {
             BinaryObjectWriter writer = new BinaryObjectWriter(filename, Endianness.Little, Encoding);
 
-            writer.WriteUInt32(Signature);
-            if (Signature == Utilities.Make4CCLE("CPAF")) 
+            if (filename.EndsWith("yncp"))
+            {
+                Signature = Utilities.Make4CCLE("CPAF");
                 writer.Endianness = Endianness.Big;
+            }
+            else
+            {
+                Signature = Utilities.Make4CCLE("FAPC");
+            }
+
+            writer.WriteUInt32(Signature);
 
             Resources[0].Write(writer);
             Resources[1].Write(writer);
