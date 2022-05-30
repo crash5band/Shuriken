@@ -50,8 +50,11 @@ namespace XNCPLib.XNCP
             reader.Seek(reader.GetOffsetOrigin() + rootNodeOffset, SeekOrigin.Begin);
             Root.Read(reader);
 
-            reader.Seek(reader.GetOffsetOrigin() + fontListOffset, SeekOrigin.Begin);
-            Fonts.Read(reader);
+            if (fontListOffset != 0)
+            {
+                reader.Seek(reader.GetOffsetOrigin() + fontListOffset, SeekOrigin.Begin);
+                Fonts.Read(reader);
+            }
 
             reader.PopOffsetOrigin();
         }
