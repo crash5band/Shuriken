@@ -17,30 +17,27 @@ namespace XNCPLib.XNCP
 
         public void Read(BinaryObjectReader reader)
         {
-            char[] c = new char[4];
-            for (int i = 0; i < 4; ++i)
-            {
-                string s = reader.ReadString(StringBinaryFormat.FixedLength, 1);
-                c[i] = s.Length > 0 ? s[0] : '.';
-            }
+            if (reader.Endianness == Endianness.Big)
+                reader.Seek(2, SeekOrigin.Current);
 
-            SourceCharacter = c[reader.Endianness == Endianness.Little ? 0 : 3];
+            SourceCharacter = reader.Read<char>();
+
+            if (reader.Endianness ==Endianness.Little)
+                reader.Seek(2, SeekOrigin.Current);
+
             SubImageIndex = reader.ReadUInt32();
         }
 
         public void Write(BinaryObjectWriter writer)
         {
-            char[] toWrite = { '.', '\0', '\0', '\0' };
-            if (writer.Endianness == Endianness.Little)
-            {
-                toWrite[0] = SourceCharacter;
-            }
-            else
-            {
-                toWrite[3] = SourceCharacter;
-            }
+            if (writer.Endianness == Endianness.Big)
+                writer.Seek(2, SeekOrigin.Current);
 
-            writer.WriteString(StringBinaryFormat.FixedLength, new string(toWrite), 4);
+            writer.Write(SourceCharacter);
+
+            if (writer.Endianness == Endianness.Little)
+                writer.Seek(2, SeekOrigin.Current);
+
             writer.WriteUInt32(SubImageIndex);
         }
     }
