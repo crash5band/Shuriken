@@ -47,14 +47,10 @@ namespace XNCPLib.XNCP
 
             if (filename.EndsWith("yncp"))
             {
-                Signature = Utilities.Make4CCLE("CPAF");
                 writer.Endianness = Endianness.Big;
             }
-            else
-            {
-                Signature = Utilities.Make4CCLE("FAPC");
-            }
 
+            Signature = Utilities.Make4CCLE("FAPC");
             writer.WriteUInt32(Signature);
 
             Resources[0].Write(writer);
