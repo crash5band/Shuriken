@@ -59,7 +59,16 @@ namespace Shuriken
         }
         private void SaveMenu_Click(object sender, RoutedEventArgs e)
         {
-            vm.Save(null);
+            try { vm.Save(null); }
+            catch(System.IO.IOException error)
+            {
+#if DEBUG
+                System.Diagnostics.Debugger.Break();
+#else
+                MessageBox.Show(error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);                
+#endif
+            }
+
         }
 
         private void SaveAsMenu_Click(object sender, RoutedEventArgs e)
