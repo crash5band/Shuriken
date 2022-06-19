@@ -63,7 +63,7 @@ namespace Shuriken
             catch(System.IO.IOException error)
             {
 #if DEBUG
-                System.Diagnostics.Debugger.Break();
+                System.Diagnostics.Debug.Fail(error.Message, error.StackTrace);                
 #else
                 MessageBox.Show(error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);                
 #endif
@@ -89,6 +89,17 @@ namespace Shuriken
         private void ViewClick(object sender, RoutedEventArgs e)
         {
         }
+        private void WidescreenSetClick(object sender, RoutedEventArgs e)
+        {
+            Shuriken.Views.UIEditor.ViewX = 1280;
+            Shuriken.Views.UIEditor.ViewY = 720;
+        }
+        private void FourThreeScreenSetClick(object sender, RoutedEventArgs e)
+        {
+            Shuriken.Views.UIEditor.ViewX = 640;
+            Shuriken.Views.UIEditor.ViewY = 480;
+        }
+
 
         private void ExitMenu_Click(object sender, RoutedEventArgs e)
         {

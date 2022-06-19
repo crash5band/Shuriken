@@ -13,6 +13,8 @@ namespace Shuriken.ViewModels
 {
     public class ScenesViewModel : ViewModelBase
     {
+        public float SizeX { get; set; } = 1280;
+        public float SizeY { get; set; } = 10;
         public float MinZoom => 0.25f;
         public float MaxZoom => 2.50f;
         public float Time { get; set; }
@@ -25,7 +27,7 @@ namespace Shuriken.ViewModels
             get => zoom;
             set { zoom = Math.Clamp(value, MinZoom, MaxZoom); }
         }
-
+        
         public RelayCommand TogglePlayingCmd { get; }
         public RelayCommand StopPlayingCmd { get; }
         public RelayCommand ReplayCmd { get; }
