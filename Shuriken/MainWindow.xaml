@@ -28,7 +28,10 @@
                 <MenuItem Header="Paste"/>
             </MenuItem>
             <MenuItem Header="View">
-                <MenuItem Header="IDK" Click="ViewClick"/>
+                <MenuItem Header="Aspect Ratio">
+                    <MenuItem Header="1280x720 (16:9)" Click="WidescreenSetClick"/>
+                    <MenuItem Header="640x480 (4:3)" Click="LetterboxScreenSetClick"/>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="Send help" Click="HelpClick"/>

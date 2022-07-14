@@ -59,7 +59,16 @@ namespace Shuriken
         }
         private void SaveMenu_Click(object sender, RoutedEventArgs e)
         {
-            vm.Save(null);
+            try { vm.Save(null); }
+            catch(System.IO.IOException error)
+            {
+#if DEBUG
+                System.Diagnostics.Debug.Fail(error.Message, error.StackTrace);                
+#else
+                MessageBox.Show(error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);                
+#endif
+            }
+
         }
 
         private void SaveAsMenu_Click(object sender, RoutedEventArgs e)
@@ -80,6 +89,15 @@ namespace Shuriken
         private void ViewClick(object sender, RoutedEventArgs e)
         {
         }
+        private void WidescreenSetClick(object sender, RoutedEventArgs e)
+        {
+            Shuriken.Views.UIEditor.ViewResolution = new Models.Vector2(1280, 720);
+        }
+        private void LetterboxScreenSetClick(object sender, RoutedEventArgs e)
+        {
+            Shuriken.Views.UIEditor.ViewResolution = new Models.Vector2(640, 480);
+        }
+
 
         private void ExitMenu_Click(object sender, RoutedEventArgs e)
         {
