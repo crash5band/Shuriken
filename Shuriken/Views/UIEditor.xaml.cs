@@ -25,8 +25,7 @@ namespace Shuriken.Views
     /// </summary>
     public partial class UIEditor : UserControl
     {
-        public static float ViewX = 1280;
-        public static float ViewY = 720;
+        public static Vec2 ViewResolution = new Vec2(1280, 720);
         Converters.ColorToBrushConverter colorConverter;
         Renderer renderer;
 
@@ -50,7 +49,7 @@ namespace Shuriken.Views
             GL.Enable(EnableCap.FramebufferSrgb);
 
             colorConverter = new Converters.ColorToBrushConverter();
-            renderer = new Renderer(1280, 960);
+            renderer = new Renderer(1280, 720);
         }
 
         private void glControlRender(TimeSpan obj)
@@ -63,8 +62,8 @@ namespace Shuriken.Views
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
             float deltaTime = obj.Milliseconds / 1000.0f * 60.0f;
-            sv.SizeX = ViewX;
-            sv.SizeY = ViewY;
+            sv.SizeX = ViewResolution.X;
+            sv.SizeY = ViewResolution.Y;
             sv.Tick(deltaTime);
             renderer.SetShader(renderer.shaderDictionary["basic"]);
 
@@ -101,6 +100,8 @@ namespace Shuriken.Views
                     if (!group.Visible)
                         continue;
 
+                    renderer.Width = (int)ViewResolution.X;
+                    renderer.Height = (int)ViewResolution.Y;
                     renderer.Start();
 
                     foreach (var lyr in group.Casts) 

@@ -91,13 +91,11 @@ namespace Shuriken
         }
         private void WidescreenSetClick(object sender, RoutedEventArgs e)
         {
-            Shuriken.Views.UIEditor.ViewX = 1280;
-            Shuriken.Views.UIEditor.ViewY = 720;
+            Shuriken.Views.UIEditor.ViewResolution = new Models.Vector2(1280, 720);
         }
-        private void FourThreeScreenSetClick(object sender, RoutedEventArgs e)
+        private void LetterboxScreenSetClick(object sender, RoutedEventArgs e)
         {
-            Shuriken.Views.UIEditor.ViewX = 640;
-            Shuriken.Views.UIEditor.ViewY = 480;
+            Shuriken.Views.UIEditor.ViewResolution = new Models.Vector2(640, 480);
         }
 
 
