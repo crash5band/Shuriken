@@ -97,6 +97,11 @@ namespace XNCPLib.XNCP
             // Header is always little endian
             writer.Endianness = Endianness.Little;
             {
+                if (endianPrev == Endianness.Big)
+                    Signature = Utilities.Make4CCLE("NYIF");
+                else
+                    Signature = Utilities.Make4CCLE("NXIF");
+
                 writer.WriteUInt32(Signature);
 
                 // Skipped: header size
