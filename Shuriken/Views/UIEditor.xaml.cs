@@ -18,12 +18,14 @@ namespace Shuriken.Views
 {
     using Vec2 = Models.Vector2;
     using Vec3 = Models.Vector3;
+    
 
     /// <summary>
     /// Interaction logic for UIEditor.xaml
     /// </summary>
     public partial class UIEditor : UserControl
     {
+        public static Vec2 ViewResolution = new Vec2(1280, 720);
         Converters.ColorToBrushConverter colorConverter;
         Renderer renderer;
 
@@ -55,12 +57,13 @@ namespace Shuriken.Views
             var sv = DataContext as ScenesViewModel;
             if (sv == null) 
                 return;
-
+            
             GL.ClearColor(0.2f, 0.2f, 0.2f, 1.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
             float deltaTime = obj.Milliseconds / 1000.0f * 60.0f;
-
+            sv.SizeX = ViewResolution.X;
+            sv.SizeY = ViewResolution.Y;
             sv.Tick(deltaTime);
             renderer.SetShader(renderer.shaderDictionary["basic"]);
 
@@ -97,6 +100,8 @@ namespace Shuriken.Views
                     if (!group.Visible)
                         continue;
 
+                    renderer.Width = (int)ViewResolution.X;
+                    renderer.Height = (int)ViewResolution.Y;
                     renderer.Start();
 
                     foreach (var lyr in group.Casts) 

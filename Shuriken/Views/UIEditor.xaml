@@ -159,14 +159,14 @@
                 
                 <!-- gl control -->
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                    <Border Width="1280" Height="720" RenderTransformOrigin="0.5, 0.5" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="2">
+                    <Border Width="{Binding SizeX}" Height="{Binding SizeY}" RenderTransformOrigin="0.5, 0.5" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="2">
                         <Border.LayoutTransform>
                             <ScaleTransform ScaleX="{Binding Zoom}" ScaleY="{Binding Zoom}"/>
                         </Border.LayoutTransform>
                         <Border.Effect>
                             <DropShadowEffect BlurRadius="12" ShadowDepth="3" Direction="-45" Color="#333" Opacity="0.5"/>
                         </Border.Effect>
-                        <gl:GLWpfControl Width="1280" Height="720" Name="glControl" Render="glControlRender"  RenderTransformOrigin="0.5, 0.5">
+                        <gl:GLWpfControl Width="{Binding SizeX}" Height="{Binding SizeY}" Name="glControl" Render="glControlRender"  RenderTransformOrigin="0.5, 0.5">
                         </gl:GLWpfControl>
                     </Border>
                 </ScrollViewer>
