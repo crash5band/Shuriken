@@ -9,7 +9,7 @@ using OpenTK.Mathematics;
 
 namespace Shuriken.Rendering
 {
-    internal class ShaderProgram
+    public class ShaderProgram
     {
         public int ID { get; private set; } = 0;
         public string Name { get; private set; }

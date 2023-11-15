@@ -17,23 +17,21 @@ namespace Shuriken.Models
         public Vector2 Dimensions { get; set; }
         public Texture Texture { get; set; }
 
-        // Used for saving to avoid corruption in un-edited values
-        public float OriginalTop { get; set; }
-        public float OriginalBottom { get; set; }
-        public float OriginalLeft { get; set; }
-        public float OriginalRight { get; set; }
-        public bool HasChanged { get; set; }
+        public int CropX { get; set; }
+        public int CropY { get; set; }
+        public int CropW { get; set; }
+        public int CropH { get; set; }
 
         public int X
         {
             get { return (int)Start.X; }
-            set { Start.X = value;CreateCrop(); HasChanged = true; }
+            set { Start.X = value; CreateCrop(); }
         }
 
         public int Y
         {
             get { return (int)Start.Y; }
-            set { Start.Y = value; CreateCrop(); HasChanged = true; }
+            set { Start.Y = value; CreateCrop(); }
         }
 
         public int Width
@@ -41,11 +39,10 @@ namespace Shuriken.Models
             get { return (int)Dimensions.X; }
             set
             {
-                if (X + value <= Texture.Width)
+                Dimensions.X = value;
+                if (X + Dimensions.X <= Texture.Width)
                 {
-                    Dimensions.X = value;
                     CreateCrop();
-                    HasChanged = true;
                 }
             }
         }
@@ -55,23 +52,28 @@ namespace Shuriken.Models
             get { return (int)Dimensions.Y; }
             set
             {
-                if (Y + value <= Texture.Height)
+                Dimensions.Y = value;
+                if (Y + Dimensions.Y <= Texture.Height)
                 {
-                    Dimensions.Y = value;
                     CreateCrop();
-                    HasChanged = true;
                 }
             }
         }
 
-        public CroppedBitmap Crop { get; set; }
+        public CroppedBitmap CropImg { get; set; }
 
         private void CreateCrop()
         {
             if (X + Width <= Texture.Width && Y + Height <= Texture.Height)
             {
+                CropX = X;
+                CropY = Y;
                 if (Width > 0 && Height > 0)
-                    Crop = new CroppedBitmap(Texture.ImageSource, new Int32Rect(X, Y, Width, Height));
+                {
+                    CropW = Width;
+                    CropH = Height;
+                    CropImg = new CroppedBitmap(Texture.ImageSource, new Int32Rect(CropX, CropY, CropW, CropH));
+                }
             }
         }
 
@@ -86,12 +88,6 @@ namespace Shuriken.Models
 
             Dimensions = new Vector2(MathF.Round((right - left) * tex.Width), MathF.Round((bottom - top) * tex.Height));
             CreateCrop();
-
-            OriginalTop = top;
-            OriginalLeft = left;
-            OriginalBottom = bottom;
-            OriginalRight = right;
-            HasChanged = false;
         }
 
         public Sprite()
@@ -100,7 +96,6 @@ namespace Shuriken.Models
             Dimensions = new Vector2();
 
             Texture = new Texture();
-            HasChanged = false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

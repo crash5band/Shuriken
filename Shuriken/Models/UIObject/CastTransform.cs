@@ -1,6 +1,6 @@
 ﻿namespace Shuriken.Models
 {
-    internal class CastTransform
+    public class CastTransform
     {
         public Vector2 Position { get; set; }
         public float Rotation { get; set; }

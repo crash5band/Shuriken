@@ -14,7 +14,7 @@ using Vector4 = System.Numerics.Vector4;
 
 namespace Shuriken.Rendering
 {
-    class Renderer
+    public class Renderer
     {
         public readonly string shadersDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Shaders");
 
@@ -32,6 +32,7 @@ namespace Shuriken.Rendering
         public bool BatchStarted { get; private set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public bool Initialized { get; private set; }
 
         public bool Additive
         {
@@ -71,6 +72,15 @@ namespace Shuriken.Rendering
 
         public Renderer(int width, int height)
         {
+            Width = width;
+            Height = height;
+        }
+
+        public void Initialize()
+        {
+            if (Initialized)
+                return;
+
             shaderDictionary = new Dictionary<string, ShaderProgram>();
 
             ShaderProgram basicShader = new ShaderProgram("basic", Path.Combine(shadersDir, "basic.vert"), Path.Combine(shadersDir, "basic.frag"));
@@ -79,11 +89,14 @@ namespace Shuriken.Rendering
             vertexBuffer = new VertexBuffer();
             quads = new List<Quad>(vertexBuffer.MaxQuads);
 
-            Width = width;
-            Height = height;
+            Initialized = true;
         }
 
-        ~Renderer()
+        /// <summary>
+        /// Disposes of the allocated vertex buffer.
+        /// Only call this when the Renderer is no longer needed.
+        /// </summary>
+        public void CleanUp()
         {
             vertexBuffer.Dispose();
         }

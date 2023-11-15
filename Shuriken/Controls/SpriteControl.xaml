@@ -47,8 +47,8 @@
                 </Grid>
 
                 <Separator Grid.Row="1"/>
-                <Image Source="{Binding Sprite.Crop}" Grid.Row="2"
-                           MaxWidth="{Binding Sprite.Width}" MaxHeight="{Binding Sprite.Height}"
+                <Image Source="{Binding Sprite.CropImg}" Grid.Row="2"
+                           MaxWidth="{Binding Sprite.CropW}" MaxHeight="{Binding Sprite.CropH}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
         </ScrollViewer>

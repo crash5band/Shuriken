@@ -74,7 +74,7 @@
                                                     Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.ChangeMappingSpriteCmd}" CommandParameter="{Binding}">
                                                 <Button.Content>
                                                     <Image Name="SpriteImg" Tag="{Binding Sprite, Converter={StaticResource SpriteIDConverter}}"
-                                                           Source="{Binding ElementName=SpriteImg, Path=Tag.Crop}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1"/>
+                                                           Source="{Binding ElementName=SpriteImg, Path=Tag.CropImg}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1"/>
                                                 </Button.Content>
                                             </Button>
                                         </Border>

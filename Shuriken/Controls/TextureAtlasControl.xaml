@@ -13,7 +13,7 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <ScrollViewer HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
             <Canvas Grid.Row="0" x:Name="SelectionBorder" MouseDown="GridMouseDown" MouseUp="GridMouseUp" MouseMove="GridMouseMove"
                     Width="{Binding ElementName=TexImage, Path=ActualWidth}" Height="{Binding ElementName=TexImage, Path=ActualHeight}">
                 <Canvas.Background>
@@ -33,7 +33,7 @@
                     <Image x:Name="TexImage" Source="{Binding Texture.ImageSource}" HorizontalAlignment="Stretch"/>
                 </Border>
                 <Rectangle x:Name="SelectionRectangle" Visibility="Visible" Stroke="#333" StrokeThickness="1" StrokeDashArray="2, 1"
-                               Canvas.Left="{Binding Sprite.X, Mode=TwoWay}" Canvas.Top="{Binding Sprite.Y, Mode=TwoWay}"
+                               Canvas.Left="{Binding Sprite.CropX, Mode=TwoWay}" Canvas.Top="{Binding Sprite.Start.Y, Mode=TwoWay}"
                            Width="{Binding Sprite.Width, Mode=TwoWay}" Height="{Binding Sprite.Height, Mode=TwoWay}"/>
             </Canvas>
         </ScrollViewer>
